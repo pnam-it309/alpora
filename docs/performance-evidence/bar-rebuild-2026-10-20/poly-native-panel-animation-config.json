@@ -1,0 +1,303 @@
+[[
+{
+    "name": "specialWorkspaceOut",
+    "overridden": false,
+    "bezier": "",
+    "enabled": true,
+    "speed": 0.00,
+    "style": ""
+},
+{
+    "name": "workspacesIn",
+    "overridden": false,
+    "bezier": "",
+    "enabled": true,
+    "speed": 0.00,
+    "style": ""
+},
+{
+    "name": "layersIn",
+    "overridden": true,
+    "bezier": "polyPanel",
+    "enabled": true,
+    "speed": 3.40,
+    "style": "fade"
+},
+{
+    "name": "fadeDpms",
+    "overridden": false,
+    "bezier": "",
+    "enabled": true,
+    "speed": 0.00,
+    "style": ""
+},
+{
+    "name": "windowsMove",
+    "overridden": false,
+    "bezier": "",
+    "enabled": true,
+    "speed": 0.00,
+    "style": ""
+},
+{
+    "name": "fadeGlow",
+    "overridden": false,
+    "bezier": "",
+    "enabled": true,
+    "speed": 0.00,
+    "style": ""
+},
+{
+    "name": "zoomFactor",
+    "overridden": false,
+    "bezier": "",
+    "enabled": true,
+    "speed": 0.00,
+    "style": ""
+},
+{
+    "name": "shadowangle",
+    "overridden": true,
+    "bezier": "default",
+    "enabled": false,
+    "speed": 1.00,
+    "style": ""
+},
+{
+    "name": "specialWorkspace",
+    "overridden": false,
+    "bezier": "",
+    "enabled": true,
+    "speed": 0.00,
+    "style": ""
+},
+{
+    "name": "glowangle",
+    "overridden": true,
+    "bezier": "default",
+    "enabled": false,
+    "speed": 1.00,
+    "style": ""
+},
+{
+    "name": "fadeSwitch",
+    "overridden": false,
+    "bezier": "",
+    "enabled": true,
+    "speed": 0.00,
+    "style": ""
+},
+{
+    "name": "borderangle",
+    "overridden": true,
+    "bezier": "default",
+    "enabled": false,
+    "speed": 1.00,
+    "style": ""
+},
+{
+    "name": "fadeOut",
+    "overridden": false,
+    "bezier": "",
+    "enabled": true,
+    "speed": 0.00,
+    "style": ""
+},
+{
+    "name": "fade",
+    "overridden": false,
+    "bezier": "",
+    "enabled": true,
+    "speed": 0.00,
+    "style": ""
+},
+{
+    "name": "border",
+    "overridden": false,
+    "bezier": "",
+    "enabled": true,
+    "speed": 0.00,
+    "style": ""
+},
+{
+    "name": "specialWorkspaceIn",
+    "overridden": false,
+    "bezier": "",
+    "enabled": true,
+    "speed": 0.00,
+    "style": ""
+},
+{
+    "name": "workspaces",
+    "overridden": false,
+    "bezier": "",
+    "enabled": true,
+    "speed": 0.00,
+    "style": ""
+},
+{
+    "name": "global",
+    "overridden": true,
+    "bezier": "default",
+    "enabled": true,
+    "speed": 8.00,
+    "style": ""
+},
+{
+    "name": "__internal_fadeCTM",
+    "overridden": true,
+    "bezier": "linear",
+    "enabled": true,
+    "speed": 5.00,
+    "style": ""
+},
+{
+    "name": "workspacesOut",
+    "overridden": false,
+    "bezier": "",
+    "enabled": true,
+    "speed": 0.00,
+    "style": ""
+},
+{
+    "name": "layersOut",
+    "overridden": true,
+    "bezier": "polyPanel",
+    "enabled": true,
+    "speed": 2.00,
+    "style": "fade"
+},
+{
+    "name": "windowsIn",
+    "overridden": false,
+    "bezier": "",
+    "enabled": true,
+    "speed": 0.00,
+    "style": ""
+},
+{
+    "name": "windowsOut",
+    "overridden": false,
+    "bezier": "",
+    "enabled": true,
+    "speed": 0.00,
+    "style": ""
+},
+{
+    "name": "layers",
+    "overridden": false,
+    "bezier": "",
+    "enabled": true,
+    "speed": 0.00,
+    "style": ""
+},
+{
+    "name": "fadeIn",
+    "overridden": false,
+    "bezier": "",
+    "enabled": true,
+    "speed": 0.00,
+    "style": ""
+},
+{
+    "name": "fadePopups",
+    "overridden": false,
+    "bezier": "",
+    "enabled": true,
+    "speed": 0.00,
+    "style": ""
+},
+{
+    "name": "fadeShadow",
+    "overridden": false,
+    "bezier": "",
+    "enabled": true,
+    "speed": 0.00,
+    "style": ""
+},
+{
+    "name": "fadeLayers",
+    "overridden": false,
+    "bezier": "",
+    "enabled": true,
+    "speed": 0.00,
+    "style": ""
+},
+{
+    "name": "windows",
+    "overridden": false,
+    "bezier": "",
+    "enabled": true,
+    "speed": 0.00,
+    "style": ""
+},
+{
+    "name": "fadeLayersIn",
+    "overridden": true,
+    "bezier": "polyPanel",
+    "enabled": true,
+    "speed": 3.40,
+    "style": ""
+},
+{
+    "name": "fadeLayersOut",
+    "overridden": true,
+    "bezier": "polyPanel",
+    "enabled": true,
+    "speed": 2.00,
+    "style": ""
+},
+{
+    "name": "fadeDim",
+    "overridden": false,
+    "bezier": "",
+    "enabled": true,
+    "speed": 0.00,
+    "style": ""
+},
+{
+    "name": "fadePopupsIn",
+    "overridden": false,
+    "bezier": "",
+    "enabled": true,
+    "speed": 0.00,
+    "style": ""
+},
+{
+    "name": "monitorAdded",
+    "overridden": false,
+    "bezier": "",
+    "enabled": true,
+    "speed": 0.00,
+    "style": ""
+},
+{
+    "name": "fadePopupsOut",
+    "overridden": false,
+    "bezier": "",
+    "enabled": true,
+    "speed": 0.00,
+    "style": ""
+}],
+[
+{
+    "name": "polyPanel",
+    "X0": 0.20,
+    "Y0": 0.00,
+    "X1": 0.20,
+    "Y1": 1.00
+},
+{
+    "name": "linear",
+    "X0": 0.00,
+    "Y0": 0.00,
+    "X1": 1.00,
+    "Y1": 1.00
+},
+{
+    "name": "default",
+    "X0": 0.00,
+    "Y0": 0.75,
+    "X1": 0.15,
+    "Y1": 1.00
+}]]

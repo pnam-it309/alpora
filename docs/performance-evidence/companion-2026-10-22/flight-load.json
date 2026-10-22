@@ -1,0 +1,124 @@
+{
+  "before": {
+    "visible": true,
+    "allowed": true,
+    "ticking": true,
+    "activity": "fly",
+    "label": "\u041b\u0435\u0442\u0430\u0435\u0442",
+    "actions": 40,
+    "age": 2.441999999999997,
+    "phase": 189.29899999999296,
+    "position": 0.582706966737751,
+    "direction": 1,
+    "rail": {
+      "left": 254,
+      "right": 726,
+      "bottom": 50
+    },
+    "travel": {
+      "mode": "fly",
+      "trips": 6,
+      "age": 5.4780000000000095,
+      "x": 0.5809207033294264,
+      "y": 0.29137675098969207
+    },
+    "clickThrough": true,
+    "flying": true,
+    "bounds": {
+      "x": 1073,
+      "y": 297,
+      "width": 70,
+      "height": 54
+    },
+    "fits": true,
+    "held": false,
+    "music": false,
+    "charging": false,
+    "fullscreen": false,
+    "reduced": false,
+    "theme": "rose-sunset"
+  },
+  "after": {
+    "visible": true,
+    "allowed": true,
+    "ticking": true,
+    "activity": "greet",
+    "label": "\u041f\u0440\u0438\u0432\u0435\u0442\u0441\u0442\u0432\u0443\u0435\u0442 \u0442\u0435\u0431\u044f",
+    "actions": 0,
+    "age": 2.000000000000001,
+    "phase": 2.000000000000001,
+    "position": 0.32,
+    "direction": 1,
+    "rail": {
+      "left": 254,
+      "right": 726,
+      "bottom": 50
+    },
+    "travel": {
+      "mode": "rail",
+      "trips": 0,
+      "age": 2.000000000000001,
+      "x": 0.20427480916030533,
+      "y": 0.0068762278978389
+    },
+    "clickThrough": false,
+    "flying": false,
+    "bounds": {
+      "x": 383,
+      "y": 7,
+      "width": 70,
+      "height": 54
+    },
+    "fits": true,
+    "held": false,
+    "music": false,
+    "charging": false,
+    "fullscreen": false,
+    "reduced": false,
+    "theme": "rose-sunset"
+  },
+  "load": {
+    "seconds": 4.03,
+    "gpuBusySamples": 20,
+    "gpuBusyMean": 30.2,
+    "gpuBusyMedian": 0.0,
+    "processes": [
+      {
+        "pid": 6336,
+        "name": "Hyprland",
+        "rssMiB": 183.4,
+        "cpuOneCorePercent": 11.66,
+        "gpuEnginePercent": {
+          "gfx": 20.94,
+          "compute": 0.01
+        }
+      },
+      {
+        "pid": 6455,
+        "name": "quickshell",
+        "rssMiB": 690.1,
+        "cpuOneCorePercent": 69.97,
+        "gpuEnginePercent": {
+          "gfx": 15.9,
+          "compute": 0.16
+        }
+      },
+      {
+        "pid": 355661,
+        "name": "quickshell",
+        "rssMiB": 0.0,
+        "cpuOneCorePercent": 0.0,
+        "gpuEnginePercent": {}
+      },
+      {
+        "pid": 355663,
+        "name": "quickshell",
+        "rssMiB": 0.0,
+        "cpuOneCorePercent": 0.0,
+        "gpuEnginePercent": {}
+      }
+    ]
+  },
+  "validForSteadyStateComparison": false,
+  "note": "A QML reload occurred during this capture (fly to rail in four seconds). It is retained as an excluded exploratory capture, not a flight performance baseline."
+}

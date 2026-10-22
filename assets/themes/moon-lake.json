@@ -1,0 +1,24 @@
+{
+  "id": "moon-lake",
+  "label": "Лунное озеро",
+  "wallpaper": "wallpapers/moon-lake.png",
+  "palette": {
+    "background": "#172239",
+    "surface": "#293650",
+    "accent": "#b2a5f2",
+    "secondary": "#a9caf6",
+    "cool": "#7e9bcb",
+    "text": "#edf0f6",
+    "muted": "#bdc5d3",
+    "border": "#566273"
+  },
+  "swatches": [
+    "#172239",
+    "#293650",
+    "#7e9bcb",
+    "#b2a5f2",
+    "#a9caf6"
+  ],
+  "iconTheme": "Poly-MoonLake",
+  "lockClockFrame": "lockscreen/moon-lake-clock.png"
+}

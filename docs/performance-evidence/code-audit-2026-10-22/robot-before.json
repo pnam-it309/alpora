@@ -1,0 +1,194 @@
+[
+  {
+    "enabled": true,
+    "before": {
+      "widgets": {
+        "clock": false,
+        "weather": false,
+        "music": false
+      },
+      "workspace": 1,
+      "popup": ""
+    },
+    "after": {
+      "widgets": {
+        "clock": false,
+        "weather": false,
+        "music": false
+      },
+      "workspace": 1,
+      "popup": ""
+    },
+    "measurement": {
+      "seconds": 12.05,
+      "gpuBusySamples": 60,
+      "gpuBusyMean": 25.1,
+      "gpuBusyMedian": 0.0,
+      "processes": [
+        {
+          "pid": 6336,
+          "name": "Hyprland",
+          "rssMiB": 188.4,
+          "cpuOneCorePercent": 10.38,
+          "gpuEnginePercent": {
+            "gfx": 22.53,
+            "compute": 0.0
+          }
+        },
+        {
+          "pid": 6455,
+          "name": "quickshell",
+          "rssMiB": 667.1,
+          "cpuOneCorePercent": 33.95,
+          "gpuEnginePercent": {
+            "gfx": 17.85,
+            "compute": 0.0
+          }
+        },
+        {
+          "pid": 355661,
+          "name": "quickshell",
+          "rssMiB": 0.0,
+          "cpuOneCorePercent": 0.0,
+          "gpuEnginePercent": {}
+        },
+        {
+          "pid": 355663,
+          "name": "quickshell",
+          "rssMiB": 0.0,
+          "cpuOneCorePercent": 0.0,
+          "gpuEnginePercent": {}
+        }
+      ]
+    },
+    "validContext": true
+  },
+  {
+    "enabled": false,
+    "before": {
+      "widgets": {
+        "clock": false,
+        "weather": false,
+        "music": false
+      },
+      "workspace": 1,
+      "popup": ""
+    },
+    "after": {
+      "widgets": {
+        "clock": false,
+        "weather": false,
+        "music": false
+      },
+      "workspace": 1,
+      "popup": ""
+    },
+    "measurement": {
+      "seconds": 12.06,
+      "gpuBusySamples": 60,
+      "gpuBusyMean": 11.2,
+      "gpuBusyMedian": 0.0,
+      "processes": [
+        {
+          "pid": 6336,
+          "name": "Hyprland",
+          "rssMiB": 188.4,
+          "cpuOneCorePercent": 4.06,
+          "gpuEnginePercent": {
+            "gfx": 7.64,
+            "compute": 0.0
+          }
+        },
+        {
+          "pid": 6455,
+          "name": "quickshell",
+          "rssMiB": 661.8,
+          "cpuOneCorePercent": 0.0,
+          "gpuEnginePercent": {
+            "gfx": 0.01,
+            "compute": 0.0
+          }
+        },
+        {
+          "pid": 355661,
+          "name": "quickshell",
+          "rssMiB": 0.0,
+          "cpuOneCorePercent": 0.0,
+          "gpuEnginePercent": {}
+        },
+        {
+          "pid": 355663,
+          "name": "quickshell",
+          "rssMiB": 0.0,
+          "cpuOneCorePercent": 0.0,
+          "gpuEnginePercent": {}
+        }
+      ]
+    },
+    "validContext": true
+  },
+  {
+    "enabled": true,
+    "before": {
+      "widgets": {
+        "clock": false,
+        "weather": false,
+        "music": false
+      },
+      "workspace": 1,
+      "popup": ""
+    },
+    "after": {
+      "widgets": {
+        "clock": false,
+        "weather": false,
+        "music": false
+      },
+      "workspace": 1,
+      "popup": ""
+    },
+    "measurement": {
+      "seconds": 12.05,
+      "gpuBusySamples": 60,
+      "gpuBusyMean": 27.4,
+      "gpuBusyMedian": 0.0,
+      "processes": [
+        {
+          "pid": 6336,
+          "name": "Hyprland",
+          "rssMiB": 188.4,
+          "cpuOneCorePercent": 8.88,
+          "gpuEnginePercent": {
+            "gfx": 21.7,
+            "compute": 0.0
+          }
+        },
+        {
+          "pid": 6455,
+          "name": "quickshell",
+          "rssMiB": 673.3,
+          "cpuOneCorePercent": 29.96,
+          "gpuEnginePercent": {
+            "gfx": 15.47,
+            "compute": 0.0
+          }
+        },
+        {
+          "pid": 355661,
+          "name": "quickshell",
+          "rssMiB": 0.0,
+          "cpuOneCorePercent": 0.0,
+          "gpuEnginePercent": {}
+        },
+        {
+          "pid": 355663,
+          "name": "quickshell",
+          "rssMiB": 0.0,
+          "cpuOneCorePercent": 0.0,
+          "gpuEnginePercent": {}
+        }
+      ]
+    },
+    "validContext": true
+  }
+]

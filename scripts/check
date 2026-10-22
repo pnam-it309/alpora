@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+set -euo pipefail
+project_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$project_dir"
+qml_linter="${QMLLINT:-/usr/lib/qt6/bin/qmllint}"
+for dependency in python3 node quickshell; do
+    if ! command -v "$dependency" >/dev/null; then
+        echo "Missing development dependency: $dependency" >&2
+        exit 1
+    fi
+done
+if [[ ! -x "$qml_linter" ]]; then
+    echo "Missing QML linter: $qml_linter" >&2
+    exit 1
+fi
+python3 -m unittest discover -s tests -v
+if ! quickshell --version >/dev/null; then
+    echo 'Cannot validate Quickshell imports until the installed Qt/Quickshell versions match.' >&2
+    exit 1
+fi
+qml_linter="${QMLLINT:-/usr/lib/qt6/bin/qmllint}"
+# The installed GlobalShortcut metadata names an internal PostReloadHook type
+# that qmllint cannot resolve. Keep this upstream metadata exception on the
+# tiny native shortcut wrapper only; all other QML keeps strict import checks.
+"$qml_linter" --max-warnings 0 --import disable -i shell/qmldir -i shell/theme/qmldir -I /usr/lib/qt6/qml -I shell shell/NativeShortcut.qml
+qml_sources=()
+for qml_source in shell/*.qml shell/theme/*.qml; do
+    if [[ "$qml_source" != shell/NativeShortcut.qml ]]; then
+        qml_sources+=("$qml_source")
+    fi
+done
+"$qml_linter" --max-warnings 0 -i shell/qmldir -i shell/theme/qmldir -I /usr/lib/qt6/qml -I shell "${qml_sources[@]}"

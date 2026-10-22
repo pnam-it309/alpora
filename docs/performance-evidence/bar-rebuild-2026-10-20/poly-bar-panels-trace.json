@@ -1,0 +1,602 @@
+{
+  "calendar": {
+    "animation": "compositor",
+    "frames": 0,
+    "p95Ms": null,
+    "maxMs": 0,
+    "trace": [
+      {
+        "ms": 100,
+        "progress": 1,
+        "width": 700,
+        "height": 550,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 102,
+        "progress": 1,
+        "width": 700,
+        "height": 550,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 134,
+        "progress": 1,
+        "width": 700,
+        "height": 550,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 170,
+        "progress": 1,
+        "width": 700,
+        "height": 550,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 200,
+        "progress": 1,
+        "width": 700,
+        "height": 550,
+        "x": 0,
+        "y": 0
+      }
+    ]
+  },
+  "notifications": {
+    "animation": "compositor",
+    "frames": 0,
+    "p95Ms": null,
+    "maxMs": 0,
+    "trace": [
+      {
+        "ms": 101,
+        "progress": 1,
+        "width": 420,
+        "height": 580,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 105,
+        "progress": 1,
+        "width": 420,
+        "height": 580,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 123,
+        "progress": 1,
+        "width": 420,
+        "height": 580,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 129,
+        "progress": 1,
+        "width": 420,
+        "height": 580,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 155,
+        "progress": 1,
+        "width": 420,
+        "height": 580,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 161,
+        "progress": 1,
+        "width": 420,
+        "height": 580,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 188,
+        "progress": 1,
+        "width": 420,
+        "height": 580,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 193,
+        "progress": 1,
+        "width": 420,
+        "height": 580,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 302,
+        "progress": 1,
+        "width": 420,
+        "height": 580,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 322,
+        "progress": 1,
+        "width": 420,
+        "height": 580,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 327,
+        "progress": 1,
+        "width": 420,
+        "height": 580,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 356,
+        "progress": 1,
+        "width": 420,
+        "height": 580,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 388,
+        "progress": 1,
+        "width": 420,
+        "height": 580,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 423,
+        "progress": 1,
+        "width": 420,
+        "height": 580,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 426,
+        "progress": 1,
+        "width": 420,
+        "height": 580,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 455,
+        "progress": 1,
+        "width": 420,
+        "height": 580,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 460,
+        "progress": 1,
+        "width": 420,
+        "height": 580,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 487,
+        "progress": 1,
+        "width": 420,
+        "height": 580,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 493,
+        "progress": 1,
+        "width": 420,
+        "height": 580,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 522,
+        "progress": 1,
+        "width": 420,
+        "height": 580,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 527,
+        "progress": 1,
+        "width": 420,
+        "height": 580,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 555,
+        "progress": 1,
+        "width": 420,
+        "height": 580,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 560,
+        "progress": 1,
+        "width": 420,
+        "height": 580,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 588,
+        "progress": 1,
+        "width": 420,
+        "height": 580,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 594,
+        "progress": 1,
+        "width": 420,
+        "height": 580,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 623,
+        "progress": 1,
+        "width": 420,
+        "height": 580,
+        "x": 0,
+        "y": 0
+      }
+    ]
+  },
+  "quick-settings": {
+    "animation": "compositor",
+    "frames": 0,
+    "p95Ms": null,
+    "maxMs": 0,
+    "trace": [
+      {
+        "ms": 98,
+        "progress": 1,
+        "width": 390,
+        "height": 596,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 99,
+        "progress": 1,
+        "width": 390,
+        "height": 596,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 122,
+        "progress": 1,
+        "width": 390,
+        "height": 596,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 154,
+        "progress": 1,
+        "width": 390,
+        "height": 596,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 158,
+        "progress": 1,
+        "width": 390,
+        "height": 596,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 188,
+        "progress": 1,
+        "width": 390,
+        "height": 596,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 191,
+        "progress": 1,
+        "width": 390,
+        "height": 596,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 382,
+        "progress": 1,
+        "width": 390,
+        "height": 596,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 391,
+        "progress": 1,
+        "width": 390,
+        "height": 596,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 421,
+        "progress": 1,
+        "width": 390,
+        "height": 596,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 424,
+        "progress": 1,
+        "width": 390,
+        "height": 596,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 453,
+        "progress": 1,
+        "width": 390,
+        "height": 596,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 458,
+        "progress": 1,
+        "width": 390,
+        "height": 596,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 487,
+        "progress": 1,
+        "width": 390,
+        "height": 596,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 491,
+        "progress": 1,
+        "width": 390,
+        "height": 596,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 520,
+        "progress": 1,
+        "width": 390,
+        "height": 596,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 524,
+        "progress": 1,
+        "width": 390,
+        "height": 596,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 553,
+        "progress": 1,
+        "width": 390,
+        "height": 596,
+        "x": 0,
+        "y": 0
+      }
+    ]
+  },
+  "launcher": {
+    "animation": "render-thread",
+    "frames": 18,
+    "p95Ms": 27,
+    "maxMs": 31,
+    "trace": [
+      {
+        "ms": 42,
+        "progress": 0.0033333333333333335,
+        "width": 500,
+        "height": 639,
+        "x": 0,
+        "y": -9.900332962962965
+      },
+      {
+        "ms": 52,
+        "progress": 0.03666666666666667,
+        "width": 500,
+        "height": 639,
+        "x": 0,
+        "y": -8.939840370370371
+      },
+      {
+        "ms": 79,
+        "progress": 0.12666666666666668,
+        "width": 500,
+        "height": 639,
+        "x": 0,
+        "y": -6.661010370370369
+      },
+      {
+        "ms": 98,
+        "progress": 0.19,
+        "width": 500,
+        "height": 639,
+        "x": 0,
+        "y": -5.3144100000000005
+      },
+      {
+        "ms": 129,
+        "progress": 0.29333333333333333,
+        "width": 500,
+        "height": 639,
+        "x": 0,
+        "y": -3.5289362962962967
+      },
+      {
+        "ms": 141,
+        "progress": 0.3333333333333333,
+        "width": 500,
+        "height": 639,
+        "x": 0,
+        "y": -2.9629629629629637
+      },
+      {
+        "ms": 163,
+        "progress": 0.4066666666666667,
+        "width": 500,
+        "height": 639,
+        "x": 0,
+        "y": -2.0887970370370357
+      },
+      {
+        "ms": 169,
+        "progress": 0.4266666666666667,
+        "width": 500,
+        "height": 639,
+        "x": 0,
+        "y": -1.8846103703703698
+      },
+      {
+        "ms": 195,
+        "progress": 0.5133333333333333,
+        "width": 500,
+        "height": 639,
+        "x": 0,
+        "y": -1.152642962962963
+      },
+      {
+        "ms": 211,
+        "progress": 0.57,
+        "width": 500,
+        "height": 639,
+        "x": 0,
+        "y": -0.7950699999999999
+      },
+      {
+        "ms": 230,
+        "progress": 0.6266666666666667,
+        "width": 500,
+        "height": 639,
+        "x": 0,
+        "y": -0.520343703703704
+      },
+      {
+        "ms": 236,
+        "progress": 0.65,
+        "width": 500,
+        "height": 639,
+        "x": 0,
+        "y": -0.42874999999999996
+      },
+      {
+        "ms": 262,
+        "progress": 0.7366666666666667,
+        "width": 500,
+        "height": 639,
+        "x": 0,
+        "y": -0.18260703703703696
+      },
+      {
+        "ms": 269,
+        "progress": 0.76,
+        "width": 500,
+        "height": 639,
+        "x": 0,
+        "y": -0.13823999999999947
+      },
+      {
+        "ms": 295,
+        "progress": 0.8466666666666667,
+        "width": 500,
+        "height": 639,
+        "x": 0,
+        "y": -0.03605037037037073
+      },
+      {
+        "ms": 302,
+        "progress": 0.8733333333333333,
+        "width": 500,
+        "height": 639,
+        "x": 0,
+        "y": -0.020322962962963098
+      },
+      {
+        "ms": 329,
+        "progress": 0.96,
+        "width": 500,
+        "height": 639,
+        "x": 0,
+        "y": -0.0006399999999995298
+      },
+      {
+        "ms": 335,
+        "progress": 0.98,
+        "width": 500,
+        "height": 639,
+        "x": 0,
+        "y": -8.000000000008001e-05
+      },
+      {
+        "ms": 363,
+        "progress": 1,
+        "width": 500,
+        "height": 639,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 369,
+        "progress": 1,
+        "width": 500,
+        "height": 639,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 369,
+        "progress": 1,
+        "width": 500,
+        "height": 639,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "ms": 397,
+        "progress": 1,
+        "width": 500,
+        "height": 639,
+        "x": 0,
+        "y": 0
+      }
+    ]
+  }
+}

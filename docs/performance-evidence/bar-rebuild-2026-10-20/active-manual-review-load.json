@@ -1,0 +1,28 @@
+{
+  "seconds": 4.03,
+  "gpuBusySamples": 20,
+  "gpuBusyMean": 79.4,
+  "gpuBusyMedian": 100.0,
+  "processes": [
+    {
+      "pid": 4158,
+      "name": "Hyprland",
+      "rssMiB": 197.7,
+      "cpuOneCorePercent": 17.12,
+      "gpuEnginePercent": {
+        "gfx": 54.27,
+        "compute": 0.52
+      }
+    },
+    {
+      "pid": 4343,
+      "name": "quickshell",
+      "rssMiB": 564.0,
+      "cpuOneCorePercent": 28.77,
+      "gpuEnginePercent": {
+        "gfx": 28.85,
+        "compute": 0.03
+      }
+    }
+  ]
+}

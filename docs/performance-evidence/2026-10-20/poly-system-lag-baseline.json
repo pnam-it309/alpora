@@ -1,0 +1,48 @@
+{
+  "seconds": 5.04,
+  "gpuBusySamples": 25,
+  "gpuBusyMean": 18.1,
+  "gpuBusyMedian": 0,
+  "processes": [
+    {
+      "pid": 4411,
+      "name": "Hyprland",
+      "rssMiB": 179.5,
+      "cpuOneCorePercent": 4.17,
+      "gpuEnginePercent": {
+        "gfx": 6.48,
+        "compute": 0.0
+      }
+    },
+    {
+      "pid": 6690,
+      "name": "kitty",
+      "rssMiB": 113.0,
+      "cpuOneCorePercent": 2.78,
+      "gpuEnginePercent": {
+        "gfx": 9.79,
+        "compute": 0.0
+      }
+    },
+    {
+      "pid": 82877,
+      "name": "quickshell",
+      "rssMiB": 677.2,
+      "cpuOneCorePercent": 0.79,
+      "gpuEnginePercent": {
+        "gfx": 0.0,
+        "compute": 0.0
+      }
+    },
+    {
+      "pid": 839806,
+      "name": "quickshell",
+      "rssMiB": 408.0,
+      "cpuOneCorePercent": 0.6,
+      "gpuEnginePercent": {
+        "gfx": 0.0,
+        "compute": 0.0
+      }
+    }
+  ]
+}

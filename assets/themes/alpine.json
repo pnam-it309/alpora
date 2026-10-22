@@ -1,0 +1,48 @@
+{
+  "id": "alpine",
+  "label": "Alpine",
+  "wallpaper": "wallpapers/alpine-dawn.png",
+  "lockClockFrame": "lockscreen/alpine-clock.png",
+  "iconTheme": "Poly-Alpine",
+  "iconFallbacks": [
+    "Papirus-Dark",
+    "Adwaita",
+    "hicolor"
+  ],
+  "cursorTheme": "Bibata-Modern-Ice",
+  "cursorFallback": "Adwaita",
+  "cursorSize": 24,
+  "fonts": {
+    "interface": "Noto Sans 11",
+    "monospace": "Noto Sans Mono 11"
+  },
+  "colors": {
+    "folderBack": "#66795b",
+    "folderTop": "#b9c9a7",
+    "folderBase": "#8fa47b",
+    "folderDark": "#566b4e",
+    "folderLight": "#ccdab9",
+    "ink": "#34462f",
+    "surface": "#293230",
+    "text": "#edf0e5",
+    "amber": "#c09d76"
+  },
+  "collectionLabel": "Альпийский рассвет",
+  "themePalette": {
+    "background": "#202829",
+    "surface": "#303a36",
+    "accent": "#b8cba1",
+    "secondary": "#f1b791",
+    "cool": "#a4c5c5",
+    "text": "#edf0e5",
+    "muted": "#b6c0b5",
+    "border": "#59655c"
+  },
+  "swatches": [
+    "#202829",
+    "#303a36",
+    "#a4c5c5",
+    "#b8cba1",
+    "#f1b791"
+  ]
+}

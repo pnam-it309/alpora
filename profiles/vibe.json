@@ -1,0 +1,12 @@
+{
+  "label": "Vibe",
+  "description": "Warmer accents and gentle transitions for downtime.",
+  "palette": {
+    "background": "#251f32",
+    "surface": "#3c304d",
+    "text": "#f5eff9",
+    "muted": "#c7b6d9",
+    "accent": "#e9b6a0"
+  },
+  "motionMs": 170
+}

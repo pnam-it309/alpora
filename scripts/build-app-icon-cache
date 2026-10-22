@@ -1,0 +1,64 @@
+#!/usr/bin/env python3
+"""Rasterize installed theme icons off the UI thread; never alter their sources."""
+import hashlib
+import json
+import os
+from pathlib import Path
+import sys
+import tempfile
+
+
+def cache_key(theme, source):
+    source = Path(source).resolve()
+    info = source.stat()
+    value = f'{theme}\0{source}\0{info.st_mtime_ns}\0{info.st_size}\0size=96'
+    return hashlib.sha256(value.encode()).hexdigest() + '.png'
+
+
+def build(theme_name, names):
+    import gi
+    gi.require_version('Gtk', '3.0')
+    from gi.repository import Gtk, GdkPixbuf
+    theme = Gtk.IconTheme.new()
+    theme.set_custom_theme(theme_name)
+    destination = Path(os.environ.get('XDG_CACHE_HOME', Path.home() / '.cache')) / 'poly-shell/app-icons'
+    destination.mkdir(parents=True, exist_ok=True)
+    result = {}
+    for name in dict.fromkeys(names):
+        temporary = None
+        try:
+            if not name:
+                continue
+            if name.startswith('/'):
+                source = Path(name)
+            else:
+                icon = theme.lookup_icon(name, 96, Gtk.IconLookupFlags.FORCE_SIZE)
+                if not icon:
+                    continue
+                source = Path(icon.get_filename())
+            if source.suffix.lower() not in ('.svg', '.svgz'):
+                result[name] = source.resolve().as_uri()
+                continue
+            target = destination / cache_key(theme_name, source)
+            if not target.exists():
+                image = GdkPixbuf.Pixbuf.new_from_file_at_scale(str(source), 96, 96, True)
+                with tempfile.NamedTemporaryFile(dir=destination, suffix='.png', delete=False) as stream:
+                    temporary = Path(stream.name)
+                image.savev(str(temporary), 'png', [], [])
+                os.replace(temporary, target)
+            result[name] = target.as_uri()
+        except Exception as failure:
+            # A broken third-party icon must not prevent the launcher opening.
+            print(f'Icon cache skipped {name}: {failure}', file=sys.stderr)
+        finally:
+            if temporary:
+                temporary.unlink(missing_ok=True)
+    return result
+
+
+if __name__ == '__main__':
+    try:
+        print(json.dumps(build(sys.argv[1], sys.argv[2:])))
+    except Exception as failure:
+        print(f'Optional icon cache unavailable: {failure}', file=sys.stderr)
+        print('{}')

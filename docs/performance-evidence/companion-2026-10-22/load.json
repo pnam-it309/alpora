@@ -1,0 +1,34 @@
+[
+  {
+    "enabled": false,
+    "workspaceBefore": 1,
+    "workspaceAfter": 1,
+    "cpuOneCorePercent": 0.0,
+    "gfxEnginePercent": 0.0,
+    "gpuBusyMean": 6.6
+  },
+  {
+    "enabled": true,
+    "workspaceBefore": 1,
+    "workspaceAfter": 1,
+    "cpuOneCorePercent": 4.3,
+    "gfxEnginePercent": 1.13,
+    "gpuBusyMean": 32.9
+  },
+  {
+    "enabled": false,
+    "workspaceBefore": 1,
+    "workspaceAfter": 1,
+    "cpuOneCorePercent": 0.0,
+    "gfxEnginePercent": 0.0,
+    "gpuBusyMean": 13.9
+  },
+  {
+    "enabled": true,
+    "workspaceBefore": 1,
+    "workspaceAfter": 1,
+    "cpuOneCorePercent": 3.64,
+    "gfxEnginePercent": 1.65,
+    "gpuBusyMean": 7.1
+  }
+]

@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+"""Read CPU/GPU counters without forcing frames or opening desktop panels."""
+import argparse
+import json
+import os
+from pathlib import Path
+import re
+import statistics
+import time
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--seconds', type=float, default=6)
+args = parser.parse_args()
+if not 1 <= args.seconds <= 60:
+    parser.error('--seconds must be between 1 and 60')
+
+
+def sample():
+    result = {}
+    for proc in Path('/proc').glob('[0-9]*'):
+        try:
+            name = (proc / 'comm').read_text().strip()
+            if name not in ('Hyprland', 'quickshell', 'kitty', 'swaybg'):
+                continue
+            fields = (proc / 'stat').read_text().rsplit(')', 1)[1].split()
+            clients = {}
+            for info in (proc / 'fdinfo').glob('*'):
+                try:
+                    data = info.read_text()
+                    client = re.search(r'drm-client-id:\s*(\d+)', data)
+                    if client:
+                        clients[client[1]] = {engine: int(value) for engine, value in
+                            re.findall(r'drm-engine-(\S+):\s*(\d+) ns', data)}
+                except OSError:
+                    pass
+            engines = {}
+            for client in clients.values():
+                for engine, value in client.items():
+                    engines[engine] = engines.get(engine, 0) + value
+            result[int(proc.name)] = {'name': name, 'cpu': int(fields[11]) + int(fields[12]),
+                'gpu': engines, 'rssMiB': round(int(fields[21]) * os.sysconf('SC_PAGE_SIZE') / 2**20, 1)}
+        except (OSError, ValueError, IndexError):
+            pass
+    return result
+
+
+before = sample()
+start = time.monotonic()
+busy = []
+paths = list(Path('/sys/class/drm').glob('card*/device/gpu_busy_percent'))
+while time.monotonic() - start < args.seconds:
+    for path in paths:
+        try:
+            busy.append(int(path.read_text()))
+        except OSError:
+            pass
+    time.sleep(.2)
+after = sample()
+elapsed = time.monotonic() - start
+processes = []
+for pid, record in after.items():
+    if pid not in before:
+        continue
+    old = before[pid]
+    processes.append({'pid': pid, 'name': record['name'], 'rssMiB': record['rssMiB'],
+        'cpuOneCorePercent': round((record['cpu'] - old['cpu']) / os.sysconf('SC_CLK_TCK') / elapsed * 100, 2),
+        'gpuEnginePercent': {engine: round((value - old['gpu'].get(engine, value)) / elapsed / 1e7, 2)
+            for engine, value in record['gpu'].items()}})
+print(json.dumps({'seconds': round(elapsed, 2), 'gpuBusySamples': len(busy),
+    'gpuBusyMean': round(statistics.mean(busy), 1) if busy else None,
+    'gpuBusyMedian': statistics.median(busy) if busy else None,
+    'processes': processes}, indent=2))

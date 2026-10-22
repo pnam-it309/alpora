@@ -1,0 +1,12 @@
+{
+  "label": "Work",
+  "description": "Quiet surfaces and short transitions for focused work.",
+  "palette": {
+    "background": "#272d2d",
+    "surface": "#343b3b",
+    "text": "#e7e9e5",
+    "muted": "#aeb5ad",
+    "accent": "#a9b99a"
+  },
+  "motionMs": 90
+}

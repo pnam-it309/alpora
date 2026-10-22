@@ -1,0 +1,56 @@
+[
+  {
+    "mode": "glass-original",
+    "page": "launcher",
+    "frames": 52,
+    "p95": 19,
+    "max": 34,
+    "over25": 3,
+    "hyprGpu": 62.73
+  },
+  {
+    "mode": "glass-original",
+    "page": "calendar",
+    "frames": 20,
+    "p95": 64,
+    "max": 66,
+    "over25": 10,
+    "hyprGpu": 51.9
+  },
+  {
+    "mode": "glass-original",
+    "page": "quick-settings",
+    "frames": 27,
+    "p95": 49,
+    "max": 51,
+    "over25": 12,
+    "hyprGpu": 53.6
+  },
+  {
+    "mode": "glass-blur-off",
+    "page": "launcher",
+    "frames": 56,
+    "p95": 18,
+    "max": 20,
+    "over25": 0,
+    "hyprGpu": 28.87
+  },
+  {
+    "mode": "glass-blur-off",
+    "page": "calendar",
+    "frames": 41,
+    "p95": 20,
+    "max": 36,
+    "over25": 1,
+    "hyprGpu": 16.3
+  },
+  {
+    "mode": "glass-blur-off",
+    "page": "quick-settings",
+    "frames": 44,
+    "p95": 18,
+    "max": 36,
+    "over25": 1,
+    "hyprGpu": 16.44
+  }
+]

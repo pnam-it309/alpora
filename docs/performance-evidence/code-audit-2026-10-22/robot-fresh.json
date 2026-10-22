@@ -1,0 +1,158 @@
+[
+  {
+    "enabled": true,
+    "before": {
+      "widgets": {
+        "clock": false,
+        "weather": false,
+        "music": false
+      },
+      "workspace": 1,
+      "popup": "",
+      "reloads": 1
+    },
+    "after": {
+      "widgets": {
+        "clock": false,
+        "weather": false,
+        "music": false
+      },
+      "workspace": 1,
+      "popup": "",
+      "reloads": 1
+    },
+    "measurement": {
+      "seconds": 12.05,
+      "gpuBusySamples": 60,
+      "gpuBusyMean": 25.8,
+      "gpuBusyMedian": 0.0,
+      "processes": [
+        {
+          "pid": 6336,
+          "name": "Hyprland",
+          "rssMiB": 181.3,
+          "cpuOneCorePercent": 12.2,
+          "gpuEnginePercent": {
+            "gfx": 23.63,
+            "compute": 0.0
+          }
+        },
+        {
+          "pid": 545658,
+          "name": "quickshell",
+          "rssMiB": 500.9,
+          "cpuOneCorePercent": 48.12,
+          "gpuEnginePercent": {
+            "gfx": 20.62,
+            "compute": 0.0
+          }
+        }
+      ]
+    },
+    "validContext": true
+  },
+  {
+    "enabled": false,
+    "before": {
+      "widgets": {
+        "clock": false,
+        "weather": false,
+        "music": false
+      },
+      "workspace": 1,
+      "popup": "",
+      "reloads": 1
+    },
+    "after": {
+      "widgets": {
+        "clock": false,
+        "weather": false,
+        "music": false
+      },
+      "workspace": 1,
+      "popup": "",
+      "reloads": 1
+    },
+    "measurement": {
+      "seconds": 12.07,
+      "gpuBusySamples": 60,
+      "gpuBusyMean": 8.4,
+      "gpuBusyMedian": 0.0,
+      "processes": [
+        {
+          "pid": 6336,
+          "name": "Hyprland",
+          "rssMiB": 181.3,
+          "cpuOneCorePercent": 4.14,
+          "gpuEnginePercent": {
+            "gfx": 6.56,
+            "compute": 0.0
+          }
+        },
+        {
+          "pid": 545658,
+          "name": "quickshell",
+          "rssMiB": 498.0,
+          "cpuOneCorePercent": 0.0,
+          "gpuEnginePercent": {
+            "gfx": 0.0,
+            "compute": 0.0
+          }
+        }
+      ]
+    },
+    "validContext": true
+  },
+  {
+    "enabled": true,
+    "before": {
+      "widgets": {
+        "clock": false,
+        "weather": false,
+        "music": false
+      },
+      "workspace": 1,
+      "popup": "",
+      "reloads": 1
+    },
+    "after": {
+      "widgets": {
+        "clock": false,
+        "weather": false,
+        "music": false
+      },
+      "workspace": 1,
+      "popup": "",
+      "reloads": 1
+    },
+    "measurement": {
+      "seconds": 12.06,
+      "gpuBusySamples": 60,
+      "gpuBusyMean": 26.6,
+      "gpuBusyMedian": 0.0,
+      "processes": [
+        {
+          "pid": 6336,
+          "name": "Hyprland",
+          "rssMiB": 181.3,
+          "cpuOneCorePercent": 11.03,
+          "gpuEnginePercent": {
+            "gfx": 22.46,
+            "compute": 0.0
+          }
+        },
+        {
+          "pid": 545658,
+          "name": "quickshell",
+          "rssMiB": 501.0,
+          "cpuOneCorePercent": 42.22,
+          "gpuEnginePercent": {
+            "gfx": 17.47,
+            "compute": 0.0
+          }
+        }
+      ]
+    },
+    "validContext": true
+  }
+]

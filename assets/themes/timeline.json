@@ -1,0 +1,18 @@
+{
+  "id": "timeline",
+  "label": "Timeline",
+  "collectionLabel": "Timeline · Время суток",
+  "wallpaper": "wallpapers/timeline/sunset.png",
+  "iconTheme": "Poly-Alpine",
+  "themePalette": {
+    "background": "#232b30",
+    "surface": "#343c3c",
+    "accent": "#c7c5a6",
+    "secondary": "#edb297",
+    "cool": "#a7bed8",
+    "text": "#f0f0e5",
+    "muted": "#b7c1bf",
+    "border": "#65716b"
+  },
+  "swatches": ["#232b30", "#343c3c", "#a7bed8", "#c7c5a6", "#edb297"]
+}

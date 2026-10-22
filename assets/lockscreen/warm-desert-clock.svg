@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="660" height="172" viewBox="0 0 660 172">
+  <defs>
+    <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#342621" stop-opacity=".90"/>
+      <stop offset="1" stop-color="#322420" stop-opacity=".78"/>
+    </linearGradient>
+    <g id="ridge">
+      <path d="M0 22 17 12 31 0 52 21 70 14 96 36H12Z" fill="#3d2b24"/>
+      <path d="M0 22 31 0 21 24Z" fill="#624637"/>
+      <path d="M17 12 31 0 26 15Z" fill="#d78d70"/>
+      <path d="M31 0 52 21 41 29Z" fill="#442f27"/>
+      <path d="M12 36 21 24 41 29 52 21 70 36Z" fill="#342621"/>
+      <path d="M52 21 70 14 64 29Z" fill="#634838"/>
+      <path d="M70 14 96 36 64 29Z" fill="#3e2b25"/>
+    </g>
+  </defs>
+  <path d="M9 14H651Q658 14 655 21L607 153Q605 159 597 159H63Q55 159 53 153L5 21Q2 14 9 14Z"
+        fill="url(#glass)" stroke="#edb886" stroke-opacity=".26"/>
+  <path d="M10 14H650" stroke="#efba87" stroke-opacity=".18"/>
+  <use href="#ridge" transform="translate(28 61) scale(1.8)" opacity=".90"/>
+  <use href="#ridge" transform="translate(632 61) scale(-1.8 1.8)" opacity=".90"/>
+  <path d="M82 158H258 M402 158H578" stroke="#edb886" stroke-opacity=".27"/>
+</svg>

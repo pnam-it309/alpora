@@ -1,0 +1,132 @@
+# Workspace overview
+
+**Super+Tab** opens/closes the overview on the focused monitor. Three-finger up
+opens it and three-finger down closes it interactively. Horizontal three-finger
+workspace switching is preserved. The installed
+Hyprland Lua configuration registers `poly-shell:overview` as a native global
+shortcut. The overview displays desks 1–10 and existing additional numbered/named
+workspaces. Special scratchpad workspaces are excluded. Other monitors' desks
+carry their monitor name. No workspace or window is created just by opening it.
+
+- Click a desk to switch to it, or a window thumbnail to focus that window.
+- Drag a window onto another desk to move it without following it.
+- Arrows, Tab/Shift+Tab, Home/End select; Enter opens the selection. Digits 1–9
+  select their corresponding desk; 0 selects desk 10.
+- Escape cancels an active drag. Another Escape, Super+Tab, the close button or
+  a click on the surrounding background closes the overview.
+- Pinned windows appear on their monitor's desks; moving them asks the user to
+  unpin first rather than silently changing pin state.
+
+Thumbnails are single-frame captures of actual application surfaces, through
+Quickshell's ScreencopyView and Hyprland's toplevel export protocol. They refresh
+on opening and after relevant compositor events, rather than streaming video.
+Unavailable captures retain the app name/title and remain interactive. JSON
+addresses have a `0x` prefix while this installed Quickshell's native addresses
+do not; the capture lookup normalizes both.
+
+Window geometry accounts for monitor position, scale, rotation and clipped
+offscreen bounds. Portrait monitors are fitted inside the preview. Windows partly
+outside a monitor have their visible bounds clamped; their full captured image
+is fitted into those bounds. Floating windows render after tiled windows, with
+recently focused windows above peers. The overview uses a scrollable grid on
+smaller screens and for additional desks; dragging targets currently visible
+cards (scroll to the desired area before starting the drag).
+
+All surfaces/text/strokes use Session's semantic palette and Theme helpers.
+Timeline's intermediate palette and wallpaper blend remain supported. Work/Vibe,
+theme, wallpaper, app and layout preferences are not written by the overview.
+The overview is a transparent overlay above the live current desktop and its
+application windows. A translucent semantic gradient dims the desktop as the
+gesture reveals the cards; it does not replace the desktop with wallpaper or
+capture a frozen screen. Wallpaper remains inside the workspace previews,
+including Timeline's blend. The design uses panoramic
+rounded cards with integrated footer typography, themed application shelves,
+occupied/empty states, and a current-desk badge. A single reversible reveal drives
+card rise, scale, fan rotation and stagger. Hover uses a fixed hit area, a smoothly
+interpolated constant-width stroke, a pointer-following glass reflection and a
+top-edge highlight. It does not translate or scale the card. Titles fade inside
+the window preview. Mouse highlight is independent of keyboard selection; only
+keyboard selection scrolls the grid. A root pointer observer distinguishes actual
+cursor movement from child hover changes caused by keyboard scrolling. There are no idle
+animation loops or blur passes. Opening takes 1.7× the configured panel duration;
+closing takes 1.25×. Reduced motion removes travel, scale, rotation and fades.
+Panel radius and reduced motion follow existing settings. The new
+layer has no compositor blur or duplicate compositor animation. Captures and the
+entire content loader are released after the closing animation; there is no idle
+overview polling. Sleep, opening another shell panel or disconnecting the target
+screen closes it. The radial theme picker closes when the overview opens.
+
+Moves/focus use explicitly addressed, validated compositor dispatches. Lua and
+legacy dispatch syntax are supported; named selectors are escaped. Failed moves
+show the compositor error. Focus actions release the layer keyboard grab before
+dispatching, allowing focus to reach the chosen application.
+
+## Validation on this desktop
+
+- `scripts/check`: 132 Python tests and strict QML lint passed.
+- `python scripts/check-overview --live`: a temporary Kitty window was captured,
+  dragged from desk 6 to 7 with no workspace switch, then tested for Escape
+  cancellation and click-to-focus. Physical Super+Tab, digit navigation,
+  Home/arrows/Enter and capture unloading were verified. The temporary window
+  was removed; the original workspace, focused window and pointer were restored.
+- The redesigned geometry passed the same live window interactions. Native
+  up/down callback dispatches are tested directly, including repeated open/close.
+  Hyprland accepted both directional gesture registrations with no config errors.
+  A physical three-finger touchpad swipe was not generated by the automated test.
+- The hover regression sweeps 50 positions along card edges and across child
+  previews/footers. Card geometry, scroll position and keyboard selection stay
+  unchanged, and hover remains owned by the correct parent card. Window moves,
+  cancellation, keyboard navigation and swipe callbacks still pass afterwards.
+- 384 geometry cases covered negative monitor origins, four scales, all eight
+  transforms, landscape/portrait thumbnails and windows outside screen bounds.
+  Invalid addresses/special selectors and quoted named-workspace escaping passed.
+- Captures of Chrome, VS Code and XWayland Spotify displayed actual pixels.
+- Hyprland configuration reload reported no errors. Preview objects are absent
+  after closing (`overview-<screen>.status` reports `loaded: false`).
+
+Multi-monitor/hotplug behavior is implemented but not physically exercised on
+this single-monitor laptop. Checks have used Warm Desert and Alpine Dawn
+themes. Palette compatibility follows the shared semantic bindings; visual
+inspection of every theme/mode is not claimed.
+
+IPC diagnostics: `overview.status`, `overview.sources`, `overview.toggle`,
+`overview.close`, `overview-<screen>.status`, and (while open)
+`overview-layout-<screen>.status` expose visibility, actual frame availability,
+workspace/window thumbnail bounds and current drag target.
+
+Sources: [ScreencopyView](https://quickshell.org/docs/v0.3.1/types/Quickshell.Wayland/ScreencopyView/),
+[HyprlandToplevel](https://quickshell.org/docs/v0.3.1/types/Quickshell.Hyprland/HyprlandToplevel/),
+[Hyprland dispatchers](https://wiki.hypr.land/Configuring/Basics/Dispatchers/).
+Gesture registration follows [Hyprland's Lua gestures](https://wiki.hypr.land/Configuring/Advanced-and-Cool/Gestures/).
+
+## Interactive swipe
+
+The production callbacks in `integrations/hyprland-overview.lua` handle gesture
+start/update/finish. They accumulate signed upward distance, including reversals,
+and emit versioned custom events through `hl.dsp.event` on the existing socket2.
+Quickshell consumes them through its existing Hyprland connection: no polling,
+helper daemon, file writes or per-frame process launches are involved.
+
+`OverviewState.progress` owns the reveal. During a gesture it is assigned directly
+from the current origin plus distance/300; holding fingers still does not run an
+animation. A new gesture stops an in-flight settling animation at its current
+position. Travel is bounded, and the visible result stays within 0–1. Both swipe
+directions support reversal. Downward motion while fully closed is ignored.
+
+Release projects recent velocity over 140 ms and chooses open/closed around the
+halfway point, then uses a short finite settling animation. Momentum older than
+120 ms is discarded. Backend cancellation restores the prior committed state.
+Escape/explicit close invalidates the gesture ID so late frames cannot reopen it;
+compositor configuration reload closes an in-progress gesture. Window actions
+are disabled while tracking. Reduced motion shows a discrete open/closed view.
+
+`python scripts/check-overview-swipe --live` loads the actual production Lua
+callbacks inside Hyprland and drives them through native events. It checks exact
+20% hold, 50% advance and 40% reversal; short/long releases; cancelled up/down;
+flick completion; reversed closing; and ignored late frames after explicit close.
+No windows or workspace preferences are changed. This validates callbacks,
+transport, state and settling, rather than claiming a synthetic physical touch.
+
+Unit tests additionally cover protocol validation, velocity aging/cancellation,
+distance bounds and native callback accumulation/sequence IDs. Standalone JS/Lua
+tests skip if their respective local interpreters are unavailable.

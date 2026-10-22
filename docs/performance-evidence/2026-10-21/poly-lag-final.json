@@ -1,0 +1,29 @@
+[
+  {
+    "mode": "applied",
+    "page": "launcher",
+    "frames": 57,
+    "p95": 17,
+    "max": 18,
+    "over25": 0,
+    "hyprGpu": 29.54
+  },
+  {
+    "mode": "applied",
+    "page": "calendar",
+    "frames": 41,
+    "p95": 18,
+    "max": 19,
+    "over25": 0,
+    "hyprGpu": 29.79
+  },
+  {
+    "mode": "applied",
+    "page": "quick-settings",
+    "frames": 47,
+    "p95": 17,
+    "max": 19,
+    "over25": 0,
+    "hyprGpu": 29.68
+  }
+]

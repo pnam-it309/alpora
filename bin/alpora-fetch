@@ -1,0 +1,7 @@
+#!/usr/bin/env python3
+"""ALPORA terminal system card; runs directly from the repository."""
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from poly_shell.fetch import main
+raise SystemExit(main())

@@ -1,0 +1,768 @@
+{
+  "baselineSpriteSha256": "1b8483069869a40f50d3b6af277940e8da4f639ddc8abff51f6be9dc60d5ccba",
+  "optimizedSpriteSha256": "f1be901315a912ce8b773330f94588c3d598f8dcb8ac752a470f4b041211f37b",
+  "baselineDesktopSha256": "91b1767e89b7a64c9fa74655f1f2ea34148f9b578fdab07cd7f49a8340255a47",
+  "optimizedDesktopSha256": "528cb350849cddef36b882b0fa59c265b66cf4fc1debda0bf8788757264f02bb",
+  "samples": [
+    {
+      "scenario": "greeting",
+      "variant": "baseline",
+      "before": {
+        "mode": "work",
+        "workspace": 1,
+        "popup": "",
+        "quickSettings": false,
+        "widgetsExposed": {
+          "clock": false,
+          "weather": false,
+          "music": false
+        },
+        "theme": "forest-mist",
+        "reduced": false,
+        "allowed": true,
+        "held": false
+      },
+      "after": {
+        "mode": "work",
+        "workspace": 1,
+        "popup": "",
+        "quickSettings": false,
+        "widgetsExposed": {
+          "clock": false,
+          "weather": false,
+          "music": false
+        },
+        "theme": "forest-mist",
+        "reduced": false,
+        "allowed": true,
+        "held": false
+      },
+      "stateBefore": {
+        "activity": "greet",
+        "phase": 1.6349999999999998,
+        "travel": {
+          "support": "",
+          "walking": false,
+          "mode": "rail",
+          "trips": 0,
+          "age": 1.6349999999999998,
+          "x": 0.20427480916030533,
+          "y": 0.001949317738791423
+        },
+        "visible": true,
+        "ticking": true,
+        "held": false
+      },
+      "stateAfter": {
+        "activity": "greet",
+        "phase": 9.835000000000006,
+        "travel": {
+          "support": "",
+          "walking": false,
+          "mode": "rail",
+          "trips": 0,
+          "age": 9.835000000000006,
+          "x": 0.20427480916030533,
+          "y": 0.001949317738791423
+        },
+        "visible": true,
+        "ticking": true,
+        "held": false
+      },
+      "validContext": true,
+      "measurement": {
+        "seconds": 8.04,
+        "gpuBusySamples": 40,
+        "gpuBusyMean": 31.6,
+        "gpuBusyMedian": 0.0,
+        "processes": [
+          {
+            "pid": 6336,
+            "name": "Hyprland",
+            "rssMiB": 181.5,
+            "cpuOneCorePercent": 9.95,
+            "gpuEnginePercent": {
+              "gfx": 24.17,
+              "compute": 0.0
+            }
+          },
+          {
+            "pid": 545658,
+            "name": "quickshell",
+            "rssMiB": 547.4,
+            "cpuOneCorePercent": 40.55,
+            "gpuEnginePercent": {
+              "gfx": 22.15,
+              "compute": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "greeting",
+      "variant": "optimized",
+      "before": {
+        "mode": "work",
+        "workspace": 1,
+        "popup": "",
+        "quickSettings": false,
+        "widgetsExposed": {
+          "clock": false,
+          "weather": false,
+          "music": false
+        },
+        "theme": "forest-mist",
+        "reduced": false,
+        "allowed": true,
+        "held": false
+      },
+      "after": {
+        "mode": "work",
+        "workspace": 1,
+        "popup": "",
+        "quickSettings": false,
+        "widgetsExposed": {
+          "clock": false,
+          "weather": false,
+          "music": false
+        },
+        "theme": "forest-mist",
+        "reduced": false,
+        "allowed": true,
+        "held": false
+      },
+      "stateBefore": {
+        "activity": "greet",
+        "phase": 1.6579999999999988,
+        "travel": {
+          "support": "",
+          "walking": false,
+          "mode": "rail",
+          "trips": 0,
+          "age": 1.6579999999999988,
+          "x": 0.20427480916030533,
+          "y": 0.001949317738791423
+        },
+        "visible": true,
+        "ticking": true,
+        "held": false
+      },
+      "stateAfter": {
+        "activity": "greet",
+        "phase": 9.834000000000007,
+        "travel": {
+          "support": "",
+          "walking": false,
+          "mode": "rail",
+          "trips": 0,
+          "age": 9.834000000000007,
+          "x": 0.20427480916030533,
+          "y": 0.001949317738791423
+        },
+        "visible": true,
+        "ticking": true,
+        "held": false
+      },
+      "validContext": true,
+      "measurement": {
+        "seconds": 8.04,
+        "gpuBusySamples": 40,
+        "gpuBusyMean": 11.5,
+        "gpuBusyMedian": 0.0,
+        "processes": [
+          {
+            "pid": 6336,
+            "name": "Hyprland",
+            "rssMiB": 181.5,
+            "cpuOneCorePercent": 6.6,
+            "gpuEnginePercent": {
+              "gfx": 14.96,
+              "compute": 0.0
+            }
+          },
+          {
+            "pid": 545658,
+            "name": "quickshell",
+            "rssMiB": 580.6,
+            "cpuOneCorePercent": 11.7,
+            "gpuEnginePercent": {
+              "gfx": 5.99,
+              "compute": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "greeting",
+      "variant": "baseline",
+      "before": {
+        "mode": "work",
+        "workspace": 1,
+        "popup": "",
+        "quickSettings": false,
+        "widgetsExposed": {
+          "clock": false,
+          "weather": false,
+          "music": false
+        },
+        "theme": "forest-mist",
+        "reduced": false,
+        "allowed": true,
+        "held": false
+      },
+      "after": {
+        "mode": "work",
+        "workspace": 1,
+        "popup": "",
+        "quickSettings": false,
+        "widgetsExposed": {
+          "clock": false,
+          "weather": false,
+          "music": false
+        },
+        "theme": "forest-mist",
+        "reduced": false,
+        "allowed": true,
+        "held": false
+      },
+      "stateBefore": {
+        "activity": "greet",
+        "phase": 1.604,
+        "travel": {
+          "support": "",
+          "walking": false,
+          "mode": "rail",
+          "trips": 0,
+          "age": 1.604,
+          "x": 0.20427480916030533,
+          "y": 0.001949317738791423
+        },
+        "visible": true,
+        "ticking": true,
+        "held": false
+      },
+      "stateAfter": {
+        "activity": "greet",
+        "phase": 9.818000000000007,
+        "travel": {
+          "support": "",
+          "walking": false,
+          "mode": "rail",
+          "trips": 0,
+          "age": 9.818000000000007,
+          "x": 0.20427480916030533,
+          "y": 0.001949317738791423
+        },
+        "visible": true,
+        "ticking": true,
+        "held": false
+      },
+      "validContext": true,
+      "measurement": {
+        "seconds": 8.04,
+        "gpuBusySamples": 40,
+        "gpuBusyMean": 16.2,
+        "gpuBusyMedian": 0.0,
+        "processes": [
+          {
+            "pid": 6336,
+            "name": "Hyprland",
+            "rssMiB": 181.5,
+            "cpuOneCorePercent": 8.83,
+            "gpuEnginePercent": {
+              "gfx": 25.0,
+              "compute": 0.0
+            }
+          },
+          {
+            "pid": 545658,
+            "name": "quickshell",
+            "rssMiB": 559.0,
+            "cpuOneCorePercent": 40.32,
+            "gpuEnginePercent": {
+              "gfx": 22.41,
+              "compute": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "greeting",
+      "variant": "optimized",
+      "before": {
+        "mode": "work",
+        "workspace": 1,
+        "popup": "",
+        "quickSettings": false,
+        "widgetsExposed": {
+          "clock": false,
+          "weather": false,
+          "music": false
+        },
+        "theme": "forest-mist",
+        "reduced": false,
+        "allowed": true,
+        "held": false
+      },
+      "after": {
+        "mode": "work",
+        "workspace": 1,
+        "popup": "",
+        "quickSettings": false,
+        "widgetsExposed": {
+          "clock": false,
+          "weather": false,
+          "music": false
+        },
+        "theme": "forest-mist",
+        "reduced": false,
+        "allowed": true,
+        "held": false
+      },
+      "stateBefore": {
+        "activity": "greet",
+        "phase": 1.5969999999999989,
+        "travel": {
+          "support": "",
+          "walking": false,
+          "mode": "rail",
+          "trips": 0,
+          "age": 1.5969999999999989,
+          "x": 0.20427480916030533,
+          "y": 0.001949317738791423
+        },
+        "visible": true,
+        "ticking": true,
+        "held": false
+      },
+      "stateAfter": {
+        "activity": "greet",
+        "phase": 9.757000000000005,
+        "travel": {
+          "support": "",
+          "walking": false,
+          "mode": "rail",
+          "trips": 0,
+          "age": 9.757000000000005,
+          "x": 0.20427480916030533,
+          "y": 0.001949317738791423
+        },
+        "visible": true,
+        "ticking": true,
+        "held": false
+      },
+      "validContext": true,
+      "measurement": {
+        "seconds": 8.04,
+        "gpuBusySamples": 40,
+        "gpuBusyMean": 20.8,
+        "gpuBusyMedian": 0.0,
+        "processes": [
+          {
+            "pid": 6336,
+            "name": "Hyprland",
+            "rssMiB": 181.5,
+            "cpuOneCorePercent": 6.59,
+            "gpuEnginePercent": {
+              "gfx": 16.2,
+              "compute": 0.0
+            }
+          },
+          {
+            "pid": 545658,
+            "name": "quickshell",
+            "rssMiB": 574.2,
+            "cpuOneCorePercent": 11.45,
+            "gpuEnginePercent": {
+              "gfx": 6.75,
+              "compute": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "flight",
+      "variant": "baseline",
+      "before": {
+        "mode": "work",
+        "workspace": 1,
+        "popup": "",
+        "quickSettings": false,
+        "widgetsExposed": {
+          "clock": false,
+          "weather": false,
+          "music": false
+        },
+        "theme": "forest-mist",
+        "reduced": false,
+        "allowed": true,
+        "held": false
+      },
+      "after": {
+        "mode": "work",
+        "workspace": 1,
+        "popup": "",
+        "quickSettings": false,
+        "widgetsExposed": {
+          "clock": false,
+          "weather": false,
+          "music": false
+        },
+        "theme": "forest-mist",
+        "reduced": false,
+        "allowed": true,
+        "held": false
+      },
+      "stateBefore": {
+        "activity": "fly",
+        "phase": 1.688999999999999,
+        "travel": {
+          "support": "floor",
+          "walking": false,
+          "mode": "fly",
+          "trips": 0,
+          "age": 0.5500000000000004,
+          "x": 0.20627316582617022,
+          "y": 0.0019675522295209947
+        },
+        "visible": true,
+        "ticking": true,
+        "held": false
+      },
+      "stateAfter": {
+        "activity": "fly",
+        "phase": 5.87200000000001,
+        "travel": {
+          "support": "floor",
+          "walking": false,
+          "mode": "fly",
+          "trips": 0,
+          "age": 4.732999999999999,
+          "x": 0.48098414381628724,
+          "y": 0.853045628861766
+        },
+        "visible": true,
+        "ticking": true,
+        "held": false
+      },
+      "validContext": true,
+      "measurement": {
+        "seconds": 4.03,
+        "gpuBusySamples": 20,
+        "gpuBusyMean": 31.4,
+        "gpuBusyMedian": 0.0,
+        "processes": [
+          {
+            "pid": 6336,
+            "name": "Hyprland",
+            "rssMiB": 181.5,
+            "cpuOneCorePercent": 10.68,
+            "gpuEnginePercent": {
+              "gfx": 24.07,
+              "compute": 0.0
+            }
+          },
+          {
+            "pid": 545658,
+            "name": "quickshell",
+            "rssMiB": 565.1,
+            "cpuOneCorePercent": 44.22,
+            "gpuEnginePercent": {
+              "gfx": 21.75,
+              "compute": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "flight",
+      "variant": "optimized",
+      "before": {
+        "mode": "work",
+        "workspace": 1,
+        "popup": "",
+        "quickSettings": false,
+        "widgetsExposed": {
+          "clock": false,
+          "weather": false,
+          "music": false
+        },
+        "theme": "forest-mist",
+        "reduced": false,
+        "allowed": true,
+        "held": false
+      },
+      "after": {
+        "mode": "work",
+        "workspace": 1,
+        "popup": "",
+        "quickSettings": false,
+        "widgetsExposed": {
+          "clock": false,
+          "weather": false,
+          "music": false
+        },
+        "theme": "forest-mist",
+        "reduced": false,
+        "allowed": true,
+        "held": false
+      },
+      "stateBefore": {
+        "activity": "fly",
+        "phase": 1.684999999999999,
+        "travel": {
+          "support": "floor",
+          "walking": false,
+          "mode": "fly",
+          "trips": 0,
+          "age": 0.5430000000000004,
+          "x": 0.2062014434746659,
+          "y": 0.0019653552203847207
+        },
+        "visible": true,
+        "ticking": true,
+        "held": false
+      },
+      "stateAfter": {
+        "activity": "fly",
+        "phase": 5.861000000000001,
+        "travel": {
+          "support": "floor",
+          "walking": false,
+          "mode": "fly",
+          "trips": 0,
+          "age": 4.718999999999999,
+          "x": 0.4804152106501751,
+          "y": 0.8495419182798246
+        },
+        "visible": true,
+        "ticking": true,
+        "held": false
+      },
+      "validContext": true,
+      "measurement": {
+        "seconds": 4.02,
+        "gpuBusySamples": 20,
+        "gpuBusyMean": 34.8,
+        "gpuBusyMedian": 4.0,
+        "processes": [
+          {
+            "pid": 6336,
+            "name": "Hyprland",
+            "rssMiB": 181.5,
+            "cpuOneCorePercent": 8.94,
+            "gpuEnginePercent": {
+              "gfx": 22.67,
+              "compute": 0.0
+            }
+          },
+          {
+            "pid": 545658,
+            "name": "quickshell",
+            "rssMiB": 575.3,
+            "cpuOneCorePercent": 16.15,
+            "gpuEnginePercent": {
+              "gfx": 17.79,
+              "compute": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "flight",
+      "variant": "baseline",
+      "before": {
+        "mode": "work",
+        "workspace": 1,
+        "popup": "",
+        "quickSettings": false,
+        "widgetsExposed": {
+          "clock": false,
+          "weather": false,
+          "music": false
+        },
+        "theme": "forest-mist",
+        "reduced": false,
+        "allowed": true,
+        "held": false
+      },
+      "after": {
+        "mode": "work",
+        "workspace": 3,
+        "popup": "",
+        "quickSettings": false,
+        "widgetsExposed": {
+          "clock": true,
+          "weather": true,
+          "music": true
+        },
+        "theme": "forest-mist",
+        "reduced": false,
+        "allowed": false,
+        "held": false
+      },
+      "stateBefore": {
+        "activity": "fly",
+        "phase": 1.6539999999999992,
+        "travel": {
+          "support": "floor",
+          "walking": false,
+          "mode": "fly",
+          "trips": 0,
+          "age": 0.5670000000000004,
+          "x": 0.2064542857486136,
+          "y": 0.001973611536453309
+        },
+        "visible": true,
+        "ticking": true,
+        "held": false
+      },
+      "stateAfter": {
+        "activity": "fly",
+        "phase": 4.709999999999998,
+        "travel": {
+          "support": "floor",
+          "walking": false,
+          "mode": "fly",
+          "trips": 0,
+          "age": 3.6229999999999922,
+          "x": 0.40927994122678996,
+          "y": 0.46840349541574444
+        },
+        "visible": false,
+        "ticking": false,
+        "held": false
+      },
+      "validContext": false,
+      "measurement": {
+        "seconds": 4.02,
+        "gpuBusySamples": 20,
+        "gpuBusyMean": 31.9,
+        "gpuBusyMedian": 0.0,
+        "processes": [
+          {
+            "pid": 6336,
+            "name": "Hyprland",
+            "rssMiB": 188.6,
+            "cpuOneCorePercent": 11.43,
+            "gpuEnginePercent": {
+              "gfx": 22.77,
+              "compute": 0.01
+            }
+          },
+          {
+            "pid": 545658,
+            "name": "quickshell",
+            "rssMiB": 596.3,
+            "cpuOneCorePercent": 51.44,
+            "gpuEnginePercent": {
+              "gfx": 20.98,
+              "compute": 0.08
+            }
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "flight",
+      "variant": "optimized",
+      "before": {
+        "mode": "work",
+        "workspace": 3,
+        "popup": "",
+        "quickSettings": false,
+        "widgetsExposed": {
+          "clock": true,
+          "weather": true,
+          "music": true
+        },
+        "theme": "forest-mist",
+        "reduced": false,
+        "allowed": true,
+        "held": false
+      },
+      "after": {
+        "mode": "work",
+        "workspace": 3,
+        "popup": "",
+        "quickSettings": false,
+        "widgetsExposed": {
+          "clock": true,
+          "weather": true,
+          "music": true
+        },
+        "theme": "forest-mist",
+        "reduced": false,
+        "allowed": true,
+        "held": false
+      },
+      "stateBefore": {
+        "activity": "fly",
+        "phase": 1.9479999999999997,
+        "travel": {
+          "support": "floor",
+          "walking": false,
+          "mode": "fly",
+          "trips": 0,
+          "age": 0.7000000000000004,
+          "x": 0.20823071741022386,
+          "y": 0.002071861000045003
+        },
+        "visible": true,
+        "ticking": true,
+        "held": false
+      },
+      "stateAfter": {
+        "activity": "fly",
+        "phase": 6.181000000000004,
+        "travel": {
+          "support": "floor",
+          "walking": false,
+          "mode": "fly",
+          "trips": 0,
+          "age": 4.932999999999996,
+          "x": 0.4880936017290202,
+          "y": 0.8974378115946492
+        },
+        "visible": true,
+        "ticking": true,
+        "held": false
+      },
+      "validContext": true,
+      "measurement": {
+        "seconds": 4.02,
+        "gpuBusySamples": 20,
+        "gpuBusyMean": 9.9,
+        "gpuBusyMedian": 0.0,
+        "processes": [
+          {
+            "pid": 6336,
+            "name": "Hyprland",
+            "rssMiB": 181.4,
+            "cpuOneCorePercent": 9.94,
+            "gpuEnginePercent": {
+              "gfx": 19.01,
+              "compute": 0.0
+            }
+          },
+          {
+            "pid": 545658,
+            "name": "quickshell",
+            "rssMiB": 588.9,
+            "cpuOneCorePercent": 39.53,
+            "gpuEnginePercent": {
+              "gfx": 13.94,
+              "compute": 0.01
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

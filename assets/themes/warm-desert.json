@@ -1,0 +1,24 @@
+{
+  "id": "warm-desert",
+  "label": "Тёплая пустыня",
+  "wallpaper": "wallpapers/warm-desert.png",
+  "palette": {
+    "background": "#30231f",
+    "surface": "#4a332a",
+    "accent": "#efba87",
+    "secondary": "#df9274",
+    "cool": "#c5ad9c",
+    "text": "#edf0f6",
+    "muted": "#bdc5d3",
+    "border": "#566273"
+  },
+  "swatches": [
+    "#30231f",
+    "#4a332a",
+    "#c5ad9c",
+    "#efba87",
+    "#df9274"
+  ],
+  "iconTheme": "Poly-WarmDesert",
+  "lockClockFrame": "lockscreen/warm-desert-clock.png"
+}

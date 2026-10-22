@@ -1,0 +1,29 @@
+# Changelog
+
+## Unreleased — ALPORA preview
+
+- Validated production configuration in isolated UID 1000/1001 profiles, real asset downloads, spaced paths, repeat setup and a separate software Wayland display; documented the remaining clean-OS gate.
+- Fixed first-start QIcon worker loading in launcher/dock, enabling active-but-disabled network/Bluetooth services, and preflighting settings-launcher conflicts before installation writes.
+
+- Added ALPORA Fetch: a faceted terminal system card that follows active/custom/Timeline palettes, supports snapshots and restores terminal state on exit.
+- Refreshed the working-desktop screenshots and native theme-switching video with the live system card.
+- Included `alpora-fetch` in both installation methods, verified its installed link and QML/service files, and added the missing `xdg-user-dirs` screenshot dependency.
+- Updated both README languages, installed-file map, application inventory and first-login commands.
+
+- Reworked the English/Russian README around a working-desktop hero, six landscape palettes, a real theme-switching recording and direct installation guidance.
+
+- Added a guided terminal installer with theme selection, real phase timing, private logs and next-login file verification.
+- Added a versioned ALPORA reference preset for missing preferences, preserving existing user data.
+
+- Added pinned Papirus/Bibata installation, consistent GTK/compositor cursor settings and theme-aware folder overlays.
+- Added an Arch install.sh preview with package installation, backed-up session defaults and offline theme preparation. Clean-OS validation is pending.
+
+- Introduced ALPORA as the public name, retaining `poly-shell` command and data compatibility.
+- Added a landscape banner, English/Russian project pages and current desktop screenshots.
+- Added installation/recovery documentation, contribution guidance and third-party notices.
+- Existing desktop includes coordinated themes and Timeline, panel controls, launcher,
+  dock, workspace overview, organiser, clipboard history and desktop widgets.
+- Added settings management of supported Lua hotkeys and robot visibility/flight preferences.
+- Fixed robot pausing when bar panels open; changed joint smoothing to use its existing clock.
+- Latest local baseline: 197 tests and strict QML lint; known performance and hardware
+  validation limits remain documented. No stable release has been published.

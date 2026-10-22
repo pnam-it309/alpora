@@ -1,0 +1,30 @@
+{
+  "generator": "built-in image_gen",
+  "transparentBackground": false,
+  "actualSize": [
+    1672,
+    941
+  ],
+  "images": [
+    {
+      "file": "moon-lake.png",
+      "prompt": "Create a finished desktop wallpaper asset, landscape 16:9, preferably 2560x1440 or at least 1920x1080. A moonlit alpine lake surrounded by faceted mountains and dark pine silhouettes, luminous full moon above the right mountain ridge, stars sparsely scattered across midnight navy sky, mist between mountains, silver moon reflection on calm lake, icy blue and lavender accents, sophisticated atmospheric depth. Art direction: premium hand-crafted low-poly landscape illustration, clearly visible clean triangular facets on mountains, rich layered scenery, refined painterly light but crisp polygonal construction, same coherent visual family as an Alpine dawn low-poly wallpaper. Edge-to-edge artwork only. Balanced usable desktop composition, calm darker regions for windows, detailed foreground corners, unobstructed central scenery. NO computer screens, NO app UI, NO frame, NO text, NO letters, NO logo, NO watermark, NO collage. One single landscape. The generated image is the wallpaper itself."
+    },
+    {
+      "file": "forest-mist.png",
+      "prompt": "Create a finished desktop wallpaper asset, landscape 16:9, preferably 2560x1440 or at least 1920x1080. Layered mountain forest in early morning mist, tall angular conifers in foreground and soft receding faceted peaks, serene small lake at bottom, sage greens, desaturated teal, pale warm gray and cream mist, quiet natural atmosphere, no sun disk. Art direction: premium hand-crafted low-poly landscape illustration, clearly visible clean triangular facets on mountains, rich layered scenery, refined painterly light but crisp polygonal construction, same coherent visual family as an Alpine dawn low-poly wallpaper. Edge-to-edge artwork only. Balanced usable desktop composition, calm darker regions for windows, detailed foreground corners, unobstructed central scenery. NO computer screens, NO app UI, NO frame, NO text, NO letters, NO logo, NO watermark, NO collage. One single landscape. The generated image is the wallpaper itself."
+    },
+    {
+      "file": "warm-desert.png",
+      "prompt": "Create a finished desktop wallpaper asset, landscape 16:9, preferably 2560x1440 or at least 1920x1080. Sweeping sculptural low-poly desert sand dunes in foreground leading to dramatic angular sandstone mesas in the distance, warm late afternoon sky, terracotta, burnt sienna, amber and peach hues, beautiful geometric shadows, minimalist uncluttered horizon. Art direction: premium hand-crafted low-poly landscape illustration, clearly visible clean triangular facets on mountains, rich layered scenery, refined painterly light but crisp polygonal construction, same coherent visual family as an Alpine dawn low-poly wallpaper. Edge-to-edge artwork only. Balanced usable desktop composition, calm darker regions for windows, detailed foreground corners, unobstructed central scenery. NO computer screens, NO app UI, NO frame, NO text, NO letters, NO logo, NO watermark, NO collage. One single landscape. The generated image is the wallpaper itself."
+    },
+    {
+      "file": "northern-lights.png",
+      "prompt": "Create a finished desktop wallpaper asset, landscape 16:9, preferably 2560x1440 or at least 1920x1080. Faceted snowy alpine mountain peaks under a spectacular but refined turquoise and violet aurora, dark navy night sky, pine silhouettes and a glacial lake reflecting delicate aurora ribbons, icy cyan and lavender palette, calm luminous atmosphere. Art direction: premium hand-crafted low-poly landscape illustration, clearly visible clean triangular facets on mountains, rich layered scenery, refined painterly light but crisp polygonal construction, same coherent visual family as an Alpine dawn low-poly wallpaper. Edge-to-edge artwork only. Balanced usable desktop composition, calm darker regions for windows, detailed foreground corners, unobstructed central scenery. NO computer screens, NO app UI, NO frame, NO text, NO letters, NO logo, NO watermark, NO collage. One single landscape. The generated image is the wallpaper itself."
+    },
+    {
+      "file": "rose-sunset.png",
+      "prompt": "Create a finished desktop wallpaper asset, landscape 16:9, preferably 2560x1440 or at least 1920x1080. Angular low-poly coastal cliffs and rocks overlooking a calm sea at sunset, warm pale sun near the right horizon, dusty rose and periwinkle clouds, lavender cliffs with restrained coral edges, soft sea reflections, quiet cinematic composition. Art direction: premium hand-crafted low-poly landscape illustration, clearly visible clean triangular facets on mountains, rich layered scenery, refined painterly light but crisp polygonal construction, same coherent visual family as an Alpine dawn low-poly wallpaper. Edge-to-edge artwork only. Balanced usable desktop composition, calm darker regions for windows, detailed foreground corners, unobstructed central scenery. NO computer screens, NO app UI, NO frame, NO text, NO letters, NO logo, NO watermark, NO collage. One single landscape. The generated image is the wallpaper itself."
+    }
+  ]
+}

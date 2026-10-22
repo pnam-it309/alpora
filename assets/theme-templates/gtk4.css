@@ -1,0 +1,62 @@
+/* Shared GTK4 / libadwaita material and semantic colors. */
+@define-color accent_bg_color #a9b99a;
+@define-color accent_fg_color #202729;
+@define-color accent_color #bfd0ad;
+@define-color window_bg_color #272d2d;
+@define-color window_fg_color #e7e9e5;
+@define-color view_bg_color #202729;
+@define-color view_fg_color #e7e9e5;
+@define-color headerbar_bg_color #2e3734;
+@define-color headerbar_fg_color #e7e9e5;
+@define-color headerbar_backdrop_color #293130;
+@define-color sidebar_bg_color #293230;
+@define-color sidebar_fg_color #e7e9e5;
+@define-color sidebar_backdrop_color #272e2c;
+@define-color secondary_sidebar_bg_color #242c2b;
+@define-color card_bg_color #343d38;
+@define-color card_fg_color #e7e9e5;
+@define-color popover_bg_color #293230;
+@define-color popover_fg_color #e7e9e5;
+@define-color dialog_bg_color #2b3430;
+@define-color dialog_fg_color #e7e9e5;
+:root {
+  --accent-bg-color: #a9b99a;
+  --accent-fg-color: #202729;
+  --accent-color: #bfd0ad;
+  --window-bg-color: #272d2d;
+  --window-fg-color: #e7e9e5;
+  --view-bg-color: #202729;
+  --view-fg-color: #e7e9e5;
+  --headerbar-bg-color: #2e3734;
+  --headerbar-fg-color: #e7e9e5;
+  --headerbar-backdrop-color: #293130;
+  --sidebar-bg-color: #293230;
+  --sidebar-fg-color: #e7e9e5;
+  --sidebar-backdrop-color: #272e2c;
+  --secondary-sidebar-bg-color: #242c2b;
+  --card-bg-color: #343d38;
+  --card-fg-color: #e7e9e5;
+  --popover-bg-color: #293230;
+  --popover-fg-color: #e7e9e5;
+  --dialog-bg-color: #2b3430;
+  --dialog-fg-color: #e7e9e5;
+  --success-bg-color: #899e79;
+  --success-color: #bfd0ad;
+  --warning-bg-color: #c09d76;
+  --warning-color: #e3c9a2;
+  --error-bg-color: #b9776b;
+  --error-color: #e4aa99;
+}
+headerbar { box-shadow: inset 0 -1px alpha(#a9b99a, 0.12); }
+entry, button { border-radius: 8px; }
+/* Application backgrounds stay opaque; popup glass is owned by the shell. */
+window.background, window.background:backdrop, window.background.csd, window.background.csd:backdrop {
+  background-color: @window_bg_color;
+  background-image: none;
+  color: @window_fg_color;
+}
+window.background .sidebar, window.background .navigation-sidebar, window.background placessidebar {
+  background-color: @sidebar_bg_color;
+  background-image: none;
+  color: @sidebar_fg_color;
+}

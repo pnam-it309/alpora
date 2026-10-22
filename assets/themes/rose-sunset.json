@@ -1,0 +1,24 @@
+{
+  "id": "rose-sunset",
+  "label": "Розовый закат",
+  "wallpaper": "wallpapers/rose-sunset.png",
+  "palette": {
+    "background": "#2c2335",
+    "surface": "#43334a",
+    "accent": "#e5a9c4",
+    "secondary": "#efb89e",
+    "cool": "#b4b3e6",
+    "text": "#edf0f6",
+    "muted": "#bdc5d3",
+    "border": "#566273"
+  },
+  "swatches": [
+    "#2c2335",
+    "#43334a",
+    "#b4b3e6",
+    "#e5a9c4",
+    "#efb89e"
+  ],
+  "iconTheme": "Poly-RoseSunset",
+  "lockClockFrame": "lockscreen/rose-sunset-clock.png"
+}

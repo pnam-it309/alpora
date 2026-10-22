@@ -1,0 +1,122 @@
+{
+  "version": 1,
+  "name": "ALPORA reference desktop",
+  "referenceResolution": [
+    1920,
+    1080
+  ],
+  "visual": {
+    "schemaVersion": 1,
+    "values": {
+      "windowRadius": 20,
+      "barRadius": 20,
+      "panelRadius": 20,
+      "barOpacity": 75,
+      "panelOpacity": 75,
+      "launcherOpacity": 75,
+      "activeOpacity": 100,
+      "inactiveOpacity": 100,
+      "blurEnabled": false,
+      "blurSize": 3,
+      "blurPasses": 1,
+      "launcherRadius": 20,
+      "widgetRadius": 16,
+      "notificationRadius": 13,
+      "widgetOpacity": 75,
+      "notificationOpacity": 75,
+      "panelPadding": 16,
+      "launcherPadding": 18,
+      "notificationPadding": 12,
+      "barBorder": 1,
+      "panelBorder": 1,
+      "launcherBorder": 1,
+      "widgetBorder": 1,
+      "notificationBorder": 1,
+      "barShadow": 20,
+      "panelShadow": 20,
+      "launcherShadow": 20,
+      "widgetShadow": 0,
+      "notificationShadow": 0,
+      "panelOpenMs": 320,
+      "panelCloseMs": 200,
+      "launcherOpenMs": 320,
+      "launcherCloseMs": 200,
+      "widgetAnimations": true,
+      "widgetFadeMs": 420,
+      "barHeight": 40,
+      "barMargin": 20,
+      "barTop": 12,
+      "barLeft": 20,
+      "barRight": 20,
+      "barBottom": 8,
+      "windowGap": 5,
+      "windowMargin": 12
+    }
+  },
+  "widgets": {
+    "schemaVersion": 1,
+    "values": {
+      "animations": true,
+      "screen": "",
+      "clock": {
+        "enabled": true,
+        "x": 0,
+        "y": 0
+      },
+      "weather": {
+        "enabled": true,
+        "x": 100,
+        "y": 0
+      },
+      "music": {
+        "enabled": true,
+        "x": 100,
+        "y": 238
+      },
+      "location": {
+        "name": "Алматы",
+        "latitude": 43.25,
+        "longitude": 76.95
+      }
+    }
+  },
+  "companion": {
+    "version": 1,
+    "enabled": true,
+    "lively": true,
+    "flights": true
+  },
+  "landscape": {
+    "version": 1,
+    "enabled": false
+  },
+  "settings": {
+    "schemaVersion": 1,
+    "apps": {
+      "terminal": [
+        "foot"
+      ],
+      "launcher": [
+        "fuzzel"
+      ],
+      "audio": [
+        "pavucontrol"
+      ],
+      "lock": [
+        "hyprlock"
+      ],
+      "network": [
+        "nm-connection-editor"
+      ]
+    },
+    "bar": {
+      "height": 40,
+      "workspaceCount": 4,
+      "fontFamily": "Noto Sans",
+      "fontSize": 13,
+      "margin": 20,
+      "top": 12
+    },
+    "reducedMotion": false
+  }
+}

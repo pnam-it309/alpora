@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="340" viewBox="0 0 1280 340" role="img" aria-labelledby="title desc">
+  <title id="title">ALPORA</title>
+  <desc id="desc">A landscape-inspired Hyprland desktop. Original faceted mountain artwork in sage, charcoal and warm sunrise tones.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1b2829"/><stop offset="1" stop-color="#111b20"/></linearGradient>
+    <linearGradient id="sunrise" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f1b791" stop-opacity=".13"/><stop offset="1" stop-color="#f1b791" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="1280" height="340" rx="18" fill="url(#sky)"/>
+  <rect x=".5" y=".5" width="1279" height="339" rx="17.5" fill="none" stroke="#a9c4b1" stroke-opacity=".17"/>
+  <path d="M685 339 848 98 1024 339Z" fill="url(#sunrise)"/>
+  <circle cx="1082" cy="99" r="27" fill="#f1b791"/>
+  <circle cx="1082" cy="99" r="44" fill="none" stroke="#f1b791" stroke-opacity=".15"/>
+  <path d="m680 269 120-94 79 59 70-81 122 107 78-60 131 93v47H680Z" fill="#263d40"/>
+  <path d="m758 293 179-205 170 205Z" fill="#a9bf9f"/>
+  <path d="m937 88 19 111 151 94Z" fill="#65847d"/>
+  <path d="m937 88-179 205 133-95Z" fill="#c7d2b8"/>
+  <path d="m937 88-46 110 65 1Z" fill="#e6e6cd"/>
+  <path d="m891 198-39 95h104V199Z" fill="#839f8d"/>
+  <path d="m956 199 51 94h100Z" fill="#4b6b68"/>
+  <path d="m659 310 134-74 106 76 129-61 107 60 145-48v77H659Z" fill="#1b3034"/>
+  <path d="M687 310h497M741 322h377" fill="none" stroke="#a4c5c5" stroke-opacity=".12"/>
+  <path d="m64 72 10-15 10 15m-10-15 3 15" fill="none" stroke="#b8cba1" stroke-width="1.8" stroke-linejoin="round"/>
+  <g fill="#edf0e5" font-family="DejaVu Sans,Arial,sans-serif">
+    <text x="100" y="72" font-size="11" letter-spacing="3" fill="#b8cba1">A DIFFERENT VIEW</text>
+    <text x="58" y="190" font-size="88" font-weight="500" letter-spacing="13">ALPORA</text>
+    <text x="64" y="234" font-size="19" fill="#bdc8c0">A landscape-inspired Hyprland desktop.</text>
+    <text x="64" y="296" font-size="10" letter-spacing="2.4" fill="#9bada4">LANDSCAPES · COLOUR · MOTION</text>
+  </g>
+</svg>

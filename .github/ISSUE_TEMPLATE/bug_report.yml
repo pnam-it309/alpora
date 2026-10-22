@@ -1,0 +1,23 @@
+name: Bug report
+description: Report a reproducible ALPORA issue
+title: "[Bug]: "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Include steps to reproduce and expected versus actual behaviour.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Distribution, Hyprland/Quickshell/Qt versions, monitor resolution and scale, theme.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs or screenshots
+      description: Remove private data, passwords, clipboard contents and personal notes before posting.

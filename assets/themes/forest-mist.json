@@ -1,0 +1,24 @@
+{
+  "id": "forest-mist",
+  "label": "Лесной туман",
+  "wallpaper": "wallpapers/forest-mist.png",
+  "palette": {
+    "background": "#192c2d",
+    "surface": "#2c4240",
+    "accent": "#a9c8ba",
+    "secondary": "#dfd7bb",
+    "cool": "#7caaa9",
+    "text": "#edf0f6",
+    "muted": "#bdc5d3",
+    "border": "#566273"
+  },
+  "swatches": [
+    "#192c2d",
+    "#2c4240",
+    "#7caaa9",
+    "#a9c8ba",
+    "#dfd7bb"
+  ],
+  "iconTheme": "Poly-ForestMist",
+  "lockClockFrame": "lockscreen/forest-mist-clock.png"
+}

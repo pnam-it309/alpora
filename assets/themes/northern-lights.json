@@ -1,0 +1,24 @@
+{
+  "id": "northern-lights",
+  "label": "Северное сияние",
+  "wallpaper": "wallpapers/northern-lights.png",
+  "palette": {
+    "background": "#172630",
+    "surface": "#283e4b",
+    "accent": "#7bd3cd",
+    "secondary": "#bca4f0",
+    "cool": "#8bb7ed",
+    "text": "#edf0f6",
+    "muted": "#bdc5d3",
+    "border": "#566273"
+  },
+  "swatches": [
+    "#172630",
+    "#283e4b",
+    "#8bb7ed",
+    "#7bd3cd",
+    "#bca4f0"
+  ],
+  "iconTheme": "Poly-NorthernLights",
+  "lockClockFrame": "lockscreen/northern-lights-clock.png"
+}

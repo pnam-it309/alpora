@@ -1,0 +1,9 @@
+scripts/check: 175 tests passed; strict QML lint passed.
+Shortcut backend: add/edit/disable/remove persisted and registered in Hyprland.
+scripts/check-shortcuts --live: Super+Shift+F8 invoked harmless temporary command; bindings restored.
+Shortcut editor: real QML/state code tested offscreen, including unsaved form and bounded form footer.
+Installer: isolated clean HOME, repeat installation, path with spaces and conflicting launcher preservation passed.
+Pointer exit: delayed real subprocess response cannot dismiss a new/reopened owner; fresh query is scheduled.
+Companion input: capture, click/drag split, recovery, cancellation and outside bar input passed with small frozen input window.
+Companion panel state: visible while panel open, motion paused, resumes on close.
+SVG assets: 276 parsed successfully. Python modules/scripts: 35 parsed successfully.
