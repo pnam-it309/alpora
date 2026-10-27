@@ -150,9 +150,10 @@ Existing preferences are preserved. A fresh account receives the reviewed
 ALPORA preset, rather than the author's notes, clipboard, accounts or location.
 Hardware status, weather, app lists and third-party application internals vary.
 
-Animated widgets still have a measurable CPU cost. Suspend/resume, monitor
-hotplug and more device combinations remain to be checked. Bluetooth pairing
-uses a terminal helper; monitor layout editing is pending.
+Animated widgets and companion timers have been optimized for idle CPU efficiency.
+The shell supports English (baseline), Vietnamese, and Russian via the i18n framework.
+Suspend/resume, monitor hotplug and more device combinations remain to be checked.
+Bluetooth pairing uses a terminal helper; monitor layout editing is pending.
 
 The last local check passed **197 tests and strict QML lint**. These are local
 results, not a hosted CI claim. Read the [known issues](docs/known-issues.md),

@@ -32,8 +32,13 @@ Item {
     readonly property bool rain: (renderedCode >= 51 && renderedCode <= 67) || (renderedCode >= 80 && renderedCode <= 82) || renderedCode >= 95
     readonly property bool fog: renderedCode === 45 || renderedCode === 48
     readonly property bool storm: renderedCode >= 95
-    clip: true
-    Timer { interval: 50; repeat: true; running: root.animated && root.visible; onTriggered: root.phase += 0.05 }
+    readonly property bool activeEffects: root.rain || root.snow || root.fog || root.storm || root.pointerX !== 0 || root.pointerY !== 0
+    Timer {
+        interval: 90
+        repeat: true
+        running: root.animated && root.visible && (root.activeEffects || Session.mode === "vibe")
+        onTriggered: root.phase += 0.075
+    }
     Rectangle {
         x: 60 + root.pointerX * 5; y: 3
         width: 110; height: 110; radius: 55

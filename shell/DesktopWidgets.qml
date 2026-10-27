@@ -20,16 +20,28 @@ Scope {
     readonly property var monitor: modelData ? Hyprland.monitorFor(modelData) : null
     function exposed(kind: string): bool {
         if (!modelData) return false;
+        // If workspace has fullscreen window or desktop overview is open, widgets are invisible
+        if (monitor && monitor.activeWorkspace && monitor.activeWorkspace.hasFullscreen) return false;
+        if (OverviewState.opened || Session.quickSettingsOpen) return false;
         const b = bounds(kind);
         const workspace = monitor && monitor.activeWorkspace ? monitor.activeWorkspace.id : -1;
         return !clients.some(c => {
-            if (!c.mapped || c.hidden || (!c.pinned && (!c.workspace || c.workspace.id !== workspace))) return false;
+            if (!c || !c.mapped || c.hidden || (!c.pinned && (!c.workspace || c.workspace.id !== workspace))) return false;
             if (!c.at || !c.size) return false;
             const x = c.at[0] - root.modelData.x, y = c.at[1] - root.modelData.y;
             const overlapWidth = Math.max(0, Math.min(x + c.size[0], b.x + b.width) - Math.max(x, b.x));
             const overlapHeight = Math.max(0, Math.min(y + c.size[1], b.y + b.height) - Math.max(y, b.y));
-            return overlapWidth * overlapHeight >= b.width * b.height * 0.97;
+            return overlapWidth * overlapHeight >= b.width * b.height * 0.88;
         });
+    }
+    function refreshClients(): void {
+        try {
+            if (Hyprland.toplevels && Hyprland.toplevels.values.length > 0) {
+                root.clients = Hyprland.toplevels.values.map(t => t.lastIpcObject).filter(c => !!c && !!c.at && !!c.size);
+                return;
+            }
+        } catch (_) {}
+        if (!clientReader.running) clientReader.running = true;
     }
     // Query only after compositor events, never on an animation-frame timer.
     Connections {
@@ -38,12 +50,12 @@ Scope {
             if (/^(openwindow|closewindow|movewindow|activewindow|workspace|focusedmon|fullscreen|changefloatingmode|pin|configreloaded)/.test(event.name)) visibilityRefresh.restart();
         }
     }
-    Timer { id: visibilityRefresh; interval: 180; onTriggered: if (!clientReader.running) clientReader.running = true }
+    Timer { id: visibilityRefresh; interval: 150; onTriggered: root.refreshClients() }
     Process {
         id: clientReader; command: ["hyprctl", "-j", "clients"]
         stdout: StdioCollector { onStreamFinished: { try { root.clients = JSON.parse(text); } catch (_) {} } }
     }
-    Component.onCompleted: visibilityRefresh.start()
+    Component.onCompleted: root.refreshClients()
     Variants {
         model: ["clock", "weather", "music"]
         // Each card has its own small surface: animating a cloud must not

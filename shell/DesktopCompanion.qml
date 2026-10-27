@@ -170,7 +170,7 @@ PanelWindow {
     }
     // Hyprland does not emit continuous geometry events while dragging windows.
     // Native IPC refresh only while travelling/attached; no spawned poll process.
-    Timer {interval:pet.travel.support.indexOf("window:")===0?(pet.lastTick-pet.geometryChangedAt<350?16:100):400;repeat:true;running:pet.moving && pet.away;onTriggered:Hyprland.refreshToplevels()}
+    Timer {interval:pet.travel.support.indexOf("window:")===0?(pet.lastTick-pet.geometryChangedAt<350?33:120):500;repeat:true;running:pet.moving && pet.away;onTriggered:Hyprland.refreshToplevels()}
     Connections {
         target:Hyprland
         function onRawEvent(event): void {
@@ -191,7 +191,7 @@ PanelWindow {
         function onBatteryChargingChanged(): void {if(Session.batteryCharging)pet.react("charge");}
     }
     Timer {
-        interval: pet.tossing || pet.pressing || pet.away || ["walk","greet","catch","dance","service"].includes(pet.behavior.activity) ? 16 : 33; repeat: true
+        interval: pet.tossing || pet.pressing || pet.away || ["walk","greet","catch","dance","service"].includes(pet.behavior.activity) ? 16 : ["sit","sleep","nap"].includes(pet.behavior.activity) ? 100 : 33; repeat: true
         running: pet.moving
         onTriggered: {
             const now=Date.now(),dt=pet.lastTick?Math.max(0,Math.min(.05,(now-pet.lastTick)/1000)):interval/1000;

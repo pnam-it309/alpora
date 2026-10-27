@@ -30,7 +30,7 @@ DesktopWidgetCard {
         syncSweep();
         if (!living) { pointerX = 0; pointerY = 0; }
     }
-    NumberAnimation { id: secondMotion; target: root; property: "sweep"; duration: 1000 }
+    NumberAnimation { id: secondMotion; target: root; property: "sweep"; duration: pointer.hovered ? 600 : 220; easing.type: Easing.OutQuad }
     HoverHandler {
         id: pointer
         onPointChanged: {

@@ -2,6 +2,8 @@
 
 ## Unreleased — ALPORA preview
 
+- Added lightweight internationalisation (i18n) framework supporting English (system baseline), Vietnamese, and Russian with dynamic runtime switching, zero-cost memory table lookups, and JSON locale files in `assets/locales/`.
+- Optimized desktop widget and companion CPU consumption: eliminated external `hyprctl` process spawning via in-memory `Hyprland.toplevels` tracking, added immediate occlusion on fullscreen windows and overview, throttled clock second sweep to rest 78% of each second, made weather particle timers conditional on active effects, and introduced adaptive tick rates for companion resting states.
 - Validated production configuration in isolated UID 1000/1001 profiles, real asset downloads, spaced paths, repeat setup and a separate software Wayland display; documented the remaining clean-OS gate.
 - Fixed first-start QIcon worker loading in launcher/dock, enabling active-but-disabled network/Bluetooth services, and preflighting settings-launcher conflicts before installation writes.
 
