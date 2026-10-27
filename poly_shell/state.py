@@ -191,6 +191,7 @@ def appearance_for(paths):
 
 def update_session(paths, requested=None):
     from .visual import visual_for
+    from .hardware import detect_hardware_profile
     with state_lock(paths):
         old = current_mode(paths)
         mode = ("vibe" if old == "work" else "work") if requested == "toggle" else (requested or old)
@@ -199,6 +200,7 @@ def update_session(paths, requested=None):
             "mode": mode,
             "profile": profile_for(paths, mode),
             "settings": settings_for(paths),
+            "hardware": detect_hardware_profile(),
             "appearance": appearance_for(paths),
             "visual": visual_for(paths),
         }

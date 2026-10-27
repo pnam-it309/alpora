@@ -2,13 +2,19 @@
 
 function size(kind) {
     return kind === "clock" ? {width: 460, height: 200}
-        : kind === "weather" ? {width: 370, height: 200} : {width: 370, height: 190};
+        : kind === "weather" ? {width: 370, height: 200}
+        : kind === "music" ? {width: 370, height: 190}
+        : kind === "developer" ? {width: 410, height: 206}
+        : {width: 390, height: 360};
 }
 
 function bounds(kind, setting, width, height, top) {
+    return boundsForSize(setting, width, height, top, size(kind));
+}
+
+function boundsForSize(setting, width, height, top, natural) {
     const scale = Math.max(0.25, Math.min(1, width / 1000, height / 800));
     const margin = 20 * scale;
-    const natural = size(kind);
     const w = Math.min(natural.width * scale, Math.max(1, width - margin * 2));
     const h = Math.min(natural.height * scale, Math.max(1, height - top - margin));
     const origin = Math.min(top, Math.max(0, height - h - margin));

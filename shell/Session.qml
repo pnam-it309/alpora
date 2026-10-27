@@ -38,9 +38,12 @@ Singleton {
     readonly property var outputs: pipewireNodes.values.filter(node => !node.isStream && node.audio && node.isSink)
     readonly property var inputs: pipewireNodes.values.filter(node => !node.isStream && node.audio && !node.isSink)
     readonly property var sink: Pipewire.defaultAudioSink
-    readonly property var audio: sink && sink.ready ? sink.audio : null
+    readonly property var hardware: snapshot.hardware || ({deviceClass: "desktop", isLaptop: false, batteryAvailable: false, brightnessAvailable: false})
+    readonly property bool isLaptop: hardware.isLaptop === true
+    readonly property bool isDesktop: !isLaptop
+    readonly property bool brightnessAvailable: hardware.brightnessAvailable !== false
     readonly property var battery: UPower.displayDevice
-    readonly property bool batteryPresent: !!battery && battery.ready && battery.isLaptopBattery
+    readonly property bool batteryPresent: isLaptop && hardware.batteryAvailable !== false && !!battery && battery.ready && battery.isLaptopBattery
     readonly property bool batteryCharging: batteryPresent && battery.state === UPowerDeviceState.Charging
     readonly property bool onBattery: UPower.onBattery
     readonly property string batteryStatus: !batteryPresent ? I18n.tr("power.ac")

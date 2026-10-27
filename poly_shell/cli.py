@@ -192,7 +192,7 @@ def main(argv=None):
     timeline_parser.add_argument("action", choices=("get", "set", "ready"))
     timeline_parser.add_argument("payload", nargs="?", default="{}")
     widgets_parser = sub.add_parser("widgets", help="desktop widgets, layout and weather")
-    widgets_parser.add_argument("action", choices=("get", "apply", "weather", "search"))
+    widgets_parser.add_argument("action", choices=("get", "apply", "weather", "search", "metrics"))
     widgets_parser.add_argument("payload", nargs="?", default="{}")
     shortcuts_parser = sub.add_parser("shortcuts", help="edit persistent Hyprland keyboard shortcuts")
     shortcuts_parser.add_argument("action", choices=("get", "apply"))

@@ -81,6 +81,8 @@ singleton ThemeState 1.0 ThemeState.qml
 ThemePage 1.0 ThemePage.qml
 
 singleton WidgetState 1.0 WidgetState.qml
+singleton RunningAppsState 1.0 RunningAppsState.qml
+singleton DeveloperMetricsState 1.0 DeveloperMetricsState.qml
 singleton WeatherState 1.0 WeatherState.qml
 DesktopWidgets 1.0 DesktopWidgets.qml
 DesktopThemeMenu 1.0 DesktopThemeMenu.qml
@@ -91,6 +93,9 @@ ClockDigit 1.0 ClockDigit.qml
 ClockLandscape 1.0 ClockLandscape.qml
 DesktopWeather 1.0 DesktopWeather.qml
 DesktopMusic 1.0 DesktopMusic.qml
+DesktopDeveloperWidget 1.0 DeveloperMetricsWidget.qml
+DesktopRunningApps 1.0 DesktopRunningApps.qml
+DeveloperMetricsPanel 1.0 DeveloperMetricsPanel.qml
 WeatherGlyph 1.0 WeatherGlyph.qml
 WeatherScene 1.0 WeatherScene.qml
 SettingsWidgets 1.0 SettingsWidgets.qml

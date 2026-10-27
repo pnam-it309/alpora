@@ -29,6 +29,7 @@ ShellRoot {
     Variants { model: Quickshell.screens; DesktopThemeMenu {} }
     Variants { model: Quickshell.screens; LivingLandscape {} }
     Variants { model: Quickshell.screens; DesktopWidgets {} }
+    Variants { model: Quickshell.screens; DeveloperMetricsPanel {} }
     Variants { model: Quickshell.screens; TimelineWallpaper {} }
     Variants { model: Quickshell.screens; WorkspaceOverview {} }
     Variants { model: Quickshell.screens; Dock {} }

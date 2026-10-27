@@ -252,12 +252,13 @@ PanelWindow {
                         onMuteRequested: if (Session.audio) Session.audio.muted = !Session.audio.muted
                         onDetailsRequested: { BarState.expandQuick(); popup.page = "output"; }
                     }
-                    Item { width: 1; height: 8 }
-                    Rectangle { width: parent.width; height: 1; color: Glass.tint(Session.accent, 0.16) }
-                    Item { width: 1; height: 8 }
+                    Item { width: 1; height: brightness.visible ? 8 : 0 }
+                    Rectangle { width: parent.width; height: brightness.visible ? 1 : 0; visible: brightness.visible; color: Glass.tint(Session.accent, 0.16) }
+                    Item { width: 1; height: brightness.visible ? 8 : 0 }
                     ControlRow {
                         id: brightness
-                        width: parent.width; height: implicitHeight
+                        visible: Session.brightnessAvailable && Desktop.data.brightnessAvailable
+                        width: parent.width; height: visible ? implicitHeight : 0
                         property real pendingValue: value
                         showLabel: true; label: I18n.tr("osd.brightness"); symbol: "sun"
                         minimum: 0.05; value: Desktop.data.brightness / 100

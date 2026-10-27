@@ -19,7 +19,7 @@ Singleton {
 
     // Current Qt.locale object for date/time formatting.
     readonly property var qtLocale: {
-        const map = { "ru": "ru_RU", "vi": "vi_VN", "en": "en_US" };
+        const map = { "ru": "ru_RU", "vi": "vi_VN", "en": "en_US", "es": "es_ES" };
         return Qt.locale(map[root.locale] || "en_US");
     }
 
@@ -60,6 +60,21 @@ Singleton {
     function trArray(key: string): var {
         const value = root.strings[key];
         return Array.isArray(value) ? value : [];
+    }
+
+    // Translates compound status string, splitting by ' · ' if present.
+    function trStatus(value: var): string {
+        const source = String(value || "");
+        if (!source) return "";
+        const direct = root.tr(source);
+        if (direct !== source) return direct;
+        if (!source.includes(" · ")) return source;
+        return source.split(" · ").map(part => root.tr(part.trim())).join(" · ");
+    }
+
+    // Compatibility wrapper for hardware status translations.
+    function trHardware(key: string, language: string): string {
+        return root.tr(key);
     }
 
     // ── Loading ─────────────────────────────────────────────────────────

@@ -21,7 +21,13 @@ ColumnLayout {
     readonly property var selectedBox: Geometry.bounds(selected, chosen, screenWidth, screenHeight, safeTop)
     spacing: 12
     Component.onCompleted: WidgetState.begin()
-    function title(kind: string): string { return kind === "clock" ? I18n.tr("center.clock") : kind === "weather" ? I18n.tr("center.weather") : I18n.tr("music.title"); }
+    function title(kind: string): string {
+        return kind === "clock" ? I18n.tr("center.clock")
+            : kind === "weather" ? I18n.tr("center.weather")
+            : kind === "music" ? I18n.tr("music.title")
+            : kind === "developer" ? I18n.tr("widgets.developer")
+            : I18n.tr("widgets.running_apps");
+    }
     ScrollView {
         id: scroll
         Layout.fillWidth: true; Layout.fillHeight: true
@@ -96,7 +102,7 @@ ColumnLayout {
                     SettingsImage { anchors.fill: parent; radius: 10; source: root.wallpaper; sourceSize: Qt.size(900, 600) }
                     Rectangle { x: 5; y: 4; width: parent.width - 10; height: Math.max(5, 40 * preview.ratio); radius: 3; color: Session.surface; opacity: 0.9 }
                     Repeater {
-                        model: ["clock", "weather", "music"]
+                        model: ["clock", "weather", "music", "developer", "apps"]
                         Rectangle {
                             id: miniature
                             required property string modelData
@@ -130,8 +136,8 @@ ColumnLayout {
             RowLayout {
                 Layout.fillWidth: true; spacing: 8
                 Repeater {
-                    model: ["clock", "weather", "music"]
-                    AppearanceButton { required property string modelData; Layout.fillWidth: true; text: root.title(modelData); symbol: modelData === "clock" ? "calendar" : modelData === "weather" ? "sun" : "music"; selected: root.selected === modelData; onClicked: root.selected = modelData }
+                    model: ["clock", "weather", "music", "developer", "apps"]
+                    AppearanceButton { required property string modelData; Layout.fillWidth: true; text: root.title(modelData); symbol: modelData === "clock" ? "calendar" : modelData === "weather" ? "sun" : modelData === "music" ? "music" : modelData === "developer" ? "settings" : "overview"; selected: root.selected === modelData; onClicked: root.selected = modelData }
                 }
                 SettingsToggle { checked: root.chosen.enabled; enabled: !WidgetState.busy; Accessible.name: I18n.tr("widgets.show_prefix") + root.title(root.selected); onToggled: WidgetState.edit(root.selected, "enabled", checked) }
             }

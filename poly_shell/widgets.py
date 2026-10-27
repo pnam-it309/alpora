@@ -7,6 +7,7 @@ from urllib.parse import urlencode
 from urllib.request import urlopen
 
 from .state import ConfigError, atomic_json, read_object, state_lock
+from .developer_metrics import snapshot as developer_metrics_snapshot
 
 DEFAULTS = {
     "animations": True,
@@ -14,21 +15,28 @@ DEFAULTS = {
     "clock": {"enabled": True, "x": 0, "y": 0},
     "weather": {"enabled": True, "x": 100, "y": 0},
     "music": {"enabled": True, "x": 100, "y": 238},
+    "developer": {"enabled": True, "x": 0, "y": 220},
+    "apps": {"enabled": True, "x": 50, "y": 430},
     "location": {"name": "Almaty", "latitude": 43.25, "longitude": 76.95},
 }
 
 
 def validate(value):
-    # Existing layouts gain motion without changing their positions or city.
-    if isinstance(value, dict) and 'animations' not in value:
-        value = value | {'animations': True}
+    # Existing layouts gain motion and new widgets without changing their positions or city.
+    if isinstance(value, dict):
+        if 'animations' not in value:
+            value = value | {'animations': True}
+        if 'developer' not in value:
+            value = value | {'developer': deepcopy(DEFAULTS['developer'])}
+        if 'apps' not in value:
+            value = value | {'apps': deepcopy(DEFAULTS['apps'])}
     if not isinstance(value, dict) or set(value) != set(DEFAULTS):
         raise ConfigError("Invalid widget settings")
     if type(value['animations']) is not bool:
         raise ConfigError("Invalid animation settings")
     if not isinstance(value['screen'], str) or len(value['screen']) > 128 or '\0' in value['screen']:
         raise ConfigError("Invalid monitor")
-    for key in ('clock', 'weather', 'music'):
+    for key in ('clock', 'weather', 'music', 'developer', 'apps'):
         item = value[key]
         if not isinstance(item, dict) or set(item) != {'enabled', 'x', 'y'} or type(item['enabled']) is not bool:
             raise ConfigError("Invalid widget parameters: " + key)
@@ -120,6 +128,8 @@ def weather(paths):
 
 
 def widgets_control(paths, action, payload):
+    if action == 'metrics':
+        return developer_metrics_snapshot()
     if action == 'weather':
         return weather(paths)
     if action == 'search':

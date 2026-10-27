@@ -14,8 +14,12 @@ Scope {
     readonly property real safeTop: Session.visual.barTop + Session.visual.barHeight + Math.max(20, Session.visual.barBottom + 12)
     readonly property var config: WidgetState.values
     readonly property string targetScreen: Quickshell.screens.find(s => s.name === config.screen)?.name || (Quickshell.screens.length ? Quickshell.screens[0].name : "")
-    readonly property bool visible: !!modelData && Session.loaded && WidgetState.loaded && modelData.name === targetScreen && (config.clock.enabled || config.weather.enabled || config.music.enabled)
-    function bounds(kind: string): var { return Geometry.bounds(kind, config[kind], width, height, safeTop); }
+    readonly property bool visible: !!modelData && Session.loaded && WidgetState.loaded && modelData.name === targetScreen && (config.clock.enabled || config.weather.enabled || config.music.enabled || (config.developer && config.developer.enabled) || (config.apps && config.apps.enabled))
+    function bounds(kind: string): var {
+        if (kind === "apps" && RunningAppsState.expanded)
+            return Geometry.boundsForSize(config[kind], width, height, safeTop, {width: 540, height: 620});
+        return Geometry.bounds(kind, config[kind], width, height, safeTop);
+    }
     property var clients: []
     readonly property var monitor: modelData ? Hyprland.monitorFor(modelData) : null
     function exposed(kind: string): bool {
@@ -57,7 +61,7 @@ Scope {
     }
     Component.onCompleted: root.refreshClients()
     Variants {
-        model: ["clock", "weather", "music"]
+        model: ["clock", "weather", "music", "developer", "apps"]
         // Each card has its own small surface: animating a cloud must not
         // repaint a full-screen transparent buffer and its compositor blur.
         // qmllint disable uncreatable-type
@@ -75,12 +79,12 @@ Scope {
             // qmllint enable missing-property
             implicitWidth: Math.ceil(box.width) + 16; implicitHeight: Math.ceil(box.height) + 16
             color: "transparent"
-            visible: root.visible && root.config[modelData].enabled
+            visible: root.visible && root.config[modelData] && root.config[modelData].enabled
             WlrLayershell.layer: WlrLayer.Bottom
             // The shell's broad glass rule enables live compositor blur.
             // These mostly opaque animated cards use their own namespace.
             WlrLayershell.namespace: "poly-desktop-widget"
-            WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+            WlrLayershell.keyboardFocus: modelData === "apps" && RunningAppsState.expanded ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
             exclusionMode: ExclusionMode.Ignore; exclusiveZone: 0
             mask: Region { item: widgetLoader }
             Loader {
@@ -88,7 +92,7 @@ Scope {
                 x: Math.min(8, card.box.x); y: Math.min(8, card.box.y)
                 width: card.box.width; height: card.box.height
                 active: card.visible
-                sourceComponent: card.modelData === "clock" ? clockComponent : card.modelData === "weather" ? weatherComponent : musicComponent
+                sourceComponent: card.modelData === "clock" ? clockComponent : card.modelData === "weather" ? weatherComponent : card.modelData === "music" ? musicComponent : card.modelData === "developer" ? developerComponent : appsComponent
             }
             Component {
                 id: clockComponent
@@ -102,10 +106,18 @@ Scope {
                 id: musicComponent
                 Item { DesktopMusic { width: 370; height: 190; scale: card.box.width / width; transformOrigin: Item.TopLeft; motionActive: card.visible && root.exposed(card.modelData) } }
             }
+            Component {
+                id: developerComponent
+                Item { DesktopDeveloperWidget { width: 410; height: 206; scale: card.box.width / width; transformOrigin: Item.TopLeft; motionActive: card.visible && root.exposed(card.modelData); screenName: root.modelData ? root.modelData.name : "" } }
+            }
+            Component {
+                id: appsComponent
+                Item { width: RunningAppsState.expanded ? 540 : 390; height: RunningAppsState.expanded ? 620 : 360; scale: card.box.width / width; transformOrigin: Item.TopLeft; DesktopRunningApps { anchors.fill: parent; motionActive: card.visible && root.exposed(card.modelData) } }
+            }
         }
     }
     IpcHandler {
         target: "desktop-widgets-" + (root.modelData ? root.modelData.name : "disconnected")
-        function status(): string { return JSON.stringify({visible: root.visible, screen: root.targetScreen, width: root.width, height: root.height, clock: root.bounds("clock"), weather: root.bounds("weather"), music: root.bounds("music"), exposed: {clock: root.exposed("clock"), weather: root.exposed("weather"), music: root.exposed("music")}, animations: !!root.config.animations && Session.visual.widgetAnimations && !Motion.reduced}); }
+        function status(): string { return JSON.stringify({visible: root.visible, screen: root.targetScreen, width: root.width, height: root.height, clock: root.bounds("clock"), weather: root.bounds("weather"), music: root.bounds("music"), developer: root.bounds("developer"), apps: root.bounds("apps"), exposed: {clock: root.exposed("clock"), weather: root.exposed("weather"), music: root.exposed("music"), developer: root.exposed("developer"), apps: root.exposed("apps")}, animations: !!root.config.animations && Session.visual.widgetAnimations && !Motion.reduced}); }
     }
 }

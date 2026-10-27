@@ -240,7 +240,7 @@ def apply(paths, patch, expected=None):
         config = paths.config / "visual.json"
         generated = generated_path(paths)
         # Persist the original files before any mutation, for exact rollback.
-        originals = {p: p.read_text() if p.exists() else None
+        originals = {p: p.read_text(encoding="utf-8") if p.exists() else None
                      for p in (config, generated, notification_file, paths.session)}
         try:
             runtime_apply(value)
@@ -255,7 +255,7 @@ def apply(paths, patch, expected=None):
                 try:
                     if original is None:
                         path.unlink(missing_ok=True)
-                    elif not path.exists() or path.read_text() != original:
+                    elif not path.exists() or path.read_text(encoding="utf-8") != original:
                         atomic_text(path, original)
                 except OSError as exc:
                     failures.append(str(exc))
