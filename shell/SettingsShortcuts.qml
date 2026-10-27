@@ -129,8 +129,10 @@ ColumnLayout {
             ShortcutItem { name: I18n.tr("bar.open_terminal"); keys: ["Super", "Return"] }
             ShortcutItem { name: I18n.tr("day.files"); keys: ["Super", "E"] }
             ShortcutItem { name: "Web Browser (Firefox)"; keys: ["Super", "B"] }
-            ShortcutItem { name: "Close Window"; keys: ["Super", "C"] }
-            ShortcutItem { name: "Toggle Floating"; keys: ["Super", "F"] }
+            ShortcutItem { name: "Close Window"; keys: ["Super", "Q"] }
+            ShortcutItem { name: "Fullscreen Toggle"; keys: ["Super", "F"] }
+            ShortcutItem { name: "Toggle Floating"; keys: ["Super", "Shift", "V"] }
+            ShortcutItem { name: "Switch Active Window"; keys: ["Alt", "Tab"] }
             ShortcutItem { name: I18n.tr("quick.screenshot"); keys: ["Print"] }
 
             // Workspaces & Navigation Group
@@ -141,7 +143,9 @@ ColumnLayout {
             }
             ShortcutItem { name: I18n.tr("overview.workspace") + " 1 … 9"; keys: ["Super", "1 - 9"] }
             ShortcutItem { name: "Move Window to Workspace 1 … 9"; keys: ["Super", "Shift", "1 - 9"] }
-            ShortcutItem { name: "Focus Left / Right / Up / Down"; keys: ["Super", "← → ↑ ↓"] }
+            ShortcutItem { name: "Focus Window"; keys: ["Super", "← → ↑ ↓"] }
+            ShortcutItem { name: "Swap / Move Window"; keys: ["Super", "Shift", "← → ↑ ↓"] }
+            ShortcutItem { name: "Resize Window (Keyboard)"; keys: ["Super", "Ctrl", "← → ↑ ↓"] }
 
             // Customizer Callout
             Item { Layout.preferredHeight: 8 }

@@ -123,6 +123,7 @@ core_packages=(
     xdg-desktop-portal xdg-desktop-portal-hyprland xdg-desktop-portal-gtk
     swaybg wl-clipboard grim slurp libnotify playerctl xdg-utils xdg-user-dirs
     noto-fonts noto-fonts-emoji adwaita-icon-theme git curl
+    fcitx5 fcitx5-bamboo fcitx5-configtool fcitx5-gtk fcitx5-qt
 )
 
 bundled_apps=(

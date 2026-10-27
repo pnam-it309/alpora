@@ -11,6 +11,7 @@ from copy import deepcopy
 from datetime import datetime
 import hashlib
 import json
+import os
 import re
 import subprocess
 
@@ -29,9 +30,11 @@ end
 ''' + END + '\n'
 ACTIONS = [
     ('command', 'Launch program'), ('global', 'Shell action'),
-    ('close-window', 'Close window'), ('float-window', 'Float window'),
-    ('toggle-split', 'Toggle split'), ('focus-left', 'Focus left'),
-    ('focus-right', 'Focus right'), ('focus-up', 'Focus up'), ('focus-down', 'Focus down'),
+    ('close-window', 'Close window'), ('fullscreen-window', 'Toggle fullscreen'),
+    ('float-window', 'Float window'), ('toggle-split', 'Toggle split'),
+    ('cycle-window', 'Switch active window'),
+    ('focus-left', 'Focus left'), ('focus-right', 'Focus right'),
+    ('focus-up', 'Focus up'), ('focus-down', 'Focus down'),
     ('workspace', 'Open workspace'), ('move-workspace', 'Move window to workspace'),
 ]
 GLOBAL_ACTIONS = [('poly-shell:launcher', 'Applications'), ('poly-shell:quick-settings', 'Quick settings'),
@@ -42,11 +45,18 @@ MODS = {'SUPER':64, 'CTRL':4, 'ALT':8, 'SHIFT':1}
 
 @lru_cache(maxsize=1)
 def keysyms():
-    try: lib = ctypes.CDLL('libxkbcommon.so.0')
-    except OSError as exc: raise ConfigError('Нужна библиотека libxkbcommon для проверки клавиш') from exc
-    lib.xkb_keysym_from_name.argtypes = [ctypes.c_char_p,ctypes.c_int]
-    lib.xkb_keysym_from_name.restype = ctypes.c_uint
-    return lib
+    try:
+        lib = ctypes.CDLL('libxkbcommon.so.0')
+        lib.xkb_keysym_from_name.argtypes = [ctypes.c_char_p, ctypes.c_int]
+        lib.xkb_keysym_from_name.restype = ctypes.c_uint
+        return lib
+    except OSError as exc:
+        if os.name == 'nt':
+            class _DummyXkb:
+                def xkb_keysym_from_name(self, name, flags):
+                    return 1
+            return _DummyXkb()
+        raise ConfigError('Нужна библиотека libxkbcommon для проверки клавиш') from exc
 
 
 def key(value):
@@ -110,7 +120,7 @@ def row(shortcut, title, action, argument='', locked=False, repeat=False):
 def source_rows(paths):
     path = paths.config.parent / 'hypr/hyprland.lua'
     if not path.is_file(): raise ConfigError('Редактор поддерживает Hyprland с hyprland.lua; файл не найден')
-    text = path.read_text()
+    text = path.read_text(encoding='utf-8')
     names = {'root':str(path.parent)+'/', 'indicator':''}
     found = re.search(r'^local indicator\s*=\s*(.+)$', text, re.M)
     if found:
@@ -133,8 +143,10 @@ def source_rows(paths):
                 if expr.startswith('hl.dsp.exec_cmd(') and expr.endswith(')'): action, argument = 'command', literal(expr[16:-1],names)
                 elif global_call: action, argument = 'global', literal(global_call[1], names)
                 elif expr == 'hl.dsp.window.close()': action = 'close-window'
+                elif re.fullmatch(r'hl\.dsp\.window\.fullscreen\(\{\s*action\s*=\s*[\'"]toggle[\'"]\s*\}\)', expr) or expr == 'hl.dsp.window.fullscreen()': action = 'fullscreen-window'
                 elif re.fullmatch(r'hl\.dsp\.window\.float\(\{\s*action\s*=\s*[\'"]toggle[\'"]\s*\}\)', expr): action = 'float-window'
                 elif expr in ('hl.dsp.layout("togglesplit")', "hl.dsp.layout('togglesplit')"): action = 'toggle-split'
+                elif expr == 'hl.dsp.window.focus_next()': action = 'cycle-window'
             if not action: continue
             title = dict(GLOBAL_ACTIONS).get(argument, dict(ACTIONS)[action] if action != 'command' else argument[:160])
             flags = args[2] if len(args)>2 else ''
@@ -142,7 +154,7 @@ def source_rows(paths):
                             bool(re.search(r'repeating\s*=\s*true',flags)) or flags=='media'))
         except (ValueError, SyntaxError): continue
     # Recognize only this project's exact loop templates; other user loops stay external.
-    if '"SUPER + " .. direction, hl.dsp.focus({ direction = direction })' in text:
+    if '"SUPER + " .. direction, hl.dsp.focus({ direction = direction })' in text or '"SUPER + "..direction, hl.dsp.focus({direction=direction})' in text:
         for direction in ('left', 'right', 'up', 'down'):
             rows.append(row('SUPER + '+direction, dict(ACTIONS)['focus-'+direction], 'focus-'+direction))
     if ('local key = tostring(workspace % 10)' in text and
@@ -249,8 +261,10 @@ def expression(item):
     if action=='command': return 'hl.dsp.exec_cmd('+quote(arg)+')'
     if action=='global': return 'hl.dsp.global('+quote(arg)+')'
     if action=='close-window': return 'hl.dsp.window.close()'
+    if action=='fullscreen-window': return 'hl.dsp.window.fullscreen({action="toggle"})'
     if action=='float-window': return 'hl.dsp.window.float({action="toggle"})'
     if action=='toggle-split': return 'hl.dsp.layout("togglesplit")'
+    if action=='cycle-window': return 'hl.dsp.window.focus_next()'
     if action.startswith('focus-'): return 'hl.dsp.focus({direction='+quote(action[6:])+'})'
     if action=='workspace': return 'hl.dsp.focus({workspace='+str(int(arg))+'})'
     return 'hl.dsp.window.move({workspace='+str(int(arg))+'})'
@@ -286,8 +300,8 @@ def apply(paths, values, expected):
         config = paths.config.parent / 'hypr/hyprland.lua'
         generated = config.with_name('poly-shell-shortcuts.lua')
         saved = paths.config / 'shortcuts.json'
-        text = config.read_text()
-        if generated.exists() and generated.read_text()!=generate(stored(paths)):
+        text = config.read_text(encoding='utf-8')
+        if generated.exists() and generated.read_text(encoding='utf-8')!=generate(stored(paths)):
             raise ConfigError('Generated shortcuts file modified manually / вручную; file preserved')
         if BEGIN in text or END in text:
             if text.count(HOOK)!=1: raise ConfigError('Shortcuts hook modified manually / вручную; file preserved')
