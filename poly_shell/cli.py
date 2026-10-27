@@ -209,6 +209,9 @@ def main(argv=None):
     organizer_parser = sub.add_parser("organizer", help="local calendar, tasks, notes and focus timer")
     organizer_parser.add_argument("action", choices=("get", "task-add", "event-add", "task-toggle", "item-remove", "note", "timer-start", "timer-pause", "timer-reset", "timer-duration"))
     organizer_parser.add_argument("payload", nargs="?", default="{}")
+    windows_fs_parser = sub.add_parser("windows-drives", help="discover and mount Windows partitions")
+    windows_fs_parser.add_argument("action", choices=("list", "mount", "unmount", "normalize-path"))
+    windows_fs_parser.add_argument("target", nargs="?", default="")
     args = parser.parse_args(argv)
     paths = Paths.current()
     try:
@@ -269,6 +272,16 @@ def main(argv=None):
             try: payload = json.loads(args.payload)
             except ValueError as exc: raise ConfigError("Invalid appearance JSON") from exc
             print(json.dumps(appearance_control(paths, args.action, payload), ensure_ascii=False))
+        elif args.command == "windows-drives":
+            from .windows_fs import detect_windows_drives, mount_drive, unmount_drive, normalize_windows_path
+            if args.action == "list":
+                print(json.dumps(detect_windows_drives(), ensure_ascii=False))
+            elif args.action == "mount":
+                print(json.dumps({"mountpoint": mount_drive(args.target)}, ensure_ascii=False))
+            elif args.action == "unmount":
+                print(json.dumps({"success": unmount_drive(args.target)}, ensure_ascii=False))
+            elif args.action == "normalize-path":
+                print(normalize_windows_path(args.target))
         elif args.command == "wallpaper":
             wallpaper(paths, args.image, reset=args.reset)
         elif args.command == "settings":

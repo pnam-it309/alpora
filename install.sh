@@ -124,6 +124,7 @@ core_packages=(
     swaybg wl-clipboard grim slurp libnotify playerctl xdg-utils xdg-user-dirs
     noto-fonts noto-fonts-emoji adwaita-icon-theme git curl
     fcitx5 fcitx5-bamboo fcitx5-configtool fcitx5-gtk fcitx5-qt
+    ntfs-3g dosfstools exfatprogs udisks2 gvfs gvfs-smb gvfs-mtp cifs-utils
 )
 
 bundled_apps=(
