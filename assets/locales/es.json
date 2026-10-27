@@ -760,5 +760,20 @@
   "System": "Sistema",
   "Unavailable": "No disponible",
   "Could not read system metrics": "No se pudieron leer las métricas del sistema",
-  "Settings": "Ajustes"
+  "Settings": "Ajustes",
+  "quick.mobile_hotspot": "Zona con cobertura móvil",
+  "wifi.hotspot_desc": "Comparte tu conexión a internet con otros dispositivos a través de Wi-Fi",
+  "wifi.hotspot_devices": "{count} dispositivos conectados",
+  "wifi.hotspot_name": "Nombre de red (SSID)",
+  "wifi.hotspot_password": "Contraseña de red",
+  "wifi.hotspot_band": "Banda de red: 2,4 GHz",
+  "wifi.hotspot_save": "Guardar configuración",
+  "wifi.hotspot_saved": "Configuración de zona guardada",
+  "wifi.enterprise_identity": "Usuario / Identidad",
+  "wifi.enterprise_checkbox": "Red empresarial / educativa (requiere usuario)",
+  "wifi.add_hidden": "Conectar a una red oculta o manual",
+  "wifi.show_password": "Mostrar contraseña",
+  "wifi.hide_password": "Ocultar contraseña",
+  "wifi.enter_ssid": "Introduce el nombre de la red (SSID)",
+  "wifi.security_label": "Seguridad: {type}"
 }

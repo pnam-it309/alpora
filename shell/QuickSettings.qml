@@ -99,7 +99,7 @@ PanelWindow {
         function startMotionTrace(): void { body.startTrace(); }
         function stopMotionTrace(): string { return JSON.stringify(body.finishTrace()); }
         function navigate(page: string): bool {
-            if (!popup.opened || !["main", "wifi", "bluetooth", "output", "input", "settings", "power", "nightlight", "dnd", "profiles", "airplane"].includes(page)) return false;
+            if (!popup.opened || !["main", "wifi", "bluetooth", "output", "input", "settings", "power", "nightlight", "dnd", "profiles", "airplane", "hotspot", "password"].includes(page)) return false;
             BarState.expandQuick(); popup.page = page; return true;
         }
     }
@@ -111,9 +111,12 @@ PanelWindow {
     PageMotion { id: pageMotion; page: popup.page; enabled: popup.opened && popup.grabReady }
     property string powerAction: ""
     property var selectedNetwork: null
+    property bool isEnterprise: false
+    property string customSsid: ""
+    property bool showPassword: false
     property string localError: ""
     readonly property var passwordInput: passwordLoader.item
-    readonly property string title: ({wifi: "Wi‑Fi", bluetooth: "Bluetooth", output: I18n.tr("settings.sound_output"), input: I18n.tr("settings.microphone"), settings: I18n.tr("settings.devices"), power: I18n.tr("settings.power"), password: I18n.tr("wifi.connecting_title"), nightlight: I18n.tr("quick.night_light"), dnd: I18n.tr("notification.dnd"), profiles: I18n.tr("quick.power_mode"), airplane: I18n.tr("quick.airplane_mode")})[page] || I18n.tr("quick.control_center")
+    readonly property string title: ({wifi: "Wi‑Fi", bluetooth: "Bluetooth", output: I18n.tr("settings.sound_output"), input: I18n.tr("settings.microphone"), settings: I18n.tr("settings.devices"), power: I18n.tr("settings.power"), password: I18n.tr("wifi.connecting_title"), nightlight: I18n.tr("quick.night_light"), dnd: I18n.tr("notification.dnd"), profiles: I18n.tr("quick.power_mode"), airplane: I18n.tr("quick.airplane_mode"), hotspot: I18n.tr("quick.mobile_hotspot")})[page] || I18n.tr("quick.control_center")
     readonly property string profileLabel: ({"power-saver": I18n.tr("quick.power_saver_short"), balanced: I18n.tr("quick.balanced_short"), performance: I18n.tr("quick.performance_short")})[Desktop.data.powerProfile] || I18n.tr("quick.power_unavailable")
     function launchTerminal(args: var): void {
         Session.closeQuickSettings();
@@ -121,6 +124,7 @@ PanelWindow {
     }
     onPageChanged: {
         localError = "";
+        showPassword = false;
         if (popup.passwordInput) popup.passwordInput.clear();
     }
     Binding {
@@ -288,8 +292,9 @@ PanelWindow {
                         id: modes
                         width: parent.width; height: 44 + 36 * popup.expansionCurve
                         spacing: 10 * popup.expansionCurve
+                        readonly property real tileWidth: (modes.width - 30) / 4
                         QuickSwitchTile {
-                            width: modes.width - (2 * (modes.width - 20) / 3 + 20) * popup.expansionCurve
+                            width: modes.width - (3 * modes.tileWidth + 30) * popup.expansionCurve
                             height: modes.height
                             compactProgress: 1 - popup.expansionCurve
                             title: I18n.tr("notification.dnd"); symbol: "bell"; active: Desktop.data.dnd
@@ -297,16 +302,22 @@ PanelWindow {
                             onToggled: Desktop.request("dnd", "")
                         }
                         QuickSwitchTile {
-                            width: (modes.width - 20) / 3 * popup.expansionCurve; height: modes.height
+                            width: modes.tileWidth * popup.expansionCurve; height: modes.height
                             clip: true; opacity: popup.expansionCurve; enabled: !popup.preview && Desktop.data.nightLightAvailable && !Desktop.changingSettings
                             title: I18n.tr("quick.night_light"); symbol: "moon-warm"; active: Desktop.data.nightLight
                             onToggled: Desktop.request("nightlight", "")
                         }
                         QuickSwitchTile {
-                            width: (modes.width - 20) / 3 * popup.expansionCurve; height: modes.height
+                            width: modes.tileWidth * popup.expansionCurve; height: modes.height
                             clip: true; opacity: popup.expansionCurve; enabled: !popup.preview && Desktop.data.airplaneAvailable && !Desktop.changingSettings
                             title: I18n.tr("quick.airplane_mode"); symbol: "airplane"; active: !!Desktop.data.airplane
                             onToggled: Desktop.request("airplane", Desktop.data.airplane || Desktop.data.airplaneManaged ? "off" : "on")
+                        }
+                        QuickSwitchTile {
+                            width: modes.tileWidth * popup.expansionCurve; height: modes.height
+                            clip: true; opacity: popup.expansionCurve; enabled: !popup.preview && Desktop.data.hotspotAvailable && !Desktop.changingSettings && !Desktop.data.airplane
+                            title: I18n.tr("quick.mobile_hotspot"); symbol: "hotspot"; active: !!Desktop.data.hotspot
+                            onToggled: Desktop.request("hotspot", Desktop.data.hotspot ? "off" : "on")
                         }
                     }
                     Item { width: 1; height: 8 }
@@ -390,9 +401,17 @@ PanelWindow {
                                 onClicked: {
                                     if (modelData.connected) return;
                                     popup.selectedNetwork = modelData;
-                                    if (modelData.known || modelData.security === WifiSecurityType.Open || modelData.security === WifiSecurityType.Owe) modelData.connect();
-                                    else if ([WifiSecurityType.Wpa2Psk, WifiSecurityType.WpaPsk, WifiSecurityType.Sae].includes(modelData.security)) popup.page = "password";
-                                    else popup.launchTerminal(["nmtui"]);
+                                    popup.customSsid = "";
+                                    popup.localError = "";
+                                    if (modelData.known || modelData.security === WifiSecurityType.Open || modelData.security === WifiSecurityType.Owe) {
+                                        modelData.connect();
+                                    } else if ([WifiSecurityType.Wpa2Psk, WifiSecurityType.WpaPsk, WifiSecurityType.Sae].includes(modelData.security)) {
+                                        popup.isEnterprise = false;
+                                        popup.page = "password";
+                                    } else {
+                                        popup.isEnterprise = true;
+                                        popup.page = "password";
+                                    }
                                 }
                                 Connections {
                                     target: networkRow.modelData
@@ -436,29 +455,227 @@ PanelWindow {
                         }
                     }
                 }
-                SettingsRow { visible: popup.page === "wifi"; Layout.fillWidth: true; text: "Network settings"; symbol: "settings"; onClicked: popup.launchTerminal(["nmtui"]) }
+                SettingsRow {
+                    visible: popup.page === "wifi"; Layout.fillWidth: true
+                    text: I18n.tr("quick.mobile_hotspot")
+                    subtitle: Desktop.data.hotspot ? (Desktop.data.hotspotClients > 0 ? I18n.trWith("wifi.hotspot_devices", {count: Desktop.data.hotspotClients}) : I18n.tr("common.enabled")) : I18n.tr("common.disabled")
+                    symbol: "hotspot"
+                    onClicked: popup.page = "hotspot"
+                }
+                SettingsRow {
+                    visible: popup.page === "wifi"; Layout.fillWidth: true
+                    text: I18n.tr("wifi.add_hidden")
+                    symbol: "plus"
+                    onClicked: { popup.selectedNetwork = null; popup.customSsid = ""; popup.isEnterprise = false; popup.localError = ""; popup.page = "password"; }
+                }
                 SettingsRow { visible: popup.page === "bluetooth"; Layout.fillWidth: true; text: "Pair a new device"; symbol: "bluetooth"; enabled: Session.bluetoothEnabled; onClicked: popup.launchTerminal(["bluetoothctl"]) }
                 ColumnLayout {
-                    visible: popup.page === "password"; Layout.fillWidth: true; Layout.fillHeight: true; spacing: 12
-                    Text { Layout.fillWidth: true; text: popup.selectedNetwork ? popup.selectedNetwork.name : ""; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 14; wrapMode: Text.Wrap }
-                    Loader {
-                        id: passwordLoader
-                        Layout.fillWidth: true
-                        active: popup.opened && popup.page === "password"
-                        onLoaded: Qt.callLater(() => { if (popup.passwordInput) popup.passwordInput.forceActiveFocus(); })
-                        sourceComponent: TextField {
-                            id: password
-                            placeholderText: "Wi-Fi password"; echoMode: TextInput.Password
-                            color: Session.foreground; selectionColor: Session.accent
-                            font.family: Session.fontFamily; font.pixelSize: 13
-                            background: Rectangle { radius: 10; color: Glass.tint(PolyTheme.Theme.color("#303939"), 0.5); border.width: 1; border.color: password.activeFocus ? Session.accent : PolyTheme.Theme.color("#49534b") }
-                            onAccepted: connectButton.clicked()
+                    visible: popup.page === "password"; Layout.fillWidth: true; Layout.fillHeight: true; spacing: 10
+                    RowLayout {
+                        Layout.fillWidth: true; spacing: 8
+                        Icon { name: "wifi"; implicitWidth: 20; implicitHeight: 20 }
+                        Text {
+                            Layout.fillWidth: true
+                            text: popup.selectedNetwork ? popup.selectedNetwork.name : (popup.customSsid || I18n.tr("quick.hidden_network"))
+                            color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 15; font.weight: Font.Medium; elide: Text.ElideRight
                         }
                     }
+                    Text {
+                        visible: !popup.selectedNetwork
+                        text: I18n.tr("wifi.enter_ssid"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11
+                    }
+                    TextField {
+                        id: hiddenSsidInput
+                        visible: !popup.selectedNetwork
+                        Layout.fillWidth: true
+                        placeholderText: I18n.tr("wifi.hotspot_name")
+                        color: Session.foreground; selectionColor: Session.accent
+                        font.family: Session.fontFamily; font.pixelSize: 13; padding: 10
+                        background: Rectangle { radius: 10; color: Glass.tint(PolyTheme.Theme.color("#303939"), 0.5); border.width: 1; border.color: hiddenSsidInput.activeFocus ? Session.accent : PolyTheme.Theme.color("#49534b") }
+                        onTextChanged: popup.customSsid = text.trim()
+                    }
+                    Rectangle {
+                        Layout.fillWidth: true; height: 36; radius: 8
+                        color: Glass.tint(Session.surface, 0.3)
+                        border.width: 1; border.color: Glass.tint(Session.accent, 0.15)
+                        RowLayout {
+                            anchors.fill: parent; anchors.margins: 8; spacing: 8
+                            Rectangle {
+                                width: 16; height: 16; radius: 4
+                                color: popup.isEnterprise ? Session.accent : "transparent"
+                                border.width: 1.5; border.color: popup.isEnterprise ? Session.accent : Session.muted
+                                Icon { anchors.centerIn: parent; name: "check"; implicitWidth: 12; implicitHeight: 12; visible: popup.isEnterprise }
+                            }
+                            Text {
+                                Layout.fillWidth: true; text: I18n.tr("wifi.enterprise_checkbox")
+                                color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 11; elide: Text.ElideRight
+                            }
+                        }
+                        MouseArea {
+                            anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                            onClicked: popup.isEnterprise = !popup.isEnterprise
+                        }
+                    }
+                    ColumnLayout {
+                        visible: popup.isEnterprise; Layout.fillWidth: true; spacing: 4
+                        Text { text: I18n.tr("wifi.enterprise_identity"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11 }
+                        TextField {
+                            id: identityField
+                            Layout.fillWidth: true
+                            placeholderText: "identity / username"
+                            color: Session.foreground; selectionColor: Session.accent
+                            font.family: Session.fontFamily; font.pixelSize: 13; padding: 10
+                            background: Rectangle { radius: 10; color: Glass.tint(PolyTheme.Theme.color("#303939"), 0.5); border.width: 1; border.color: identityField.activeFocus ? Session.accent : PolyTheme.Theme.color("#49534b") }
+                        }
+                    }
+                    ColumnLayout {
+                        Layout.fillWidth: true; spacing: 4
+                        Text { text: I18n.tr("wifi.password_label"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11 }
+                        RowLayout {
+                            Layout.fillWidth: true; spacing: 6
+                            Loader {
+                                id: passwordLoader
+                                Layout.fillWidth: true
+                                active: popup.opened && popup.page === "password"
+                                onLoaded: Qt.callLater(() => { if (popup.passwordInput) popup.passwordInput.forceActiveFocus(); })
+                                sourceComponent: TextField {
+                                    id: password
+                                    placeholderText: I18n.tr("wifi.password_placeholder")
+                                    echoMode: popup.showPassword ? TextInput.Normal : TextInput.Password
+                                    color: Session.foreground; selectionColor: Session.accent
+                                    font.family: Session.fontFamily; font.pixelSize: 13; padding: 10
+                                    background: Rectangle { radius: 10; color: Glass.tint(PolyTheme.Theme.color("#303939"), 0.5); border.width: 1; border.color: password.activeFocus ? Session.accent : PolyTheme.Theme.color("#49534b") }
+                                    onAccepted: if (connectButton.enabled) connectButton.clicked()
+                                }
+                            }
+                            Rectangle {
+                                Layout.preferredWidth: 42; Layout.preferredHeight: 38; radius: 9
+                                color: Glass.tint(Session.surface, 0.4)
+                                border.width: 1; border.color: Glass.tint(Session.accent, 0.2)
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: popup.showPassword ? I18n.tr("wifi.hide_password") : I18n.tr("wifi.show_password")
+                                    color: Session.accent; font.family: Session.fontFamily; font.pixelSize: 10; font.weight: Font.Medium
+                                }
+                                MouseArea {
+                                    anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                                    onClicked: popup.showPassword = !popup.showPassword
+                                }
+                            }
+                        }
+                    }
+                    Text {
+                        visible: !!popup.localError || !!Desktop.error
+                        Layout.fillWidth: true
+                        text: popup.localError || Desktop.error
+                        color: PolyTheme.Theme.color("#f18b82"); font.family: Session.fontFamily; font.pixelSize: 11; wrapMode: Text.Wrap
+                    }
+                    RowLayout {
+                        Layout.fillWidth: true; spacing: 10
+                        SettingsRow {
+                            id: connectButton
+                            Layout.fillWidth: true; Layout.preferredWidth: 1
+                            text: I18n.tr("wifi.connect_button"); symbol: "wifi"
+                            readonly property string activeSsid: popup.selectedNetwork ? popup.selectedNetwork.name : popup.customSsid
+                            readonly property string passVal: popup.passwordInput ? popup.passwordInput.text : ""
+                            readonly property string identVal: identityField ? identityField.text.trim() : ""
+                            enabled: activeSsid.length > 0 && (!popup.isEnterprise ? (passVal.length >= 8 || !popup.selectedNetwork) : (identVal.length > 0 && passVal.length > 0)) && !Desktop.changingSettings
+                            onClicked: {
+                                if (!enabled) return;
+                                popup.localError = "";
+                                if (popup.isEnterprise) {
+                                    Desktop.request("wifi-connect", JSON.stringify({ ssid: activeSsid, identity: identVal, password: passVal }));
+                                    popup.page = "wifi";
+                                } else if (popup.selectedNetwork) {
+                                    popup.selectedNetwork.connectWithPsk(passVal);
+                                    if (popup.passwordInput) popup.passwordInput.clear();
+                                    popup.page = "wifi";
+                                } else {
+                                    Desktop.request("wifi-connect", JSON.stringify({ ssid: activeSsid, password: passVal, hidden: true }));
+                                    popup.page = "wifi";
+                                }
+                            }
+                        }
+                        SettingsRow {
+                            Layout.preferredWidth: 80
+                            text: I18n.tr("common.cancel"); symbol: "close"
+                            onClicked: { popup.localError = ""; popup.page = "wifi"; }
+                        }
+                    }
+                    Item { Layout.fillHeight: true }
+                }
+                ColumnLayout {
+                    visible: popup.page === "hotspot"
+                    Layout.fillWidth: true; Layout.fillHeight: true; spacing: 12
+                    Text {
+                        Layout.fillWidth: true
+                        text: I18n.tr("wifi.hotspot_desc")
+                        color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 12; wrapMode: Text.Wrap
+                    }
                     SettingsRow {
-                        id: connectButton
-                        Layout.fillWidth: true; text: "Connect"; symbol: "wifi"; enabled: !!popup.passwordInput && popup.passwordInput.text.length >= 8
-                        onClicked: if (enabled && popup.selectedNetwork) { popup.selectedNetwork.connectWithPsk(popup.passwordInput.text); if (popup.passwordInput) popup.passwordInput.clear(); popup.page = "wifi"; }
+                        Layout.fillWidth: true
+                        text: I18n.tr("quick.mobile_hotspot")
+                        symbol: "hotspot"
+                        selected: !!Desktop.data.hotspot
+                        subtitle: Desktop.data.hotspot ? (Desktop.data.hotspotClients > 0 ? I18n.trWith("wifi.hotspot_devices", {count: Desktop.data.hotspotClients}) : I18n.tr("common.enabled")) : I18n.tr("common.disabled")
+                        enabled: Desktop.data.hotspotAvailable && !Desktop.changingSettings && !Desktop.data.airplane
+                        onClicked: Desktop.request("hotspot", Desktop.data.hotspot ? "off" : "on")
+                    }
+                    Rectangle {
+                        Layout.fillWidth: true; height: 1; color: Glass.tint(Session.accent, 0.2)
+                    }
+                    Text {
+                        text: I18n.tr("wifi.hotspot_name"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11
+                    }
+                    TextField {
+                        id: hotspotSsidEdit
+                        Layout.fillWidth: true
+                        text: Desktop.data.hotspotSsid || "Alpora-Hotspot"
+                        color: Session.foreground; selectionColor: Session.accent
+                        font.family: Session.fontFamily; font.pixelSize: 13; padding: 10
+                        background: Rectangle { radius: 10; color: Glass.tint(PolyTheme.Theme.color("#303939"), 0.5); border.width: 1; border.color: hotspotSsidEdit.activeFocus ? Session.accent : PolyTheme.Theme.color("#49534b") }
+                    }
+                    Text {
+                        text: I18n.tr("wifi.hotspot_password"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11
+                    }
+                    RowLayout {
+                        Layout.fillWidth: true; spacing: 6
+                        TextField {
+                            id: hotspotPasswordEdit
+                            Layout.fillWidth: true
+                            text: Desktop.data.hotspotPassword || "alporapassword"
+                            echoMode: popup.showPassword ? TextInput.Normal : TextInput.Password
+                            color: Session.foreground; selectionColor: Session.accent
+                            font.family: Session.fontFamily; font.pixelSize: 13; padding: 10
+                            background: Rectangle { radius: 10; color: Glass.tint(PolyTheme.Theme.color("#303939"), 0.5); border.width: 1; border.color: hotspotPasswordEdit.activeFocus ? Session.accent : PolyTheme.Theme.color("#49534b") }
+                        }
+                        Rectangle {
+                            Layout.preferredWidth: 42; Layout.preferredHeight: 38; radius: 9
+                            color: Glass.tint(Session.surface, 0.4)
+                            border.width: 1; border.color: Glass.tint(Session.accent, 0.2)
+                            Text {
+                                anchors.centerIn: parent
+                                text: popup.showPassword ? I18n.tr("wifi.hide_password") : I18n.tr("wifi.show_password")
+                                color: Session.accent; font.family: Session.fontFamily; font.pixelSize: 10; font.weight: Font.Medium
+                            }
+                            MouseArea {
+                                anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                                onClicked: popup.showPassword = !popup.showPassword
+                            }
+                        }
+                    }
+                    Text {
+                        text: I18n.tr("wifi.hotspot_band")
+                        color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11
+                    }
+                    SettingsRow {
+                        Layout.fillWidth: true
+                        text: I18n.tr("wifi.hotspot_save")
+                        symbol: "check"
+                        enabled: hotspotSsidEdit.text.trim().length > 0 && hotspotPasswordEdit.text.trim().length >= 8 && !Desktop.changingSettings
+                        onClicked: {
+                            Desktop.request("hotspot", JSON.stringify({ ssid: hotspotSsidEdit.text.trim(), password: hotspotPasswordEdit.text.trim(), active: Desktop.data.hotspot }));
+                        }
                     }
                     Item { Layout.fillHeight: true }
                 }
@@ -468,6 +685,7 @@ PanelWindow {
                     SettingsRow { Layout.fillWidth: true; text: "Microphone"; symbol: "microphone"; onClicked: popup.page = "input" }
                     SettingsRow { Layout.fillWidth: true; text: "Wi-Fi"; symbol: "wifi"; onClicked: popup.page = "wifi" }
                     SettingsRow { Layout.fillWidth: true; text: "Bluetooth"; symbol: "bluetooth"; onClicked: popup.page = "bluetooth" }
+                    SettingsRow { Layout.fillWidth: true; text: I18n.tr("quick.mobile_hotspot"); symbol: "hotspot"; onClicked: popup.page = "hotspot" }
                     SettingsRow { Layout.fillWidth: true; text: I18n.tr("quick.power_mode"); symbol: "performance"; onClicked: popup.page = "profiles" }
                     SettingsRow { Layout.fillWidth: true; text: I18n.tr("quick.airplane_mode"); symbol: "airplane"; onClicked: popup.page = "airplane" }
                     SettingsRow { Layout.fillWidth: true; text: "Night Light"; symbol: "moon-warm"; onClicked: popup.page = "nightlight" }

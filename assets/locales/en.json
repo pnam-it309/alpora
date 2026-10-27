@@ -760,5 +760,20 @@
   "System": "System",
   "Unavailable": "Unavailable",
   "Could not read system metrics": "Could not read system metrics",
-  "Settings": "Settings"
+  "Settings": "Settings",
+  "quick.mobile_hotspot": "Mobile Hotspot",
+  "wifi.hotspot_desc": "Share your internet connection with other devices over Wi-Fi",
+  "wifi.hotspot_devices": "{count} connected devices",
+  "wifi.hotspot_name": "Network name (SSID)",
+  "wifi.hotspot_password": "Network password",
+  "wifi.hotspot_band": "Network band: 2.4 GHz",
+  "wifi.hotspot_save": "Save settings",
+  "wifi.hotspot_saved": "Hotspot settings saved",
+  "wifi.enterprise_identity": "Username / Identity",
+  "wifi.enterprise_checkbox": "Enterprise / School network (requires Username)",
+  "wifi.add_hidden": "Connect to a hidden or manual network",
+  "wifi.show_password": "Show password",
+  "wifi.hide_password": "Hide password",
+  "wifi.enter_ssid": "Enter network name (SSID)",
+  "wifi.security_label": "Security: {type}"
 }

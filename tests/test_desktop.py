@@ -68,6 +68,69 @@ class DesktopTests(unittest.TestCase):
             with self.assertRaises(ConfigError):
                 control(paths, 'airplane', 'invalid')
 
+    def test_hotspot_toggle_on_and_off(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            paths = Paths(root / 'config', root / 'state', root / 'runtime')
+            with patch('shutil.which', return_value='/usr/bin/nmcli'), \
+                 patch('poly_shell.desktop.command') as run, \
+                 patch('poly_shell.desktop.hotspot_status', return_value={'hotspot': False, 'hotspotAvailable': True}):
+                run.return_value.returncode = 0
+                run.return_value.stdout = 'OtherConn'
+                control(paths, 'hotspot', 'on')
+                self.assertTrue(any('hotspot' in c.args[0] or 'Hotspot' in c.args[0] for c in run.call_args_list))
+
+                run.reset_mock()
+                run.return_value.stdout = 'Hotspot:802-11-wireless'
+                control(paths, 'hotspot', 'off')
+                self.assertTrue(any('down' in c.args[0] for c in run.call_args_list))
+
+    def test_hotspot_configuration_update(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            paths = Paths(root / 'config', root / 'state', root / 'runtime')
+            with patch('shutil.which', return_value='/usr/bin/nmcli'), \
+                 patch('poly_shell.desktop.status', return_value={}):
+                control(paths, 'hotspot', '{"ssid": "CustomAP", "password": "securepassword123"}')
+                target = paths.config / 'hotspot.json'
+                self.assertTrue(target.exists())
+                import json
+                saved = json.loads(target.read_text())
+                self.assertEqual(saved['ssid'], 'CustomAP')
+                self.assertEqual(saved['password'], 'securepassword123')
+
+    def test_wifi_connect_personal(self):
+        paths = Paths(Path('/unused'), Path('/unused'), Path('/unused'))
+        with patch('shutil.which', return_value='/usr/bin/nmcli'), \
+             patch('poly_shell.desktop.command') as run:
+            run.return_value.returncode = 0
+            run.return_value.stdout = 'Successfully activated'
+            result = control(paths, 'wifi-connect', '{"ssid": "HomeWiFi", "password": "mypassword123"}')
+            self.assertEqual(result['success'], True)
+            self.assertEqual(result['ssid'], 'HomeWiFi')
+            self.assertEqual(run.call_args[0][0], ['nmcli', 'device', 'wifi', 'connect', 'HomeWiFi', 'password', 'mypassword123'])
+
+    def test_wifi_connect_enterprise(self):
+        paths = Paths(Path('/unused'), Path('/unused'), Path('/unused'))
+        with patch('shutil.which', return_value='/usr/bin/nmcli'), \
+             patch('poly_shell.desktop.command') as run:
+            run.return_value.returncode = 0
+            run.return_value.stdout = ''
+            result = control(paths, 'wifi-connect', '{"ssid": "UniWiFi", "identity": "student1", "password": "unipassword"}')
+            self.assertEqual(result['success'], True)
+            self.assertEqual(result['ssid'], 'UniWiFi')
+            calls = [c.args[0] for c in run.call_args_list]
+            self.assertTrue(any('802-1x.identity' in call for call in calls))
+            self.assertTrue(any(['nmcli', 'connection', 'up', 'UniWiFi'] == call for call in calls))
+
+    def test_wifi_connect_validation(self):
+        paths = Paths(Path('/unused'), Path('/unused'), Path('/unused'))
+        with patch('shutil.which', return_value='/usr/bin/nmcli'):
+            with self.assertRaises(ConfigError):
+                control(paths, 'wifi-connect', '{"password": "test"}')  # Missing SSID
+            with self.assertRaises(ConfigError):
+                control(paths, 'wifi-connect', 'not-json')
+
 
 if __name__ == '__main__':
     unittest.main()

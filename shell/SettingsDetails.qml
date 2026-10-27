@@ -13,13 +13,14 @@ ScrollView {
     property var monitors: []
     property url wallpaper: ""
     property var selectedNetwork: null
+    property bool isEnterprise: false
     property string localError: ""
     signal navigate(string page)
     signal chooseWallpaper()
     signal restoreWallpaper()
     clip: true; contentWidth: availableWidth
     function terminal(args: var): void { Quickshell.execDetached((Session.settings.apps.terminal || ["kitty"]).concat(["-e"]).concat(args)); }
-    onPageChanged: { selectedNetwork = null; password.clear(); localError = ""; }
+    onPageChanged: { selectedNetwork = null; isEnterprise = false; password.clear(); localError = ""; }
     Binding {
         target: Session.wifiDevice; property: "scannerEnabled"
         value: root.visible && root.page === "wifi" && Session.wifiEnabled
@@ -62,9 +63,13 @@ ScrollView {
                 onClicked: {
                     if (modelData.connected) return;
                     root.localError = "";
-                    if (modelData.known || [WifiSecurityType.Open, WifiSecurityType.Owe].includes(modelData.security)) modelData.connect();
-                    else if ([WifiSecurityType.Wpa2Psk, WifiSecurityType.WpaPsk, WifiSecurityType.Sae].includes(modelData.security)) { root.selectedNetwork = modelData; password.clear(); password.forceActiveFocus(); }
-                    else root.terminal(["nmtui"]);
+                    if (modelData.known || [WifiSecurityType.Open, WifiSecurityType.Owe].includes(modelData.security)) {
+                        modelData.connect();
+                    } else if ([WifiSecurityType.Wpa2Psk, WifiSecurityType.WpaPsk, WifiSecurityType.Sae].includes(modelData.security)) {
+                        root.selectedNetwork = modelData; root.isEnterprise = false; password.clear(); password.forceActiveFocus();
+                    } else {
+                        root.selectedNetwork = modelData; root.isEnterprise = true; password.clear(); password.forceActiveFocus();
+                    }
                 }
                 Connections { target: networkRow.modelData; function onConnectionFailed(reason): void { root.localError = String(reason); } }
             }
@@ -72,6 +77,13 @@ ScrollView {
         SettingsCard {
             Layout.fillWidth: true; visible: root.page === "wifi" && !!root.selectedNetwork
             Text { text: I18n.tr("wifi.password_label") + ": " + (root.selectedNetwork ? root.selectedNetwork.name : ""); color: PolyTheme.Theme.color("#eff1f4"); font.family: Session.fontFamily; font.pixelSize: 14 }
+            TextField {
+                id: enterpriseIdentity
+                visible: root.isEnterprise
+                Layout.fillWidth: true; placeholderText: I18n.tr("wifi.enterprise_identity"); echoMode: TextInput.Normal
+                color: PolyTheme.Theme.color("#eff1f4"); font.family: Session.fontFamily; font.pixelSize: 14; padding: 12
+                background: Rectangle { radius: 9; color: PolyTheme.Theme.color("#252c33"); border.color: enterpriseIdentity.activeFocus ? PolyTheme.Theme.color("#b5c99d") : PolyTheme.Theme.color("#596166") }
+            }
             TextField {
                 id: password
                 Layout.fillWidth: true; placeholderText: I18n.tr("wifi.password_placeholder"); echoMode: TextInput.Password
@@ -82,12 +94,20 @@ ScrollView {
             AppearanceButton {
                 id: connectButton
                 text: I18n.tr("wifi.connect_button"); symbol: "wifi"; primary: true
-                enabled: password.text.length >= 8 && password.text.length <= 63
-                onClicked: { if (!root.selectedNetwork) return; root.selectedNetwork.connectWithPsk(password.text); password.clear(); root.selectedNetwork = null; }
+                enabled: (!root.isEnterprise ? (password.text.length >= 8 && password.text.length <= 63) : (enterpriseIdentity.text.trim().length > 0 && password.text.length > 0))
+                onClicked: {
+                    if (!root.selectedNetwork) return;
+                    if (root.isEnterprise) {
+                        Desktop.request("wifi-connect", JSON.stringify({ ssid: root.selectedNetwork.name, identity: enterpriseIdentity.text.trim(), password: password.text }));
+                    } else {
+                        root.selectedNetwork.connectWithPsk(password.text);
+                    }
+                    password.clear(); root.selectedNetwork = null; root.isEnterprise = false;
+                }
             }
         }
         Text { Layout.fillWidth: true; visible: root.page === "wifi" && Session.wifiEnabled && Session.wifiDevice && !Session.wifiDevice.networks.values.length; text: I18n.tr("wifi.searching_networks"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 13 }
-        AppearanceButton { visible: root.page === "wifi"; text: I18n.tr("wifi.advanced_settings"); symbol: "settings"; onClicked: root.terminal(["nmtui"]) }
+        AppearanceButton { visible: root.page === "wifi"; text: I18n.tr("quick.mobile_hotspot"); symbol: "hotspot"; onClicked: Desktop.request("hotspot", Desktop.data.hotspot ? "off" : "on") }
         Repeater {
             model: root.page === "bluetooth" && Session.bluetoothAdapter ? Session.bluetoothAdapter.devices.values.filter(d => d.paired) : []
             SettingsRow {

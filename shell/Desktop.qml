@@ -5,12 +5,12 @@ import Quickshell.Io
 
 Singleton {
     id: root
-    property var data: ({ brightness: 100, brightnessAvailable: false, dnd: false, dndAvailable: false, nightLight: false, nightLightAvailable: false, powerProfilesAvailable: false, powerProfiles: [], powerProfile: "", powerDegraded: "", airplaneAvailable: false, airplane: false, airplaneHardwareBlocked: false, airplaneManaged: false })
+    property var data: ({ brightness: 100, brightnessAvailable: false, dnd: false, dndAvailable: false, nightLight: false, nightLightAvailable: false, powerProfilesAvailable: false, powerProfiles: [], powerProfile: "", powerDegraded: "", airplaneAvailable: false, airplane: false, airplaneHardwareBlocked: false, airplaneManaged: false, hotspotAvailable: false, hotspot: false, hotspotSsid: "Alpora-Hotspot", hotspotPassword: "", hotspotClients: 0 })
     property string error: ""
     property var pending: []
     readonly property bool changingSettings: (worker.running && worker.command.length > 2 && worker.command[2] !== "status") || pending.some(item => item[2] !== "status")
 
-    readonly property var validActions: ["status", "brightness", "dnd", "nightlight", "bluetooth", "power-profile", "airplane"]
+    readonly property var validActions: ["status", "brightness", "dnd", "nightlight", "bluetooth", "power-profile", "airplane", "hotspot", "wifi-connect"]
 
     function request(action: string, value: string): void {
         if (!validActions.includes(action)) {
@@ -26,6 +26,16 @@ Singleton {
         } else if (action === "bluetooth" || action === "airplane") {
             if (value !== "on" && value !== "off" && value !== "") {
                 console.warn("Desktop.request: invalid toggle value for " + action + ":", value);
+                return;
+            }
+        } else if (action === "hotspot") {
+            if (value !== "on" && value !== "off" && value !== "toggle" && value !== "" && !value.trim().startsWith("{")) {
+                console.warn("Desktop.request: invalid hotspot value:", value);
+                return;
+            }
+        } else if (action === "wifi-connect") {
+            if (!value.trim().startsWith("{")) {
+                console.warn("Desktop.request: invalid wifi-connect payload:", value);
                 return;
             }
         } else if (action === "power-profile") {

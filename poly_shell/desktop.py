@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import time
 import uuid
+import json
 import math
 
 from .state import ConfigError, ROOT, atomic_json, read_object, state_lock
@@ -31,6 +32,193 @@ def backlight_device(root=Path('/sys/class/backlight')):
     return None, 0
 
 
+def hotspot_config(paths):
+    target = paths.config / 'hotspot.json'
+    if target.exists():
+        try:
+            data = read_object(target)
+            if isinstance(data, dict):
+                return {
+                    'ssid': str(data.get('ssid', 'Alpora-Hotspot')),
+                    'password': str(data.get('password', 'alporapassword')),
+                }
+        except Exception:
+            pass
+    return {'ssid': 'Alpora-Hotspot', 'password': 'alporapassword'}
+
+
+def hotspot_status(paths):
+    if not shutil.which('nmcli'):
+        return {
+            'hotspotAvailable': False,
+            'hotspot': False,
+            'hotspotSsid': 'Alpora-Hotspot',
+            'hotspotPassword': 'alporapassword',
+            'hotspotClients': 0,
+        }
+    cfg = hotspot_config(paths)
+    is_active = False
+    active_device = None
+    try:
+        res = command(['nmcli', '-t', '-f', 'NAME,TYPE,DEVICE', 'connection', 'show', '--active'], check=False)
+        if res.returncode == 0:
+            for line in res.stdout.splitlines():
+                parts = line.strip().split(':')
+                if len(parts) >= 3 and parts[1] in ('802-11-wireless', 'wifi'):
+                    cname = parts[0]
+                    if cname in ('Hotspot', cfg['ssid']):
+                        is_active = True
+                        active_device = parts[2]
+                        break
+                    mode_res = command(['nmcli', '-t', '-f', '802-11-wireless.mode', 'connection', 'show', cname], check=False)
+                    if mode_res.returncode == 0 and 'ap' in mode_res.stdout.lower():
+                        is_active = True
+                        active_device = parts[2]
+                        break
+    except Exception:
+        pass
+
+    clients = 0
+    if is_active and active_device:
+        try:
+            neigh = command(['ip', 'neigh', 'show', 'dev', active_device], check=False)
+            if neigh.returncode == 0:
+                clients = len([l for l in neigh.stdout.splitlines() if any(k in l for k in ('REACHABLE', 'STALE', 'DELAY'))])
+        except Exception:
+            pass
+
+    return {
+        'hotspotAvailable': True,
+        'hotspot': is_active,
+        'hotspotSsid': cfg['ssid'],
+        'hotspotPassword': cfg['password'],
+        'hotspotClients': clients,
+    }
+
+
+def set_hotspot(paths, value):
+    if not shutil.which('nmcli'):
+        raise ConfigError('NetworkManager (nmcli) is required for Mobile Hotspot')
+    cfg = hotspot_config(paths)
+
+    if value and str(value).strip().startswith('{'):
+        try:
+            payload = json.loads(value)
+            if not isinstance(payload, dict):
+                raise ValueError
+        except Exception as exc:
+            raise ConfigError('Invalid hotspot configuration JSON') from exc
+
+        if 'ssid' in payload:
+            ssid = str(payload['ssid']).strip()
+            if not ssid:
+                raise ConfigError('Hotspot SSID cannot be empty')
+            cfg['ssid'] = ssid
+        if 'password' in payload:
+            pwd = str(payload['password']).strip()
+            if len(pwd) < 8:
+                raise ConfigError('Hotspot password must be at least 8 characters')
+            cfg['password'] = pwd
+        atomic_json(paths.config / 'hotspot.json', cfg)
+        if payload.get('active') is False:
+            value = 'off'
+        elif payload.get('active') is True:
+            value = 'on'
+        else:
+            return
+
+    current = hotspot_status(paths)
+    if value in ('toggle', None, ''):
+        value = 'off' if current['hotspot'] else 'on'
+
+    if value not in ('on', 'off'):
+        raise ConfigError("Hotspot value must be 'on', 'off', or configuration JSON")
+
+    if value == 'on':
+        command(['nmcli', 'radio', 'wifi', 'on'], check=False)
+        chk = command(['nmcli', '-t', '-f', 'NAME', 'connection', 'show'], check=False)
+        existing = [l.strip() for l in chk.stdout.splitlines() if l.strip()]
+        if 'Hotspot' in existing:
+            command(['nmcli', 'connection', 'modify', 'Hotspot',
+                     '802-11-wireless.ssid', cfg['ssid'],
+                     '802-11-wireless-security.key-mgmt', 'wpa-psk',
+                     '802-11-wireless-security.psk', cfg['password'],
+                     '802-11-wireless.mode', 'ap',
+                     '802-11-wireless.band', 'bg',
+                     'ipv4.method', 'shared'])
+            command(['nmcli', 'connection', 'up', 'Hotspot'])
+        else:
+            try:
+                command(['nmcli', 'device', 'wifi', 'hotspot', 'ssid', cfg['ssid'], 'password', cfg['password']])
+            except ConfigError:
+                command(['nmcli', 'connection', 'add', 'type', 'wifi', 'con-name', 'Hotspot',
+                         'autoconnect', 'no', 'ssid', cfg['ssid'],
+                         '802-11-wireless.mode', 'ap', '802-11-wireless.band', 'bg',
+                         'ipv4.method', 'shared',
+                         'wifi-sec.key-mgmt', 'wpa-psk', 'wifi-sec.psk', cfg['password']])
+                command(['nmcli', 'connection', 'up', 'Hotspot'])
+    elif value == 'off':
+        chk = command(['nmcli', '-t', '-f', 'NAME,TYPE', 'connection', 'show', '--active'], check=False)
+        if chk.returncode == 0:
+            for l in chk.stdout.splitlines():
+                parts = l.strip().split(':')
+                if len(parts) >= 2 and parts[1] in ('802-11-wireless', 'wifi'):
+                    cname = parts[0]
+                    if cname in ('Hotspot', cfg['ssid']):
+                        command(['nmcli', 'connection', 'down', cname], check=False)
+                    else:
+                        mode_res = command(['nmcli', '-t', '-f', '802-11-wireless.mode', 'connection', 'show', cname], check=False)
+                        if mode_res.returncode == 0 and 'ap' in mode_res.stdout.lower():
+                            command(['nmcli', 'connection', 'down', cname], check=False)
+
+
+def connect_wifi(value):
+    if not shutil.which('nmcli'):
+        raise ConfigError('NetworkManager (nmcli) is required to connect to Wi-Fi')
+    try:
+        payload = json.loads(value) if isinstance(value, str) else value
+        if not isinstance(payload, dict):
+            raise ValueError
+    except Exception as exc:
+        raise ConfigError('Invalid Wi-Fi connect JSON payload') from exc
+
+    ssid = payload.get('ssid')
+    if not ssid:
+        raise ConfigError('SSID is required')
+    password = payload.get('password', '')
+    identity = payload.get('identity')
+    hidden = payload.get('hidden', False)
+
+    if identity:
+        chk = command(['nmcli', '-t', '-f', 'NAME', 'connection', 'show'], check=False)
+        existing = [l.strip() for l in chk.stdout.splitlines() if l.strip()]
+        if ssid in existing:
+            command(['nmcli', 'connection', 'modify', ssid,
+                     '802-1x.eap', 'peap',
+                     '802-1x.phase2-auth', 'mschapv2',
+                     '802-1x.identity', str(identity),
+                     '802-1x.password', str(password)])
+        else:
+            args = ['nmcli', 'connection', 'add', 'type', 'wifi',
+                    'con-name', ssid, 'ssid', ssid,
+                    'wifi-sec.key-mgmt', 'wpa-eap',
+                    '802-1x.eap', 'peap',
+                    '802-1x.phase2-auth', 'mschapv2',
+                    '802-1x.identity', str(identity),
+                    '802-1x.password', str(password)]
+            command(args)
+        command(['nmcli', 'connection', 'up', ssid])
+        return {'success': True, 'ssid': ssid}
+
+    args = ['nmcli', 'device', 'wifi', 'connect', ssid]
+    if password:
+        args += ['password', str(password)]
+    if hidden:
+        args += ['hidden', 'yes']
+    command(args)
+    return {'success': True, 'ssid': ssid}
+
+
 def status(paths):
     device, brightness = backlight_device()
     dnd = command(['makoctl', 'mode'], check=False) if shutil.which('makoctl') else None
@@ -45,6 +233,7 @@ def status(paths):
         'nightLight': bool(saved.get('nightLight', False)),
         **power_status(command),
         **radio_status(),
+        **hotspot_status(paths),
         'airplaneManaged': (paths.state / 'airplane-restore.json').exists(),
     }
 
@@ -109,6 +298,11 @@ def control(paths, action, value=None):
         set_profile(value, command)
     elif action == 'airplane':
         set_airplane(paths, value, command)
+    elif action == 'hotspot':
+        with state_lock(paths):
+            set_hotspot(paths, value)
+    elif action == 'wifi-connect':
+        return connect_wifi(value)
     else:
         raise ConfigError('Unsupported desktop action')
     return status(paths)

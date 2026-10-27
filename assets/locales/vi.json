@@ -760,5 +760,20 @@
   "System": "Hệ thống",
   "Unavailable": "Không khả dụng",
   "Could not read system metrics": "Không thể đọc thông số hệ thống",
-  "Settings": "Cài đặt"
+  "Settings": "Cài đặt",
+  "quick.mobile_hotspot": "Điểm phát sóng di động",
+  "wifi.hotspot_desc": "Chia sẻ kết nối internet của bạn với các thiết bị khác qua Wi-Fi",
+  "wifi.hotspot_devices": "{count} thiết bị đã kết nối",
+  "wifi.hotspot_name": "Tên mạng (SSID)",
+  "wifi.hotspot_password": "Mật khẩu mạng",
+  "wifi.hotspot_band": "Băng tần mạng: 2.4 GHz",
+  "wifi.hotspot_save": "Lưu cài đặt",
+  "wifi.hotspot_saved": "Đã lưu cài đặt điểm phát sóng",
+  "wifi.enterprise_identity": "Tên đăng nhập / Danh tính",
+  "wifi.enterprise_checkbox": "Mạng trường học / Doanh nghiệp (cần Tên đăng nhập)",
+  "wifi.add_hidden": "Kết nối mạng ẩn hoặc thủ công",
+  "wifi.show_password": "Hiện mật khẩu",
+  "wifi.hide_password": "Ẩn mật khẩu",
+  "wifi.enter_ssid": "Nhập tên mạng (SSID)",
+  "wifi.security_label": "Bảo mật: {type}"
 }

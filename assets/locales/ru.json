@@ -760,5 +760,20 @@
   "System": "Система",
   "Unavailable": "Недоступно",
   "Could not read system metrics": "Не удалось прочитать системные метрики",
-  "Settings": "Настройки"
+  "Settings": "Настройки",
+  "quick.mobile_hotspot": "Мобильный хот-спот",
+  "wifi.hotspot_desc": "Поделитесь интернет-подключением с другими устройствами через Wi-Fi",
+  "wifi.hotspot_devices": "Подключено устройств: {count}",
+  "wifi.hotspot_name": "Имя сети (SSID)",
+  "wifi.hotspot_password": "Сетевой пароль",
+  "wifi.hotspot_band": "Сетевой диапазон: 2,4 ГГц",
+  "wifi.hotspot_save": "Сохранить настройки",
+  "wifi.hotspot_saved": "Настройки хот-спота сохранены",
+  "wifi.enterprise_identity": "Имя пользователя / Удостоверение",
+  "wifi.enterprise_checkbox": "Корпоративная / учебная сеть (требуется имя пользователя)",
+  "wifi.add_hidden": "Подключиться к скрытой или настроенной сети",
+  "wifi.show_password": "Показать пароль",
+  "wifi.hide_password": "Скрыть пароль",
+  "wifi.enter_ssid": "Введите имя сети (SSID)",
+  "wifi.security_label": "Безопасность: {type}"
 }
