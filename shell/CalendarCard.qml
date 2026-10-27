@@ -10,7 +10,7 @@ ColumnLayout {
     property date month: new Date(ClockState.date.getFullYear(), ClockState.date.getMonth(), 1)
     property date selected: ClockState.date
     readonly property int firstOffset: (month.getDay() + 6) % 7
-    readonly property var locale: Qt.locale("ru_RU")
+    readonly property var locale: I18n.qtLocale
     property bool compact: false
     property real expansion: 1
     readonly property int selectedWeek: Math.floor((selected.getDate() - 1 + firstOffset) / 7)
@@ -21,18 +21,18 @@ ColumnLayout {
         Layout.fillHeight: false
         Layout.preferredHeight: 30 * root.expansion
         Layout.minimumHeight: 0; Layout.maximumHeight: 30 * root.expansion; clip: true
-        BarButton { symbol: "chevron-left"; hint: "Предыдущий месяц"; onClicked: root.shift(-1) }
+        BarButton { symbol: "chevron-left"; hint: I18n.tr("calendar.prev_month"); onClicked: root.shift(-1) }
         Button {
             id: monthHeading
             Layout.fillWidth: true
             implicitHeight: 30; padding: 0; hoverEnabled: true
-            text: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"][root.month.getMonth()] + " " + root.month.getFullYear()
-            Accessible.name: text + " — вернуться к сегодняшнему дню"
+            text: (I18n.trArray("calendar.months")[root.month.getMonth()] || "") + " " + root.month.getFullYear()
+            Accessible.name: text + " — " + I18n.tr("calendar.back_to_today")
             background: Rectangle { radius: 8; color: monthHeading.hovered || monthHeading.visualFocus ? PolyTheme.Theme.color("#333f37") : "transparent" }
             contentItem: Text { text: monthHeading.text; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 14 }
             onClicked: { root.month = new Date(ClockState.date.getFullYear(), ClockState.date.getMonth(), 1); root.selected = ClockState.date; }
         }
-        BarButton { symbol: "chevron-right"; hint: "Следующий месяц"; onClicked: root.shift(1) }
+        BarButton { symbol: "chevron-right"; hint: I18n.tr("calendar.next_month"); onClicked: root.shift(1) }
     }
     GridLayout {
         Layout.fillWidth: true
@@ -40,7 +40,7 @@ ColumnLayout {
         Layout.preferredHeight: 49 + ((root.compact ? 208 : 238) - 49) * root.expansion
         columns: 7; columnSpacing: 4; rowSpacing: 4 * root.expansion
         Repeater {
-            model: ["ПН", "ВТ", "СР", "ЧТ", "ПТ", "СБ", "ВС"]
+            model: I18n.trArray("calendar.weekdays")
             Text {
                 required property string modelData
                 Layout.fillWidth: true; Layout.preferredHeight: 22
@@ -99,7 +99,7 @@ ColumnLayout {
             elide: Text.ElideRight
         }
         Button {
-            text: "Сегодня"; flat: true
+            text: I18n.tr("calendar.today"); flat: true
             onClicked: { root.month = new Date(ClockState.date.getFullYear(), ClockState.date.getMonth(), 1); root.selected = ClockState.date; }
             palette.buttonText: PolyTheme.Theme.color("#b4c49e")
         }

@@ -113,8 +113,8 @@ PanelWindow {
     property var selectedNetwork: null
     property string localError: ""
     readonly property var passwordInput: passwordLoader.item
-    readonly property string title: ({wifi: "Wi‑Fi", bluetooth: "Bluetooth", output: "Вывод звука", input: "Микрофон", settings: "Устройства", power: "Питание", password: "Подключение к Wi‑Fi", nightlight: "Ночной свет", dnd: "Не беспокоить", profiles: "Режим питания", airplane: "Авиарежим"})[page] || "Центр управления"
-    readonly property string profileLabel: ({"power-saver": "Экономия", balanced: "Баланс", performance: "Производительность"})[Desktop.data.powerProfile] || "Недоступно"
+    readonly property string title: ({wifi: "Wi‑Fi", bluetooth: "Bluetooth", output: I18n.tr("settings.sound_output"), input: I18n.tr("settings.microphone"), settings: I18n.tr("settings.devices"), power: I18n.tr("settings.power"), password: I18n.tr("wifi.connecting_title"), nightlight: I18n.tr("quick.night_light"), dnd: I18n.tr("notification.dnd"), profiles: I18n.tr("quick.power_mode"), airplane: I18n.tr("quick.airplane_mode")})[page] || I18n.tr("quick.control_center")
+    readonly property string profileLabel: ({"power-saver": I18n.tr("quick.power_saver_short"), balanced: I18n.tr("quick.balanced_short"), performance: I18n.tr("quick.performance_short")})[Desktop.data.powerProfile] || I18n.tr("quick.power_unavailable")
     function launchTerminal(args: var): void {
         Session.closeQuickSettings();
         Quickshell.execDetached(Session.settings.apps.terminal.concat(["-e"]).concat(args));
@@ -211,8 +211,8 @@ PanelWindow {
                         RowLayout {
                             anchors.fill: parent; spacing: 10
                             GemMark { Layout.preferredWidth: 22; Layout.preferredHeight: 26 }
-                            Text { Layout.fillWidth: true; text: popup.preview ? "Быстрый доступ" : "Центр управления"; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 15; font.weight: Font.Medium; elide: Text.ElideRight }
-                            IconButton { opacity: popup.expansionCurve; enabled: !popup.preview; symbol: "close"; hint: "Закрыть"; implicitWidth: 28; implicitHeight: 28; onClicked: Session.closeQuickSettings() }
+                            Text { Layout.fillWidth: true; text: popup.preview ? I18n.tr("quick.quick_access") : I18n.tr("quick.control_center"); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 15; font.weight: Font.Medium; elide: Text.ElideRight }
+                            IconButton { opacity: popup.expansionCurve; enabled: !popup.preview; symbol: "close"; hint: I18n.tr("common.close"); implicitWidth: 28; implicitHeight: 28; onClicked: Session.closeQuickSettings() }
                         }
                     }
                     Rectangle { width: parent.width; height: 1; color: Glass.tint(Session.accent, 0.22) }
@@ -242,12 +242,12 @@ PanelWindow {
                     ControlRow {
                         id: outputControl
                         width: parent.width; height: implicitHeight
-                        showLabel: true; label: "Громкость"; symbol: Session.audio && Session.audio.muted ? "muted" : "volume"
+                        showLabel: true; label: I18n.tr("osd.volume"); symbol: Session.audio && Session.audio.muted ? "muted" : "volume"
                         statusKind: Session.audioStatus.kind; statusLevel: Session.audioStatus.level
                         value: Session.audio ? Session.audio.volume : 0
                         adjustable: !!Session.audio; muted: Session.audio ? Session.audio.muted : false
                         hasMute: true; hasDetails: true
-                        deviceName: Session.sink ? (Session.sink.nickname || Session.sink.description || "Динамики") : "Нет устройства вывода"
+                        deviceName: Session.sink ? (Session.sink.nickname || Session.sink.description || I18n.tr("audio.speakers")) : I18n.tr("audio.no_output_device")
                         onAdjusted: value => { if (Session.audio) { Session.audio.volume = value; if (value > 0) Session.audio.muted = false; } }
                         onMuteRequested: if (Session.audio) Session.audio.muted = !Session.audio.muted
                         onDetailsRequested: { BarState.expandQuick(); popup.page = "output"; }
@@ -259,7 +259,7 @@ PanelWindow {
                         id: brightness
                         width: parent.width; height: implicitHeight
                         property real pendingValue: value
-                        showLabel: true; label: "Яркость"; symbol: "sun"
+                        showLabel: true; label: I18n.tr("osd.brightness"); symbol: "sun"
                         minimum: 0.05; value: Desktop.data.brightness / 100
                         adjustable: Desktop.data.brightnessAvailable
                         onAdjusted: value => { pendingValue = value; brightnessDebounce.restart(); }
@@ -272,11 +272,11 @@ PanelWindow {
                             id: inputControl
                             y: 8; width: parent.width; height: implicitHeight
                             enabled: !popup.preview
-                            showLabel: true; label: "Микрофон"; symbol: Session.microphone && Session.microphone.muted ? "microphone-muted" : "microphone"
+                            showLabel: true; label: I18n.tr("settings.microphone"); symbol: Session.microphone && Session.microphone.muted ? "microphone-muted" : "microphone"
                             value: Session.microphone ? Session.microphone.volume : 0
                             adjustable: !!Session.microphone; muted: Session.microphone ? Session.microphone.muted : false
                             hasMute: true; hasDetails: true
-                            deviceName: Session.source ? (Session.source.nickname || Session.source.description || "Микрофон") : "Нет устройства ввода"
+                            deviceName: Session.source ? (Session.source.nickname || Session.source.description || I18n.tr("settings.microphone")) : I18n.tr("audio.no_input_device")
                             onAdjusted: value => { if (Session.microphone) { Session.microphone.volume = value; if (value > 0) Session.microphone.muted = false; } }
                             onMuteRequested: if (Session.microphone) Session.microphone.muted = !Session.microphone.muted
                             onDetailsRequested: popup.page = "input"
@@ -291,44 +291,44 @@ PanelWindow {
                             width: modes.width - (2 * (modes.width - 20) / 3 + 20) * popup.expansionCurve
                             height: modes.height
                             compactProgress: 1 - popup.expansionCurve
-                            title: "Не беспокоить"; symbol: "bell"; active: Desktop.data.dnd
+                            title: I18n.tr("notification.dnd"); symbol: "bell"; active: Desktop.data.dnd
                             enabled: Desktop.data.dndAvailable && !Desktop.changingSettings
                             onToggled: Desktop.request("dnd", "")
                         }
                         QuickSwitchTile {
                             width: (modes.width - 20) / 3 * popup.expansionCurve; height: modes.height
                             clip: true; opacity: popup.expansionCurve; enabled: !popup.preview && Desktop.data.nightLightAvailable && !Desktop.changingSettings
-                            title: "Ночной свет"; symbol: "moon-warm"; active: Desktop.data.nightLight
+                            title: I18n.tr("quick.night_light"); symbol: "moon-warm"; active: Desktop.data.nightLight
                             onToggled: Desktop.request("nightlight", "")
                         }
                         QuickSwitchTile {
                             width: (modes.width - 20) / 3 * popup.expansionCurve; height: modes.height
                             clip: true; opacity: popup.expansionCurve; enabled: !popup.preview && Desktop.data.airplaneAvailable && !Desktop.changingSettings
-                            title: "Авиарежим"; symbol: "airplane"; active: !!Desktop.data.airplane
+                            title: I18n.tr("quick.airplane_mode"); symbol: "airplane"; active: !!Desktop.data.airplane
                             onToggled: Desktop.request("airplane", Desktop.data.airplane || Desktop.data.airplaneManaged ? "off" : "on")
                         }
                     }
                     Item { width: 1; height: 8 }
                     Item {
                         width: parent.width; height: 70 * popup.expansionCurve; clip: true
-                        SettingsRow { width: parent.width; height: 53; enabled: !popup.preview; text: "Режим питания"; subtitle: popup.profileLabel; symbol: "performance"; onClicked: popup.page = "profiles" }
+                        SettingsRow { width: parent.width; height: 53; enabled: !popup.preview; text: I18n.tr("quick.power_mode"); subtitle: popup.profileLabel; symbol: "performance"; onClicked: popup.page = "profiles" }
                         Rectangle { y: 61; width: parent.width; height: 1; color: Glass.tint(Session.accent, 0.22) }
                     }
                     Item {
                         width: parent.width; height: 40 * (1 - popup.expansionCurve); clip: true
-                        QuickActionButton { width: parent.width; height: 40; enabled: popup.preview; text: "Открыть центр управления"; symbol: "settings"; onClicked: BarState.expandQuick() }
+                        QuickActionButton { width: parent.width; height: 40; enabled: popup.preview; text: I18n.tr("quick.open_control_center"); symbol: "settings"; onClicked: BarState.expandQuick() }
                     }
                     Item {
                         width: parent.width; height: 40 * popup.expansionCurve; clip: true
                         RowLayout {
                             width: parent.width; height: 40; spacing: 8; enabled: !popup.preview
-                            QuickActionButton { Layout.fillWidth: true; Layout.preferredWidth: 1; text: "Настройки"; symbol: "settings"; onClicked: { Session.closeQuickSettings(); Quickshell.execDetached([Session.controller, "settings"]); } }
-                            QuickActionButton { Layout.fillWidth: true; Layout.preferredWidth: 1; text: "Блокировка"; symbol: "lock"; onClicked: { Session.closeQuickSettings(); Session.launch("lock"); } }
-                            QuickActionButton { Layout.fillWidth: true; Layout.preferredWidth: 1; text: "Питание"; symbol: "power"; onClicked: popup.page = "power" }
+                            QuickActionButton { Layout.fillWidth: true; Layout.preferredWidth: 1; text: I18n.tr("settings.title"); symbol: "settings"; onClicked: { Session.closeQuickSettings(); Quickshell.execDetached([Session.controller, "settings"]); } }
+                            QuickActionButton { Layout.fillWidth: true; Layout.preferredWidth: 1; text: I18n.tr("quick.lock"); symbol: "lock"; onClicked: { Session.closeQuickSettings(); Session.launch("lock"); } }
+                            QuickActionButton { Layout.fillWidth: true; Layout.preferredWidth: 1; text: I18n.tr("settings.power"); symbol: "power"; onClicked: popup.page = "power" }
                             QuickActionButton {
                                 Layout.preferredWidth: 40; Layout.minimumWidth: 40
-                                symbol: "screenshot"; Accessible.name: "Снимок экрана"
-                                ToolTip.visible: hovered; ToolTip.text: "Снимок экрана"
+                                symbol: "screenshot"; Accessible.name: I18n.tr("quick.screenshot")
+                                ToolTip.visible: hovered; ToolTip.text: I18n.tr("quick.screenshot")
                                 onClicked: BarState.screenshot()
                             }
                         }
@@ -342,10 +342,10 @@ PanelWindow {
                 opacity: pageMotion.opacity
                 transformOrigin: Item.Top
                 RowLayout {
-                    IconButton { symbol: "chevron-left"; hint: "Назад"; implicitWidth: 30; implicitHeight: 30; onClicked: { popup.page = "main"; popup.powerAction = ""; } }
+                    IconButton { symbol: "chevron-left"; hint: I18n.tr("common.back"); implicitWidth: 30; implicitHeight: 30; onClicked: { popup.page = "main"; popup.powerAction = ""; } }
                     Text { text: popup.title; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 15 }
                     Item { Layout.fillWidth: true }
-                    IconButton { symbol: "close"; hint: "Закрыть"; implicitWidth: 30; implicitHeight: 30; onClicked: Session.closeQuickSettings() }
+                    IconButton { symbol: "close"; hint: I18n.tr("common.close"); implicitWidth: 30; implicitHeight: 30; onClicked: Session.closeQuickSettings() }
                 }
                 ScrollView {
                     id: deviceScroll
@@ -357,10 +357,10 @@ PanelWindow {
                         width: deviceScroll.availableWidth; spacing: 8
                         SettingsRow {
                             width: parent.width; visible: popup.page === "wifi"
-                            symbol: "wifi"; text: Session.wifiEnabled ? "Wi-Fi включён" : "Wi-Fi выключен"
+                            symbol: "wifi"; text: Session.wifiEnabled ? I18n.tr("wifi.enabled") : I18n.tr("wifi.disabled")
                             statusKind: Session.wifiStatus.kind; statusLevel: Session.wifiStatus.level
                             statusBusy: Session.wifiStatus.busy; statusWarning: Session.wifiStatus.warning
-                            subtitle: "Нажми, чтобы переключить"; selected: Session.wifiEnabled
+                            subtitle: I18n.tr("quick.click_to_toggle"); selected: Session.wifiEnabled
                             enabled: !!Session.wifiDevice
                             onClicked: Session.toggleWifi()
                         }
@@ -377,14 +377,14 @@ PanelWindow {
                                 id: networkRow
                                 required property var modelData
                                 width: parent.width
-                                text: modelData.name || "Скрытая сеть"
+                                text: modelData.name || I18n.tr("quick.hidden_network")
                                 symbol: "wifi"; selected: modelData.connected
                                 statusKind: modelData.stateChanging ? "wifi-connecting" : "wifi"
                                 statusLevel: StatusLogic.wifiLevel(modelData.signalStrength)
                                 statusBusy: modelData.stateChanging
                                 statusWarning: modelData.connected && Session.wifiStatus.warning
-                                statusLabel: "Уровень приёма: " + statusLevel + " из 3"
-                                subtitle: modelData.stateChanging ? "Подключение…" : modelData.connected ? "Подключено" : ""
+                                statusLabel: I18n.trWith("quick.signal_level", {level: statusLevel})
+                                subtitle: modelData.stateChanging ? I18n.tr("quick.connecting") : modelData.connected ? I18n.tr("quick.connected") : ""
                                 enabled: !modelData.stateChanging
                                 onClicked: {
                                     if (modelData.connected) return;
@@ -467,8 +467,8 @@ PanelWindow {
                     SettingsRow { Layout.fillWidth: true; text: "Microphone"; symbol: "microphone"; onClicked: popup.page = "input" }
                     SettingsRow { Layout.fillWidth: true; text: "Wi-Fi"; symbol: "wifi"; onClicked: popup.page = "wifi" }
                     SettingsRow { Layout.fillWidth: true; text: "Bluetooth"; symbol: "bluetooth"; onClicked: popup.page = "bluetooth" }
-                    SettingsRow { Layout.fillWidth: true; text: "Режим питания"; symbol: "performance"; onClicked: popup.page = "profiles" }
-                    SettingsRow { Layout.fillWidth: true; text: "Авиарежим"; symbol: "airplane"; onClicked: popup.page = "airplane" }
+                    SettingsRow { Layout.fillWidth: true; text: I18n.tr("quick.power_mode"); symbol: "performance"; onClicked: popup.page = "profiles" }
+                    SettingsRow { Layout.fillWidth: true; text: I18n.tr("quick.airplane_mode"); symbol: "airplane"; onClicked: popup.page = "airplane" }
                     SettingsRow { Layout.fillWidth: true; text: "Night Light"; symbol: "moon-warm"; onClicked: popup.page = "nightlight" }
                     SettingsRow { Layout.fillWidth: true; text: "Do Not Disturb"; symbol: "bell"; onClicked: popup.page = "dnd" }
                     Item { Layout.fillHeight: true }
@@ -478,11 +478,11 @@ PanelWindow {
                     Layout.fillWidth: true; Layout.fillHeight: true; spacing: 12
                     Text {
                         Layout.fillWidth: true
-                        text: Desktop.data.powerProfilesAvailable ? "Выбери баланс между скоростью работы и расходом батареи." : "Служба профилей питания недоступна. Нужен power-profiles-daemon."
+                        text: Desktop.data.powerProfilesAvailable ? I18n.tr("quick.power_profiles_desc") : I18n.tr("quick.power_profiles_unavailable")
                         color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 12; wrapMode: Text.Wrap
                     }
                     Repeater {
-                        model: [{key: "power-saver", label: "Энергосбережение", detail: "Дольше от батареи, тише охлаждение", icon: "leaf"}, {key: "balanced", label: "Сбалансированный", detail: "Для повседневной работы", icon: "balance"}, {key: "performance", label: "Производительность", detail: "Для высокой нагрузки; выше расход энергии", icon: "performance"}]
+                        model: [{key: "power-saver", label: I18n.tr("quick.power_saver"), detail: I18n.tr("quick.power_saver_desc"), icon: "leaf"}, {key: "balanced", label: I18n.tr("quick.balanced"), detail: I18n.tr("quick.balanced_desc"), icon: "balance"}, {key: "performance", label: I18n.tr("quick.performance"), detail: I18n.tr("quick.performance_desc"), icon: "performance"}]
                         SettingsRow {
                             required property var modelData
                             Layout.fillWidth: true
@@ -495,7 +495,7 @@ PanelWindow {
                     Text {
                         visible: !!Desktop.data.powerDegraded
                         Layout.fillWidth: true
-                        text: "Система временно ограничивает высокую мощность — например, из-за температуры."
+                        text: I18n.tr("quick.power_throttled")
                         color: PolyTheme.Theme.color("#d9b38d"); font.family: Session.fontFamily; font.pixelSize: 12; wrapMode: Text.Wrap
                     }
                     Item { Layout.fillHeight: true }
@@ -505,20 +505,20 @@ PanelWindow {
                     Layout.fillWidth: true; Layout.fillHeight: true; spacing: 14
                     Text {
                         Layout.fillWidth: true
-                        text: "Отключает беспроводные радиомодули, включая Wi-Fi и Bluetooth. При выключении восстанавливает их прежнее состояние."
+                        text: I18n.tr("quick.airplane_desc")
                         color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 12; wrapMode: Text.Wrap
                     }
                     SettingsRow {
                         Layout.fillWidth: true
-                        text: "Авиарежим"; symbol: "airplane"; selected: !!Desktop.data.airplane
-                        subtitle: Desktop.data.airplaneManaged && !selected ? "Нажми, чтобы восстановить радиомодули" : (selected ? "Включён · нажми, чтобы выключить" : "Выключен · нажми, чтобы включить")
+                        text: I18n.tr("quick.airplane_mode"); symbol: "airplane"; selected: !!Desktop.data.airplane
+                        subtitle: Desktop.data.airplaneManaged && !selected ? I18n.tr("quick.airplane_restore") : (selected ? I18n.tr("quick.airplane_on_desc") : I18n.tr("quick.airplane_off_desc"))
                         enabled: Desktop.data.airplaneAvailable && !Desktop.changingSettings
                         onClicked: Desktop.request("airplane", Desktop.data.airplane || Desktop.data.airplaneManaged ? "off" : "on")
                     }
                     Text {
                         visible: !!Desktop.data.airplaneHardwareBlocked
                         Layout.fillWidth: true
-                        text: "Часть радиомодулей отключена аппаратным переключателем. Для их включения используй переключатель или клавишу ноутбука."
+                        text: I18n.tr("quick.airplane_hardware_rfkill")
                         color: PolyTheme.Theme.color("#d9b38d"); font.family: Session.fontFamily; font.pixelSize: 12; wrapMode: Text.Wrap
                     }
                     Item { Layout.fillHeight: true }

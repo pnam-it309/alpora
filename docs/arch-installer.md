@@ -49,13 +49,17 @@ can remain after a later failure. The installer reports the backup location.
 `--skip-packages` is for development with dependencies already installed. It is
 not a promise that missing runtime dependencies will work.
 
-`--core-only` installs only the core compositor, shell, audio, and portal packages,
+`--minimal` (or `--core-only`) installs only the core compositor, shell, audio, and portal packages (~28 packages),
 skipping bundled third-party applications (Firefox, Nautilus, Kitty, Foot, Fuzzel, Pavucontrol).
+
+`--ignore-distro-check` (or `--force-distro`) bypasses Arch distro detection in case you are on an unlisted Arch spin
+or derivative and want to use pacman to install packages.
 
 `--ui-only` installs the standalone ALPORA UI shell (panel, widgets, companion, and settings)
 without altering existing Hyprland configurations or installing packages. This is ideal
-for custom Arch kernels, personal configurations, or other distributions. Launch with
-`poly-shell run` or add `exec-once = poly-shell run` to your existing configuration.
+for custom Arch kernels (linux-zen, linux-lts, linux-hardened, etc.), personal configurations,
+or other distributions. Launch with `poly-shell run` or add `exec-once = poly-shell run` to
+your existing configuration.
 
 ## Uninstallation & recovery
 

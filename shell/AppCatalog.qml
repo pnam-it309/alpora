@@ -6,14 +6,14 @@ import Quickshell.Io
 Singleton {
     id: root
     readonly property var categories: [
-        { id: "Network", name: "Интернет", icon: "wifi" },
-        { id: "AudioVideo", name: "Мультимедиа", icon: "music" },
-        { id: "Office", name: "Офис", icon: "note" },
-        { id: "Graphics", name: "Графика", icon: "sun" },
-        { id: "Utility", name: "Утилиты", icon: "terminal" },
-        { id: "System", name: "Система", icon: "settings" },
-        { id: "Development", name: "Разработка", icon: "terminal" },
-        { id: "Game", name: "Игры", icon: "plus" }
+        { id: "Network", name: I18n.tr("app.category.Network"), icon: "wifi" },
+        { id: "AudioVideo", name: I18n.tr("app.category.AudioVideo"), icon: "music" },
+        { id: "Office", name: I18n.tr("app.category.Office"), icon: "note" },
+        { id: "Graphics", name: I18n.tr("app.category.Graphics"), icon: "sun" },
+        { id: "Utility", name: I18n.tr("app.category.Utility"), icon: "terminal" },
+        { id: "System", name: I18n.tr("app.category.System"), icon: "settings" },
+        { id: "Development", name: I18n.tr("app.category.Development"), icon: "terminal" },
+        { id: "Game", name: I18n.tr("app.category.Game"), icon: "plus" }
     ]
     readonly property var entries: DesktopEntries.applications.values.filter(entry => !entry.noDisplay).slice().sort((a, b) => a.name.localeCompare(b.name))
     property var pinnedIds: []
@@ -29,7 +29,7 @@ Singleton {
     readonly property var favorites: entries.filter(entry => pinnedIds.includes(entry.id))
     function categoryName(entry: var): string {
         const category = categories.find(item => entry.categories.includes(item.id));
-        return category ? category.name : "Приложение";
+        return category ? category.name : I18n.tr("app.category.default");
     }
     function results(query: string, category: string): var {
         const words = query.trim().toLocaleLowerCase().split(/\s+/).filter(word => word.length);
@@ -88,12 +88,12 @@ Singleton {
         onLoaded: {
             try {
                 const value = JSON.parse(text());
-                if (!Array.isArray(value.pinned) || !value.pinned.every(id => typeof id === "string")) throw new Error("Некорректное избранное");
+                if (!Array.isArray(value.pinned) || !value.pinned.every(id => typeof id === "string")) throw new Error(I18n.tr("app.invalid_pinned"));
                 root.pinnedIds = value.pinned;
                 root.initialized = true;
-            } catch (_) { root.error = "Не удалось прочитать избранное"; root.seed(); }
+            } catch (_) { root.error = I18n.tr("app.favorites_error"); root.seed(); }
         }
         onLoadFailed: root.seed()
-        onSaveFailed: root.error = "Не удалось сохранить избранное"
+        onSaveFailed: root.error = I18n.tr("app.favorites_save_error")
     }
 }

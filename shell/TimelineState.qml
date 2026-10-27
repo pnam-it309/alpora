@@ -70,7 +70,7 @@ Singleton {
                 root.savedMinute = data.minute;
                 if (follow) root.minute = data.minute;
                 root.loaded = true;
-            } catch (_) { root.error = "Не удалось прочитать Timeline"; }
+            } catch (_) { root.error = I18n.tr("timeline.error_read"); }
         } }
         stderr: StdioCollector { onStreamFinished: if (text.trim()) root.error = text.trim().replace(/^poly-shell: /, "") }
     }
@@ -80,7 +80,7 @@ Singleton {
         stderr: StdioCollector { onStreamFinished: if (text.trim()) root.error = text.trim().replace(/^poly-shell: /, "") }
         onExited: exitCode => {
             if (exitCode === 0 && root.response && root.response.saved) root.savedMinute = root.response.minute;
-            else if (!root.error) root.error = "Не удалось сохранить время";
+            else if (!root.error) root.error = I18n.tr("timeline.error_save");
             if (root.pending && root.active) { root.pending = false; Qt.callLater(root.commit); }
         }
     }

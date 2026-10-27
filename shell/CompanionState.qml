@@ -27,11 +27,11 @@ Singleton {
                 if (saved.version !== 1 || typeof saved.enabled !== "boolean" || typeof saved.lively !== "boolean") throw new Error("Invalid companion preferences");
                 if (saved.flights !== undefined && typeof saved.flights !== "boolean") throw new Error("Invalid flight preference");
                 root.enabled = saved.enabled; root.lively = saved.lively; root.flights = saved.flights !== false; root.error = "";
-            } catch (_) { root.error = "Не удалось прочитать настройки Грани"; }
+            } catch (_) { root.error = I18n.tr("companion.error_read"); }
             root.loaded = true;
         }
         onLoadFailed: root.loaded = true
-        onSaveFailed: root.error = "Не удалось сохранить настройки Грани"
+        onSaveFailed: root.error = I18n.tr("companion.error_save")
     }
     IpcHandler {
         target: "companion"

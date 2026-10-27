@@ -113,7 +113,7 @@ PanelWindow {
                     id: applications
                     width: 56; height: 64; padding: 0
                     hoverEnabled: true; focusPolicy: Qt.NoFocus
-                    Accessible.name: "Все приложения"
+                    Accessible.name: I18n.tr("dock.all_apps")
                     onHoveredChanged: {
                         if (hovered) { dock.hoverItem = applications; dock.hoverId = ""; }
                         else if (dock.hoverItem === applications) dock.hoverItem = null;
@@ -173,7 +173,7 @@ PanelWindow {
         Text {
             id: labelText
             anchors.fill: parent; anchors.leftMargin: 12; anchors.rightMargin: 12
-            text: dock.hoveredGroup ? dock.hoveredGroup.name + (dock.hoveredGroup.windows.length > 1 ? " · " + dock.hoveredGroup.windows.length + " окна" : "") : "Все приложения"
+            text: dock.hoveredGroup ? dock.hoveredGroup.name + (dock.hoveredGroup.windows.length > 1 ? " · " + dock.hoveredGroup.windows.length + " " + I18n.tr("dock.windows_plural") : "") : I18n.tr("dock.all_apps")
             textFormat: Text.PlainText; elide: Text.ElideRight
             color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 11
             horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
@@ -197,7 +197,7 @@ PanelWindow {
                 Layout.fillWidth: true; spacing: 10
                 Image { source: contextMenu.item ? DockState.iconSource(contextMenu.item) : ""; Layout.preferredWidth: 28; Layout.preferredHeight: 28; sourceSize: Qt.size(56, 56) }
                 Text { Layout.fillWidth: true; text: contextMenu.item ? contextMenu.item.name : ""; textFormat: Text.PlainText; elide: Text.ElideRight; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 13 }
-                BarButton { symbol: "close"; hint: "Закрыть меню"; onClicked: dock.contextId = "" }
+                BarButton { symbol: "close"; hint: I18n.tr("dock.close_menu"); onClicked: dock.contextId = "" }
             }
             ListView {
                 id: windows
@@ -211,12 +211,12 @@ PanelWindow {
                     required property var modelData
                     width: windows.width; height: 45; padding: 8
                     hoverEnabled: true; focusPolicy: Qt.NoFocus
-                    Accessible.name: modelData.title + ", стол " + modelData.workspace.name
+                    Accessible.name: modelData.title + ", " + I18n.tr("dock.workspace_prefix") + modelData.workspace.name
                     background: Rectangle { radius: Math.min(9, Session.visual.panelRadius); color: PolyTheme.Theme.withAlpha(Session.accent, windowButton.hovered ? 0.18 : windowButton.modelData.active ? 0.09 : 0) }
                     contentItem: Column {
                         spacing: 3
                         Text { width: parent.width; text: windowButton.modelData.title; textFormat: Text.PlainText; elide: Text.ElideRight; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 11 }
-                        Text { width: parent.width; text: "Стол " + windowButton.modelData.workspace.name + (windowButton.modelData.active ? " · активно" : ""); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 9 }
+                        Text { width: parent.width; text: I18n.tr("dock.workspace_prefix") + windowButton.modelData.workspace.name + (windowButton.modelData.active ? " · " + I18n.tr("dock.active_indicator") : ""); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 9 }
                     }
                     onClicked: { DockState.focus(modelData); dock.contextId = ""; }
                 }
@@ -224,20 +224,20 @@ PanelWindow {
             Text {
                 visible: contextMenu.windowCount === 0
                 Layout.fillWidth: true; Layout.fillHeight: true
-                text: "Приложение ещё не запущено"; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11
+                text: I18n.tr("dock.app_not_running"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11
                 verticalAlignment: Text.AlignVCenter
             }
             Rectangle { Layout.fillWidth: true; implicitHeight: 1; color: PolyTheme.Theme.withAlpha(Session.muted, 0.2) }
             DayAction {
                 visible: !!contextMenu.item && !!contextMenu.item.entry
                 Layout.fillWidth: true
-                text: "Открыть приложение"
+                text: I18n.tr("dock.launch_app")
                 onClicked: { DockState.launch(dock.contextId); dock.contextId = ""; }
             }
             DayAction {
                 visible: !!contextMenu.item && !!contextMenu.item.entry
                 Layout.fillWidth: true
-                text: contextMenu.item && contextMenu.item.pinned ? "Убрать из избранного" : "Закрепить в доке"
+                text: contextMenu.item && contextMenu.item.pinned ? I18n.tr("dock.unpin_from_dock") : I18n.tr("dock.pin_to_dock")
                 onClicked: { const id = dock.contextId; dock.contextId = ""; DockState.togglePin(id); }
             }
         }

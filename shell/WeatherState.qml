@@ -28,8 +28,7 @@ Singleton {
         return I18n.tr("weather.thunder");
     }
     function day(value: string): string {
-        const localeMap = {"ru": "ru_RU", "vi": "vi_VN", "en": "en_US"};
-        return new Date(value + "T12:00:00").toLocaleDateString(Qt.locale(localeMap[I18n.locale] || "ru_RU"), "ddd");
+        return new Date(value + "T12:00:00").toLocaleDateString(I18n.qtLocale, "ddd");
     }
     onActiveChanged: if (active) refresh()
     Connections {

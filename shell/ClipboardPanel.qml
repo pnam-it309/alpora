@@ -17,8 +17,8 @@ ColumnLayout {
     DayField {
         id: search
         Layout.fillWidth: true
-        placeholderText: "Поиск в истории…"
-        Accessible.name: "Поиск в буфере обмена"
+        placeholderText: I18n.tr("clipboard.search_placeholder")
+        Accessible.name: I18n.tr("clipboard.search_accessible")
         onTextChanged: clips.currentIndex = 0
         onAccepted: panel.choose()
         Keys.onDownPressed: clips.currentIndex = Math.min(panel.entries.length - 1, clips.currentIndex + 1)
@@ -29,15 +29,15 @@ ColumnLayout {
         DayAction {
             id: pinnedOnly
             checkable: true; primary: checked
-            text: checked ? "Закреплённые" : "Все записи"
-            Accessible.name: "Показать только закреплённые"
+            text: checked ? I18n.tr("clipboard.pinned") : I18n.tr("clipboard.all_entries")
+            Accessible.name: I18n.tr("clipboard.pinned_only")
         }
         Item { Layout.fillWidth: true }
         Text { text: panel.entries.length + " / " + ClipboardState.entries.length; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11 }
         DayAction {
-            text: ClipboardState.paused ? "Продолжить" : "Пауза"
+            text: ClipboardState.paused ? I18n.tr("clipboard.resume") : I18n.tr("clipboard.pause")
             primary: ClipboardState.paused
-            Accessible.name: ClipboardState.paused ? "Возобновить запись истории" : "Приостановить запись истории"
+            Accessible.name: ClipboardState.paused ? I18n.tr("clipboard.resume_history") : I18n.tr("clipboard.pause_history")
             enabled: ClipboardState.ready && !ClipboardState.busy
             onClicked: ClipboardState.request("pause", "")
         }
@@ -45,7 +45,7 @@ ColumnLayout {
     Text {
         visible: !!ClipboardState.error || ClipboardState.paused
         Layout.fillWidth: true
-        text: ClipboardState.error || "Запись истории приостановлена"
+        text: ClipboardState.error || I18n.tr("clipboard.history_paused")
         textFormat: Text.PlainText; wrapMode: Text.Wrap
         color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11
     }
@@ -68,20 +68,20 @@ ColumnLayout {
             anchors.centerIn: parent; width: parent.width - 32; spacing: 10
             visible: panel.entries.length === 0
             Icon { anchors.horizontalCenter: parent.horizontalCenter; name: "clipboard"; width: 32; height: 32 }
-            Text { width: parent.width; text: search.text || pinnedOnly.checked ? "Ничего не найдено" : "Здесь появится скопированное"; horizontalAlignment: Text.AlignHCenter; wrapMode: Text.Wrap; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 13 }
-            Text { width: parent.width; text: "Тексты и изображения · до 200 записей"; horizontalAlignment: Text.AlignHCenter; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11 }
+            Text { width: parent.width; text: search.text || pinnedOnly.checked ? I18n.tr("clipboard.not_found") : I18n.tr("clipboard.empty_hint"); horizontalAlignment: Text.AlignHCenter; wrapMode: Text.Wrap; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 13 }
+            Text { width: parent.width; text: I18n.tr("clipboard.formats_hint"); horizontalAlignment: Text.AlignHCenter; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11 }
         }
     }
     RowLayout {
         Layout.fillWidth: true
-        Text { Layout.fillWidth: true; text: "Выбрать → Ctrl+V\n↑ ↓ — выбор · Enter — скопировать"; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 10 }
+        Text { Layout.fillWidth: true; text: I18n.tr("clipboard.footer_hint"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 10 }
         DayAction {
-            text: "Очистить историю"
-            Accessible.name: "Очистить историю, сохранив закреплённые"
+            text: I18n.tr("clipboard.clear")
+            Accessible.name: I18n.tr("clipboard.clear_keep_pinned")
             enabled: ClipboardState.ready && !ClipboardState.busy && ClipboardState.entries.some(e => !e.pinned)
             onClicked: ClipboardState.request("clear", "")
             ToolTip.visible: hovered
-            ToolTip.text: "Закреплённые записи останутся"
+            ToolTip.text: I18n.tr("clipboard.pinned_remain")
         }
     }
 }

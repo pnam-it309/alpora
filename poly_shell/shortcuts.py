@@ -28,15 +28,15 @@ do
 end
 ''' + END + '\n'
 ACTIONS = [
-    ('command', 'Запустить программу'), ('global', 'Действие оболочки'),
-    ('close-window', 'Закрыть окно'), ('float-window', 'Плавающее окно'),
-    ('toggle-split', 'Сменить разбиение'), ('focus-left', 'Фокус влево'),
-    ('focus-right', 'Фокус вправо'), ('focus-up', 'Фокус вверх'), ('focus-down', 'Фокус вниз'),
-    ('workspace', 'Открыть рабочий стол'), ('move-workspace', 'Перенести окно на стол'),
+    ('command', 'Launch program'), ('global', 'Shell action'),
+    ('close-window', 'Close window'), ('float-window', 'Float window'),
+    ('toggle-split', 'Toggle split'), ('focus-left', 'Focus left'),
+    ('focus-right', 'Focus right'), ('focus-up', 'Focus up'), ('focus-down', 'Focus down'),
+    ('workspace', 'Open workspace'), ('move-workspace', 'Move window to workspace'),
 ]
-GLOBAL_ACTIONS = [('poly-shell:launcher', 'Приложения'), ('poly-shell:quick-settings', 'Быстрые настройки'),
-                  ('poly-shell:notifications', 'Уведомления'), ('poly-shell:overview', 'Обзор рабочих столов'),
-                  ('poly-shell:clipboard', 'Буфер обмена')]
+GLOBAL_ACTIONS = [('poly-shell:launcher', 'Applications'), ('poly-shell:quick-settings', 'Quick settings'),
+                  ('poly-shell:notifications', 'Notifications'), ('poly-shell:overview', 'Overview'),
+                  ('poly-shell:clipboard', 'Clipboard')]
 MODS = {'SUPER':64, 'CTRL':4, 'ALT':8, 'SHIFT':1}
 
 
@@ -50,12 +50,12 @@ def keysyms():
 
 
 def key(value):
-    if not isinstance(value, str): raise ConfigError('Сочетание должно быть строкой')
+    if not isinstance(value, str): raise ConfigError('Key combination must be a string')
     parts = [p.strip() for p in value.split('+')]
-    if not parts or any(not p for p in parts): raise ConfigError('Укажи клавишу и модификаторы, например SUPER + E')
+    if not parts or any(not p for p in parts): raise ConfigError('Specify key and modifiers, e.g. SUPER + E')
     modifiers = [p.upper().replace('CONTROL', 'CTRL').replace('WIN', 'SUPER') for p in parts[:-1]]
     if any(m not in MODS for m in modifiers) or len(set(modifiers)) != len(modifiers):
-        raise ConfigError('Модификаторы: SUPER, CTRL, ALT, SHIFT; без повторов')
+        raise ConfigError('Modifiers: SUPER, CTRL, ALT, SHIFT; without duplicates')
     button = parts[-1]
     if not re.fullmatch(r'(?:[A-Za-z0-9_]{1,48}|code:[0-9]{1,3})', button):
         raise ConfigError('Клавиша: латинская буква, цифра, F1…F35, Return, Print или code:номер')
@@ -148,9 +148,9 @@ def source_rows(paths):
     if ('local key = tostring(workspace % 10)' in text and
             '"SUPER + " .. key, hl.dsp.focus({ workspace = workspace })' in text):
         for workspace in range(1,11):
-            rows.append(row('SUPER + '+str(workspace%10), 'Рабочий стол '+str(workspace), 'workspace', str(workspace)))
+            rows.append(row('SUPER + '+str(workspace%10), 'Workspace '+str(workspace), 'workspace', str(workspace)))
             if '"SUPER + SHIFT + " .. key, hl.dsp.window.move({ workspace = workspace })' in text:
-                rows.append(row('SUPER + SHIFT + '+str(workspace%10), 'Окно на стол '+str(workspace), 'move-workspace', str(workspace)))
+                rows.append(row('SUPER + SHIFT + '+str(workspace%10), 'Window to workspace '+str(workspace), 'move-workspace', str(workspace)))
     # Ambiguous or unsupported source keys stay external. Never reinterpret an
     # arbitrary callback or an application's unrelated global shortcut.
     imported=[]
@@ -166,9 +166,9 @@ def stored(paths):
     path = paths.config / 'shortcuts.json'
     if not path.exists(): return []
     data = read_object(path)
-    if data.get('version')!=1 or not isinstance(data.get('overrides'), list) or len(data['overrides'])>250: raise ConfigError('Повреждён файл горячих клавиш; исходный файл сохранён')
-    if any(not isinstance(r,dict) or not isinstance(r.get('id'),str) for r in data['overrides']): raise ConfigError('Повреждены записи горячих клавиш')
-    if len({r['id'] for r in data['overrides']})!=len(data['overrides']): raise ConfigError('Повторяющиеся записи горячих клавиш')
+    if data.get('version')!=1 or not isinstance(data.get('overrides'), list) or len(data['overrides'])>250: raise ConfigError('Corrupted shortcuts file; original preserved / Повреждён файл')
+    if any(not isinstance(r,dict) or not isinstance(r.get('id'),str) for r in data['overrides']): raise ConfigError('Corrupted shortcut records / Повреждены записи')
+    if len({r['id'] for r in data['overrides']})!=len(data['overrides']): raise ConfigError('Duplicate shortcut entries / Повторяющиеся записи')
     return data['overrides']
 
 
@@ -182,15 +182,15 @@ def effective(paths):
 
 def hypr(*args):
     try: result = subprocess.run(['hyprctl',*args],capture_output=True,text=True,timeout=8)
-    except (OSError,subprocess.SubprocessError) as exc: raise ConfigError('Hyprland не отвечает: '+str(exc)) from exc
-    if result.returncode: raise ConfigError((result.stderr or result.stdout).strip() or 'Ошибка Hyprland')
+    except (OSError,subprocess.SubprocessError) as exc: raise ConfigError('Hyprland is not responding / Hyprland не отвечает: '+str(exc)) from exc
+    if result.returncode: raise ConfigError((result.stderr or result.stdout).strip() or 'Hyprland error / Ошибка Hyprland')
     return result.stdout
 
 
 def active_binds():
     try: data = json.loads(hypr('-j','binds'))
-    except ValueError as exc: raise ConfigError('Некорректный ответ Hyprland о сочетаниях') from exc
-    if not isinstance(data,list): raise ConfigError('Некорректный список сочетаний Hyprland')
+    except ValueError as exc: raise ConfigError('Invalid Hyprland shortcuts response / Некорректный ответ Hyprland') from exc
+    if not isinstance(data,list): raise ConfigError('Invalid Hyprland shortcuts list / Некорректный список сочетаний')
     return data
 
 
@@ -208,34 +208,34 @@ def get(paths):
 
 
 def validate(values, base):
-    if not isinstance(values,list) or len(values)>250: raise ConfigError('Допустимо не более 250 сочетаний')
+    if not isinstance(values,list) or len(values)>250: raise ConfigError('Maximum 250 shortcuts allowed / Допустимо не более 250')
     original = {r['id']:r for r in base}
     result, ids, keys = [],set(),set()
     fields = {'id','source','key','title','action','argument','enabled','locked','repeat'}
     for item in values:
-        if not isinstance(item,dict) or set(item)!=fields: raise ConfigError('Некорректная запись горячей клавиши')
+        if not isinstance(item,dict) or set(item)!=fields: raise ConfigError('Invalid shortcut entry / Некорректная запись')
         value = dict(item)
         if not isinstance(value['id'],str) or not re.fullmatch(r'(?:source-[0-9a-f]{20}|custom-[a-zA-Z0-9-]{1,64})',value['id']) or value['id'] in ids:
-            raise ConfigError('Некорректный или повторяющийся идентификатор')
+            raise ConfigError('Invalid or duplicate identifier / Некорректный или повторяющийся')
         ids.add(value['id'])
         if value['id'] in original:
-            if value['source']!=original[value['id']]['source']: raise ConfigError('Исходное сочетание изменено; обнови список')
-        elif value['source'] or not value['id'].startswith('custom-'): raise ConfigError('Исходное сочетание больше не найдено; обнови список')
+            if value['source']!=original[value['id']]['source']: raise ConfigError('Original shortcut modified; refresh list / Исходное сочетание изменено')
+        elif value['source'] or not value['id'].startswith('custom-'): raise ConfigError('Original shortcut not found; refresh list / Исходное сочетание больше не найдено')
         value['key'] = key(value['key'])
-        if any(type(value[k]) is not bool for k in ('enabled','locked','repeat')): raise ConfigError('Некорректные флаги сочетания')
-        if not isinstance(value['title'],str) or not 1<=len(value['title'].strip())<=160 or any(ord(c)<32 for c in value['title']): raise ConfigError('Название: от 1 до 160 символов')
-        if value['action'] not in dict(ACTIONS): raise ConfigError('Неизвестное действие')
+        if any(type(value[k]) is not bool for k in ('enabled','locked','repeat')): raise ConfigError('Invalid shortcut flags / Некорректные флаги')
+        if not isinstance(value['title'],str) or not 1<=len(value['title'].strip())<=160 or any(ord(c)<32 for c in value['title']): raise ConfigError('Title: 1 to 160 characters / Название: от 1 до 160')
+        if value['action'] not in dict(ACTIONS): raise ConfigError('Unknown action')
         arg = value['argument']
-        if not isinstance(arg,str) or len(arg)>4096 or any(ord(c)<32 for c in arg): raise ConfigError('Некорректный аргумент действия')
-        if value['action']=='command' and not arg.strip(): raise ConfigError('Укажи команду запуска')
-        if value['action']=='global' and arg not in dict(GLOBAL_ACTIONS): raise ConfigError('Выбери действие оболочки из списка')
-        if value['action'] in ('workspace','move-workspace') and (not arg.isdigit() or not 1<=int(arg)<=99): raise ConfigError('Номер рабочего стола: 1…99')
+        if not isinstance(arg,str) or len(arg)>4096 or any(ord(c)<32 for c in arg): raise ConfigError('Invalid action argument / Некорректный аргумент')
+        if value['action']=='command' and not arg.strip(): raise ConfigError('Specify command to execute / Укажи команду')
+        if value['action']=='global' and arg not in dict(GLOBAL_ACTIONS): raise ConfigError('Select shell action from list / Выбери действие')
+        if value['action'] in ('workspace','move-workspace') and (not arg.isdigit() or not 1<=int(arg)<=99): raise ConfigError('Workspace number: 1..99 / Номер рабочего стола')
         if value['enabled']:
             sig = signature(value['key'])
-            if sig in keys: raise ConfigError('Сочетание уже используется: '+value['key'])
+            if sig in keys: raise ConfigError('Shortcut already in use / Сочетание уже используется: '+value['key'])
             keys.add(sig)
         result.append(value)
-    if not set(original)<=ids: raise ConfigError('Исходные сочетания нужно отключать, а не удалять из запроса')
+    if not set(original)<=ids: raise ConfigError('Original shortcuts must be disabled, not removed / Исходные сочетания нужно отключать')
     return result
 
 
@@ -270,7 +270,7 @@ def generate(changes):
 def apply(paths, values, expected):
     with state_lock(paths):
         current = effective(paths)
-        if expected!=current: raise ConfigError('Сочетания изменились в другом окне. Обнови список перед сохранением')
+        if expected!=current: raise ConfigError('Shortcuts changed in another window / в другом окне. Refresh.')
         base = source_rows(paths)
         values = validate(values,base)
         baseline = {r['id']:r for r in base}
@@ -282,15 +282,15 @@ def apply(paths, values, expected):
                     or sum(bind_signature(o)==bind_signature(b) for o in bindings)>1]
         for r in changes:
             if any((r['enabled'] and bind_signature(b)==signature(r['key'])) or (r['source'] and bind_signature(b)==signature(r['source'])) for b in external):
-                raise ConfigError('Конфликт с внешним сочетанием Hyprland: '+r['key'])
+                raise ConfigError('Conflict with external Hyprland shortcut / Конфликт: '+r['key'])
         config = paths.config.parent / 'hypr/hyprland.lua'
         generated = config.with_name('poly-shell-shortcuts.lua')
         saved = paths.config / 'shortcuts.json'
         text = config.read_text()
         if generated.exists() and generated.read_text()!=generate(stored(paths)):
-            raise ConfigError('Сгенерированный файл клавиш изменён вручную; файл сохранён')
+            raise ConfigError('Generated shortcuts file modified manually / вручную; file preserved')
         if BEGIN in text or END in text:
-            if text.count(HOOK)!=1: raise ConfigError('Блок горячих клавиш изменён вручную; файл сохранён')
+            if text.count(HOOK)!=1: raise ConfigError('Shortcuts hook modified manually / вручную; file preserved')
             text = text.replace(HOOK,'').rstrip()+'\n\n'+HOOK
         else: text = text.rstrip()+'\n\n'+HOOK
         before = {p:p.read_bytes() if p.exists() else None for p in (config,generated,saved)}
@@ -305,26 +305,26 @@ def apply(paths, values, expected):
             atomic_json(saved,dict(version=1,overrides=changes))
             hypr('reload','config-only')
             errors_after = [e for e in json.loads(hypr('-j','configerrors')) if isinstance(e,str) and e.strip()]
-            if any(error not in errors_before for error in errors_after): raise ConfigError('Hyprland отклонил сочетания: '+str(errors_after))
+            if any(error not in errors_before for error in errors_after): raise ConfigError('Hyprland rejected shortcuts: '+str(errors_after))
             binds = active_binds()
             for r in changes:
                 if r['enabled'] and not any(bind_signature(b)==signature(r['key']) and b.get('description')=='Poly: '+r['title'] for b in binds):
-                    raise ConfigError('Hyprland не зарегистрировал сочетание: '+r['key'])
+                    raise ConfigError('Hyprland did not register shortcut / не зарегистрировал: '+r['key'])
             wanted = {signature(r['key']) for r in values if r['enabled']}
             for r in changes:
                 if r['source'] and signature(r['source']) not in wanted and any(bind_signature(b)==signature(r['source']) for b in binds):
-                    raise ConfigError('Hyprland не удалил прежнее сочетание: '+r['source'])
+                    raise ConfigError('Hyprland did not remove previous shortcut: '+r['source'])
         except Exception as exc:
             for path,data in before.items():
                 if data is None: path.unlink(missing_ok=True)
                 else: atomic_text(path,data.decode())
             try: hypr('reload','config-only')
-            except ConfigError as rollback: raise ConfigError('Не удалось восстановить Hyprland: '+str(rollback)) from exc
-            raise ConfigError('Изменения отменены: '+str(exc)) from exc
+            except ConfigError as rollback: raise ConfigError('Cannot restore Hyprland: '+str(rollback)) from exc
+            raise ConfigError('Changes rolled back / отменены: '+str(exc)) from exc
         return dict(saved=True,values=values,backup=str(backup))
 
 
 def shortcuts_control(paths,action,payload):
     if action=='get': return get(paths)
-    if not isinstance(payload,dict): raise ConfigError('Некорректный запрос горячих клавиш')
+    if not isinstance(payload,dict): raise ConfigError('Invalid shortcuts request / Некорректный запрос')
     return apply(paths,payload.get('values'),payload.get('expected'))

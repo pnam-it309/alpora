@@ -36,8 +36,8 @@ ColumnLayout {
             width: pages.width; height: pages.height
             spacing: 10
             PanelHeader {
-                title: "Мой день"
-                subtitle: ClockState.date.toLocaleDateString(Qt.locale("ru_RU"), "dddd, d MMMM")
+                title: I18n.tr("center.my_day")
+                subtitle: ClockState.date.toLocaleDateString(I18n.qtLocale, "dddd, d MMMM")
             }
             Rectangle {
                 Layout.fillWidth: true; Layout.fillHeight: true
@@ -55,7 +55,7 @@ ColumnLayout {
                             Layout.fillWidth: true; spacing: 8
                             Text {
                                 Layout.fillWidth: true
-                                text: ["ПН", "ВТ", "СР", "ЧТ", "ПТ", "СБ", "ВС"][day.index]
+                                text: (I18n.trArray("calendar.weekdays") || [])[day.index] || ""
                                 horizontalAlignment: Text.AlignHCenter
                                 font.family: Session.fontFamily; font.pixelSize: 10; color: Session.muted
                             }
@@ -79,15 +79,15 @@ ColumnLayout {
                 RowLayout {
                     anchors.fill: parent; anchors.margins: 10; spacing: 8
                     Icon { name: "focus"; Layout.preferredWidth: 20; Layout.preferredHeight: 20 }
-                    Text { text: "Фокус"; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12 }
+                    Text { text: I18n.tr("center.focus"); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12 }
                     Text { Layout.fillWidth: true; text: DayState.countdown; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 20 }
                     DayAction {
-                        primary: true; text: DayState.running ? "Пауза" : "Начать"
+                        primary: true; text: DayState.running ? I18n.tr("common.pause") : I18n.tr("center.start")
                         enabled: DayState.loaded && !DayState.busy
                         onClicked: DayState.request(DayState.running ? "timer-pause" : "timer-start", {})
                     }
                     BarButton {
-                        symbol: "refresh"; hint: "Сбросить таймер"; implicitWidth: 24
+                        symbol: "refresh"; hint: I18n.tr("focus.reset_timer"); implicitWidth: 24
                         enabled: DayState.loaded && !DayState.busy
                         onClicked: DayState.request("timer-reset", {})
                     }
@@ -170,7 +170,7 @@ ColumnLayout {
     SettingsRow {
         Layout.fillWidth: true; Layout.preferredHeight: 40
         symbol: BarState.centerPage === 0 ? "calendar" : "music"
-        text: BarState.centerPage === 0 ? "Открыть панель" : "Открыть плеер"
+        text: BarState.centerPage === 0 ? I18n.tr("center.open_panel") : I18n.tr("center.open_player")
         onClicked: root.expandRequested()
     }
     Rectangle {
@@ -179,13 +179,13 @@ ColumnLayout {
         RowLayout {
             anchors.fill: parent; anchors.margins: 4; spacing: 6
             BarButton {
-                symbol: "chevron-left"; hint: "Мой день"; implicitWidth: 26; implicitHeight: 26
+                symbol: "chevron-left"; hint: I18n.tr("center.my_day"); implicitWidth: 26; implicitHeight: 26
                 enabled: BarState.centerPage > 0
                 onClicked: BarState.centerPage = 0
             }
             Item { Layout.fillWidth: true }
             Repeater {
-                model: ["Мой день", "Музыка"]
+                model: [I18n.tr("center.my_day"), I18n.tr("music.title")]
                 Button {
                     id: tab
                     required property int index
@@ -208,7 +208,7 @@ ColumnLayout {
             }
             Item { Layout.fillWidth: true }
             BarButton {
-                symbol: "chevron-right"; hint: "Музыка"; implicitWidth: 26; implicitHeight: 26
+                symbol: "chevron-right"; hint: I18n.tr("music.title"); implicitWidth: 26; implicitHeight: 26
                 enabled: BarState.centerPage === 0
                 onClicked: BarState.centerPage = 1
             }

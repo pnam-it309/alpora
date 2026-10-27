@@ -36,10 +36,10 @@ Singleton {
     }
     Process {
         id: worker
-        stdout: StdioCollector { onStreamFinished: { try { root.response = JSON.parse(text); } catch (_) { root.error = "Не удалось прочитать коллекцию тем"; } } }
+        stdout: StdioCollector { onStreamFinished: { try { root.response = JSON.parse(text); } catch (_) { root.error = I18n.tr("theme.error_collection"); } } }
         stderr: StdioCollector { onStreamFinished: if (text.trim()) root.error = text.trim().replace(/^poly-shell: /, "") }
         onExited: exitCode => {
-            if (exitCode !== 0 || !root.response) { root.wallpaperTransitioning = false; if (!root.error) root.error = "Не удалось выполнить действие"; return; }
+            if (exitCode !== 0 || !root.response) { root.wallpaperTransitioning = false; if (!root.error) root.error = I18n.tr("theme.error_action"); return; }
             if (root.wallpaperTransitioning) wallpaperHandoff.restart();
             const keepDraft = root.loaded && root.dirty && root.action === "list";
             root.items = root.response.items;
@@ -47,8 +47,8 @@ Singleton {
             root.baseAutomatic = root.response.colorsFromWallpaper;
             if (!keepDraft) { root.selectedId = root.response.imported || root.baseId; root.automatic = root.baseAutomatic; }
             root.loaded = true;
-            if (root.action === "apply") root.message = "Тема сохранена";
-            if (root.action === "import") root.message = "Обои добавлены. Нажми «Применить тему»";
+            if (root.action === "apply") root.message = I18n.tr("theme.applied");
+            if (root.action === "import") root.message = I18n.tr("theme.imported");
         }
     }
     Component.onCompleted: refresh()

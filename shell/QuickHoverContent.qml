@@ -8,15 +8,15 @@ ColumnLayout {
     readonly property bool dragging: volume.dragging || brightness.dragging
     readonly property bool wifiConnected: Session.wifiEnabled && !!Session.wifiNetwork && !Session.wifiStatus.busy
     readonly property string wifiDetail: wifiConnected ? Session.wifiNetwork.name
-        : Session.wifiStatus.busy ? "Подключение…"
-        : !Session.wifiDevice ? "Нет адаптера"
-        : !Session.wifiObservation.hardwareEnabled ? "Аппаратная блокировка"
-        : !Session.wifiEnabled ? "Выключен" : "Нет подключения"
+        : Session.wifiStatus.busy ? I18n.tr("quick.connecting")
+        : !Session.wifiDevice ? I18n.tr("quick.no_adapter")
+        : !Session.wifiObservation.hardwareEnabled ? I18n.tr("quick.hardware_locked")
+        : !Session.wifiEnabled ? I18n.tr("common.disabled") : I18n.tr("quick.no_connection")
     readonly property string wifiNote: ""
-    readonly property string bluetoothDetail: !Session.bluetoothAdapter ? "Нет адаптера"
-        : !Session.bluetoothEnabled ? "Выключен"
-        : Session.connectedBluetooth.length ? Session.connectedBluetooth[0].name : "Нет подключений"
-    readonly property string bluetoothNote: Session.connectedBluetooth.length > 1 ? "Подключено: " + Session.connectedBluetooth.length
+    readonly property string bluetoothDetail: !Session.bluetoothAdapter ? I18n.tr("quick.no_adapter")
+        : !Session.bluetoothEnabled ? I18n.tr("common.disabled")
+        : Session.connectedBluetooth.length ? Session.connectedBluetooth[0].name : I18n.tr("quick.no_bluetooth_connections")
+    readonly property string bluetoothNote: Session.connectedBluetooth.length > 1 ? I18n.trWith("quick.bluetooth_connected_count", {count: Session.connectedBluetooth.length})
         : ""
     signal pageRequested(string page)
     spacing: 8
@@ -26,7 +26,7 @@ ColumnLayout {
         RowLayout {
             anchors.fill: parent; spacing: 10
             GemMark { Layout.preferredWidth: 22; Layout.preferredHeight: 26 }
-            Text { Layout.fillWidth: true; text: "Быстрый доступ"; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 15; elide: Text.ElideRight }
+            Text { Layout.fillWidth: true; text: I18n.tr("quick.quick_access"); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 15; elide: Text.ElideRight }
         }
     }
     Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 1; color: Glass.tint(Session.accent, 0.22) }
@@ -54,8 +54,8 @@ ColumnLayout {
     ControlRow {
         id: volume
         Layout.fillWidth: true; Layout.preferredHeight: implicitHeight
-        showLabel: true; label: "Громкость"; symbol: Session.audio && Session.audio.muted ? "muted" : "volume"
-        deviceName: Session.sink ? (Session.sink.nickname || Session.sink.description || Session.sink.name) : "Нет устройства вывода"
+        showLabel: true; label: I18n.tr("osd.volume"); symbol: Session.audio && Session.audio.muted ? "muted" : "volume"
+        deviceName: Session.sink ? (Session.sink.nickname || Session.sink.description || Session.sink.name) : I18n.tr("audio.no_output_device")
         value: Session.audio ? Session.audio.volume : 0
         adjustable: !!Session.audio; muted: Session.audio ? Session.audio.muted : false
         hasMute: true; hasDetails: true
@@ -69,7 +69,7 @@ ColumnLayout {
         id: brightness
         Layout.fillWidth: true; Layout.preferredHeight: implicitHeight
         property real pendingValue: value
-        showLabel: true; label: "Яркость"; symbol: "sun"
+        showLabel: true; label: I18n.tr("osd.brightness"); symbol: "sun"
         minimum: 0.05; value: Desktop.data.brightness / 100
         adjustable: Desktop.data.brightnessAvailable
         onAdjusted: value => { pendingValue = value; brightnessDebounce.restart(); }
@@ -79,13 +79,13 @@ ColumnLayout {
     QuickSwitchTile {
         Layout.fillWidth: true
         compact: true
-        title: "Не беспокоить"; symbol: Desktop.data.dnd ? "bell-muted" : "bell"; active: Desktop.data.dnd
+        title: I18n.tr("notification.dnd"); symbol: Desktop.data.dnd ? "bell-muted" : "bell"; active: Desktop.data.dnd
         enabled: Desktop.data.dndAvailable && !Desktop.changingSettings
         onToggled: Desktop.request("dnd", "")
     }
     QuickActionButton {
         Layout.fillWidth: true
-        text: "Открыть центр управления"; symbol: "settings"
+        text: I18n.tr("quick.open_control_center"); symbol: "settings"
         onClicked: root.expandRequested()
     }
 }

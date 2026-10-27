@@ -3,23 +3,23 @@
 // Coordinates are measured against the original 1672 × 941 artwork, before
 // PreserveAspectCrop. A future/imported theme gets usable neutral landmarks.
 var scenes = {
-    "alpine": { light: [0.806, 0.538], peak: [0.118, 0.196], music: [0.51, 0.675], water: true, name: "Солнце" },
-    "moon-lake": { light: [0.795, 0.182], peak: [0.249, 0.115], music: [0.60, 0.77], water: true, name: "Луна" },
-    "forest-mist": { light: [0.264, 0.232], peak: [0.558, 0.100], music: [0.59, 0.79], water: true, name: "Свет в тумане" },
-    "warm-desert": { light: [0.207, 0.276], peak: [0.546, 0.185], music: [0.61, 0.68], water: false, name: "Солнце" },
-    "northern-lights": { light: [0.704, 0.174], peak: [0.417, 0.279], music: [0.61, 0.77], water: true, name: "Сияние" },
-    "rose-sunset": { light: [0.850, 0.387], peak: [0.242, 0.270], music: [0.64, 0.67], water: true, name: "Солнце" },
-    "timeline": { light: [0.806, 0.538], peak: [0.118, 0.196], music: [0.51, 0.675], water: true, name: "Свет" }
+    "alpine": { light: [0.806, 0.538], peak: [0.118, 0.196], music: [0.51, 0.675], water: true, name: (typeof I18n !== "undefined" && I18n && typeof I18n.tr === "function") ? I18n.tr("landscape.sun") : "Солнце" },
+    "moon-lake": { light: [0.795, 0.182], peak: [0.249, 0.115], music: [0.60, 0.77], water: true, name: (typeof I18n !== "undefined" && I18n && typeof I18n.tr === "function") ? I18n.tr("landscape.moon") : "Луна" },
+    "forest-mist": { light: [0.264, 0.232], peak: [0.558, 0.100], music: [0.59, 0.79], water: true, name: (typeof I18n !== "undefined" && I18n && typeof I18n.tr === "function") ? I18n.tr("landscape.light_in_mist") : "Свет в тумане" },
+    "warm-desert": { light: [0.207, 0.276], peak: [0.546, 0.185], music: [0.61, 0.68], water: false, name: (typeof I18n !== "undefined" && I18n && typeof I18n.tr === "function") ? I18n.tr("landscape.sun") : "Солнце" },
+    "northern-lights": { light: [0.704, 0.174], peak: [0.417, 0.279], music: [0.61, 0.77], water: true, name: (typeof I18n !== "undefined" && I18n && typeof I18n.tr === "function") ? I18n.tr("landscape.aurora") : "Сияние" },
+    "rose-sunset": { light: [0.850, 0.387], peak: [0.242, 0.270], music: [0.64, 0.67], water: true, name: (typeof I18n !== "undefined" && I18n && typeof I18n.tr === "function") ? I18n.tr("landscape.sun") : "Солнце" },
+    "timeline": { light: [0.806, 0.538], peak: [0.118, 0.196], music: [0.51, 0.675], water: true, name: (typeof I18n !== "undefined" && I18n && typeof I18n.tr === "function") ? I18n.tr("landscape.light") : "Свет" }
 };
 function scene(id, minute) {
-    var base = scenes[id] || { light: [0.79, 0.32], peak: [0.26, 0.28], music: [0.54, 0.70], water: false, name: "Оформление" };
+    var base = scenes[id] || { light: [0.79, 0.32], peak: [0.26, 0.28], music: [0.54, 0.70], water: false, name: (typeof I18n !== "undefined" && I18n && typeof I18n.tr === "function") ? I18n.tr("landscape.theme") : "Оформление" };
     var value = { light: base.light.slice(), peak: base.peak.slice(), music: base.music.slice(), water: base.water, name: base.name };
     if (id === "timeline") {
         // Timeline reuses the Alpine composition. The night moon is lower and
         // farther right; other frames have no visible celestial disc.
-        if (minute < 165 || minute >= 1350) { value.light = [0.81, 0.538]; value.name = "Луна"; }
-        else if (minute >= 1020 && minute < 1200) value.name = "Солнце";
-        else { value.light = [0.78, 0.30]; value.name = "Время суток"; }
+        if (minute < 165 || minute >= 1350) { value.light = [0.81, 0.538]; value.name = (typeof I18n !== "undefined" && I18n && typeof I18n.tr === "function") ? I18n.tr("landscape.moon") : "Луна"; }
+        else if (minute >= 1020 && minute < 1200) value.name = (typeof I18n !== "undefined" && I18n && typeof I18n.tr === "function") ? I18n.tr("landscape.sun") : "Солнце";
+        else { value.light = [0.78, 0.30]; value.name = (typeof I18n !== "undefined" && I18n && typeof I18n.tr === "function") ? I18n.tr("landscape.time_of_day") : "Время суток"; }
     }
     return value;
 }

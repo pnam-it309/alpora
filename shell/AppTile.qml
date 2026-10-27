@@ -60,7 +60,7 @@ Button {
             anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter
             width: 25; height: 30
             text: AppCatalog.pinnedIds.includes(tile.entry.id) ? "★" : "☆"
-            Accessible.name: AppCatalog.pinnedIds.includes(tile.entry.id) ? "Убрать из избранного" : "Добавить в избранное"
+            Accessible.name: AppCatalog.pinnedIds.includes(tile.entry.id) ? I18n.tr("app.remove_favorite") : I18n.tr("app.add_favorite")
             contentItem: Text { text: pin.text; color: PolyTheme.Theme.color("#b9c9a7"); font.pixelSize: 17; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
             background: Rectangle { radius: 6; color: pin.hovered ? PolyTheme.Theme.color("#485348") : "transparent" }
             onClicked: AppCatalog.togglePin(tile.entry.id)

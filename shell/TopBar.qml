@@ -243,7 +243,7 @@ PanelWindow {
                 }
                 Text {
                     width: clockButton.width
-                    text: ClockState.date.toLocaleDateString(Qt.locale("ru_RU"), "ddd  ·  d MMMM").toUpperCase()
+                    text: ClockState.date.toLocaleDateString(I18n.qtLocale, "ddd  ·  d MMMM").toUpperCase()
                     color: PolyTheme.Theme.color("#b8c7b0")
                     font.family: Session.fontFamily
                     font.pixelSize: 8

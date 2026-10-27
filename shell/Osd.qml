@@ -40,7 +40,7 @@ PanelWindow {
                     RowLayout {
                         Layout.fillWidth: true
                         Text { text: OsdState.title; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12; Layout.fillWidth: true }
-                        Text { text: OsdState.muted ? "Выкл." : Math.round(OsdState.value * 100) + "%"; color: Session.accent; font.family: Session.fontFamily; font.pixelSize: 12; font.weight: Font.DemiBold }
+                        Text { text: OsdState.muted ? I18n.tr("common.off") : Math.round(OsdState.value * 100) + "%"; color: Session.accent; font.family: Session.fontFamily; font.pixelSize: 12; font.weight: Font.DemiBold }
                     }
                     Rectangle {
                         Layout.fillWidth: true; Layout.preferredHeight: 5; radius: 3

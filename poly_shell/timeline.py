@@ -7,9 +7,9 @@ import subprocess
 from .state import ConfigError, ROOT, atomic_json, read_object, state_lock
 
 DEFAULT_MINUTE = 1110
-STOPS = ((0, 'night', 'Ночь'), (330, 'dawn', 'Рассвет'),
-         (480, 'morning', 'Утро'), (780, 'day', 'День'),
-         (1110, 'sunset', 'Закат'), (1260, 'dusk', 'Сумерки'))
+STOPS = ((0, 'night', 'Night'), (330, 'dawn', 'Dawn'),
+         (480, 'morning', 'Morning'), (780, 'day', 'Day'),
+         (1110, 'sunset', 'Sunset'), (1260, 'dusk', 'Dusk'))
 
 # Semantic colors for the same six lighting states as the wallpaper.
 PALETTES = (
@@ -41,7 +41,7 @@ def palette_for(minute):
 
 def validate_minute(value):
     if type(value) is not int or not 0 <= value <= 1440:
-        raise ConfigError('Время Timeline должно быть от 00:00 до 24:00')
+        raise ConfigError('Timeline time must be between 00:00 and 24:00')
     return value % 1440
 
 
@@ -51,7 +51,7 @@ def saved_minute(paths):
         return DEFAULT_MINUTE
     saved = read_object(path)
     if saved.get('schemaVersion') != 1:
-        raise ConfigError('Неизвестная версия настроек Timeline')
+        raise ConfigError('Unknown Timeline settings schema')
     return validate_minute(saved.get('minute'))
 
 
@@ -60,7 +60,7 @@ def assets():
     for minute, name, label in STOPS:
         path = ROOT / 'assets/wallpapers/timeline' / (name + '.png')
         if not path.is_file():
-            raise ConfigError('Не найден пейзаж Timeline: ' + name)
+            raise ConfigError('Timeline landscape not found: ' + name)
         result.append({'minute': minute, 'name': name, 'label': label, 'image': str(path),
                        'palette': palette_for(minute)})
     return result
@@ -86,23 +86,23 @@ def release_fallback():
 
 def timeline_control(paths, action, payload):
     if not isinstance(payload, dict):
-        raise ConfigError('Неверный запрос Timeline')
+        raise ConfigError('Invalid Timeline request')
     with state_lock(paths):
         if action == 'get':
             return {'minute': saved_minute(paths), 'stops': assets()}
         if action == 'ready':
-            if payload: raise ConfigError('Неверный запрос готовности Timeline')
+            if payload: raise ConfigError('Invalid Timeline readiness request')
             selected = paths.config / 'appearance.json'
             if not selected.exists() or read_object(selected).get('theme') != 'timeline':
                 return {'presented': False}
             release_fallback()
             return {'presented': True}
         if action != 'set' or set(payload) != {'minute'}:
-            raise ConfigError('Неверный запрос Timeline')
+            raise ConfigError('Invalid Timeline request')
         minute = validate_minute(payload['minute'])
         selected = paths.config / 'appearance.json'
         if not selected.exists() or read_object(selected).get('theme') != 'timeline':
-            raise ConfigError('Сначала выбери тему Timeline в настройках')
+            raise ConfigError('Select Timeline theme in settings first')
         # Validate both images/config before replacing the last saved position.
         assets()
         saved_minute(paths)

@@ -136,7 +136,7 @@ def doctor(paths):
 def open_settings(paths):
     runtime_check()
     if not os.environ.get("WAYLAND_DISPLAY"):
-        raise ConfigError("Открой настройки внутри сеанса Wayland")
+        raise ConfigError("Open settings inside Wayland session")
     entry = ROOT / "shell/settings.qml"
     ipc = ["quickshell", "ipc", "--path", str(entry), "call", "settings-app", "raiseWindow"]
     paths.runtime.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -162,12 +162,12 @@ def open_settings(paths):
             result = subprocess.run(command + ["quickshell", "--path", str(entry), "--no-duplicate"],
                                     capture_output=True, text=True, timeout=10)
             if result.returncode:
-                raise ConfigError("Не удалось открыть настройки: " + result.stderr.strip())
+                raise ConfigError("Cannot open settings: " + result.stderr.strip())
         for _ in range(60):
             if subprocess.run(ipc, capture_output=True, text=True, timeout=2).returncode == 0:
                 return
             time.sleep(.1)
-        raise ConfigError("Окно настроек не запустилось. См. journalctl --user -u poly-shell-settings")
+        raise ConfigError("Settings window failed to start. See journalctl --user -u poly-shell-settings")
 
 
 def main(argv=None):
@@ -232,20 +232,20 @@ def main(argv=None):
             print(json.dumps(control(paths, args.action, args.value)))
         elif args.command == "theme":
             try: payload = json.loads(args.payload)
-            except ValueError as exc: raise ConfigError("Неверный JSON темы") from exc
+            except ValueError as exc: raise ConfigError("Invalid theme JSON") from exc
             print(json.dumps(theme_control(paths, args.action, payload), ensure_ascii=False))
         elif args.command == "timeline":
             try: payload = json.loads(args.payload)
-            except ValueError as exc: raise ConfigError("Неверный JSON Timeline") from exc
+            except ValueError as exc: raise ConfigError("Invalid Timeline JSON") from exc
             print(json.dumps(timeline_control(paths, args.action, payload), ensure_ascii=False))
         elif args.command == "widgets":
             try: payload = json.loads(args.payload)
-            except ValueError as exc: raise ConfigError("Неверный JSON виджетов") from exc
-            if not isinstance(payload, dict): raise ConfigError("Неверный запрос виджетов")
+            except ValueError as exc: raise ConfigError("Invalid widgets JSON") from exc
+            if not isinstance(payload, dict): raise ConfigError("Invalid widgets request")
             print(json.dumps(widgets_control(paths, args.action, payload), ensure_ascii=False))
         elif args.command == "shortcuts":
             try: payload = json.loads(args.payload)
-            except ValueError as exc: raise ConfigError("Неверный JSON горячих клавиш") from exc
+            except ValueError as exc: raise ConfigError("Invalid shortcuts JSON") from exc
             print(json.dumps(shortcuts_control(paths,args.action,payload),ensure_ascii=False))
         elif args.command == "assets":
             from .desktop_assets import install as install_assets, apply as apply_assets
@@ -267,7 +267,7 @@ def main(argv=None):
             print(json.dumps(organizer(paths, args.action, payload), ensure_ascii=False))
         elif args.command == "appearance":
             try: payload = json.loads(args.payload)
-            except ValueError as exc: raise ConfigError("Неверный JSON внешнего вида") from exc
+            except ValueError as exc: raise ConfigError("Invalid appearance JSON") from exc
             print(json.dumps(appearance_control(paths, args.action, payload), ensure_ascii=False))
         elif args.command == "wallpaper":
             wallpaper(paths, args.image, reset=args.reset)

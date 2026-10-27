@@ -7,8 +7,16 @@ import tempfile
 from .state import ConfigError, ROOT, Paths, read_object
 
 
-def lock_date(now=None):
+def lock_date(now=None, locale='ru'):
     now = now or datetime.now().astimezone()
+    if locale == 'vi':
+        days = ('Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy', 'Chủ Nhật')
+        return f'{days[now.weekday()]} · {now.day} tháng {now.month}'
+    if locale == 'en':
+        days = ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
+        months = ('January', 'February', 'March', 'April', 'May', 'June',
+                  'July', 'August', 'September', 'October', 'November', 'December')
+        return f'{days[now.weekday()]} · {months[now.month - 1]} {now.day}'
     days = ('понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота', 'воскресенье')
     months = ('января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
               'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря')
@@ -54,7 +62,7 @@ def lock_style(snapshot):
         '$lockAmber = rgba(' + palette.get('secondary', '#c09d76')[1:] + 'ff)',
         f'$lockFont = {font}', f'$lockClockFont = {font} SemiBold',
         f'$lockClockFrame = {clock_frame}',
-        f'$lockTitle = {title} · СЕАНС ЗАБЛОКИРОВАН',
+        f'$lockTitle = {title} · ' + ('SESSION LOCKED' if snapshot.get('settings', {}).get('locale') == 'en' else ('PHIÊN ĐÃ KHÓA' if snapshot.get('settings', {}).get('locale') == 'vi' else 'СЕАНС ЗАБЛОКИРОВАН')),
         f'$lockWallpaper = {image}',
         f'$lockDateCommand = "{ROOT / "bin/poly-shell"}" lock-date',
         '$lockMotion = ' + ('false' if snapshot['settings'].get('reducedMotion') else 'true'),

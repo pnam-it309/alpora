@@ -21,7 +21,7 @@ ScrollView {
     required property var modelData
     Layout.fillWidth: true
     title: modelData.title; symbol: modelData.icon
-    description: modelData.title === "Материал" ? "100% — сплошной фон" : modelData.title === "Тень" ? "0% — без тени" : modelData.title === "Анимации" ? "0 мс — мгновенный переход" : root.element === "window" ? "Отступ на каждую сторону: 5 px дают 10 px между окнами. Внешний отступ — от рабочей области под баром. Для окон в раскладке." : root.element === "bar" && modelData.title === "Расположение" ? "Снизу резервируется свободное место для окон. Меню остаются рядом с баром." : ""
+    description: modelData.title === I18n.tr("appearance.field.section_material") ? I18n.tr("appearance.desc_material") : modelData.title === I18n.tr("appearance.field.section_shadow") ? I18n.tr("appearance.desc_shadow") : modelData.title === I18n.tr("appearance.field.section_animations") ? I18n.tr("appearance.desc_anim") : root.element === "window" ? I18n.tr("appearance.desc_window") : root.element === "bar" && modelData.title === I18n.tr("appearance.field.section_placement") ? I18n.tr("appearance.desc_bar") : ""
     Repeater {
      model: group.modelData.fields
      AppearanceSlider {
@@ -34,23 +34,23 @@ ScrollView {
   }
   AppearanceSection {
    Layout.fillWidth: true; visible: root.element === "widget"
-   title: "Движение виджетов"; description: "Дополнительно учитывается переключатель в разделе «Виджеты»."; symbol: "music"
+   title: I18n.tr("appearance.widget_motion"); description: I18n.tr("appearance.widget_motion_desc"); symbol: "music"
    RowLayout {
     Layout.fillWidth: true
-    Text { Layout.fillWidth: true; text: "Декоративные анимации"; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12; wrapMode: Text.Wrap }
-    SettingsToggle { checked: !!AppearanceState.draft.widgetAnimations; enabled: !AppearanceState.busy; Accessible.name: "Декоративные анимации виджетов"; onToggled: AppearanceState.edit("widgetAnimations", checked) }
+    Text { Layout.fillWidth: true; text: I18n.tr("appearance.decorative_animations"); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12; wrapMode: Text.Wrap }
+    SettingsToggle { checked: !!AppearanceState.draft.widgetAnimations; enabled: !AppearanceState.busy; Accessible.name: I18n.tr("appearance.decorative_animations"); onToggled: AppearanceState.edit("widgetAnimations", checked) }
    }
   }
   AppearanceSection {
    Layout.fillWidth: true; visible: root.element === "window" || root.element === "panel" || root.element === "bar" || root.element === "launcher"
-   title: "Общее размытие"; description: "Размывает окна и содержимое под панелями."; symbol: "blur"
+   title: I18n.tr("appearance.blur_title"); description: I18n.tr("appearance.blur_desc"); symbol: "blur"
    RowLayout {
     Layout.fillWidth: true
-    Text { Layout.fillWidth: true; text: "Размывать фон"; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12 }
-    SettingsToggle { checked: !!AppearanceState.draft.blurEnabled; enabled: !AppearanceState.busy; Accessible.name: "Общее размытие фона"; onToggled: AppearanceState.edit("blurEnabled", checked) }
+    Text { Layout.fillWidth: true; text: I18n.tr("appearance.blur_background"); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12 }
+    SettingsToggle { checked: !!AppearanceState.draft.blurEnabled; enabled: !AppearanceState.busy; Accessible.name: I18n.tr("appearance.blur_background"); onToggled: AppearanceState.edit("blurEnabled", checked) }
    }
-   AppearanceSlider { Layout.fillWidth: true; settingKey: "blurSize"; label: "Сила размытия"; minimum: 1; maximum: 8; suffix: ""; enabled: !!AppearanceState.draft.blurEnabled }
-   AppearanceSlider { Layout.fillWidth: true; settingKey: "blurPasses"; label: "Проходы"; minimum: 1; maximum: 2; suffix: ""; enabled: !!AppearanceState.draft.blurEnabled }
+   AppearanceSlider { Layout.fillWidth: true; settingKey: "blurSize"; label: I18n.tr("appearance.blur_strength"); minimum: 1; maximum: 8; suffix: ""; enabled: !!AppearanceState.draft.blurEnabled }
+   AppearanceSlider { Layout.fillWidth: true; settingKey: "blurPasses"; label: I18n.tr("appearance.blur_passes"); minimum: 1; maximum: 2; suffix: ""; enabled: !!AppearanceState.draft.blurEnabled }
   }
  }
 }

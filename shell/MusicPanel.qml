@@ -27,8 +27,8 @@ ColumnLayout {
         function onIsPlayingChanged(): void { root.updatePosition(); }
     }
     PanelHeader {
-        title: "Музыка"
-        subtitle: root.player ? root.player.identity : "Твой ритм, твоё пространство"
+        title: I18n.tr("music.title")
+        subtitle: root.player ? root.player.identity : I18n.tr("music.default_subtitle")
     }
     Rectangle {
         visible: !root.player
@@ -41,8 +41,8 @@ ColumnLayout {
                 width: 38 + 46 * root.expansion; height: width; radius: 10 + 12 * root.expansion; color: PolyTheme.Theme.color("#344238")
                 Icon { anchors.centerIn: parent; name: "music"; width: 22 + 14 * root.expansion; height: width }
             }
-            Text { width: parent.width; text: "Музыка появится здесь"; horizontalAlignment: Text.AlignHCenter; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 13 + 5 * root.expansion }
-            Text { width: parent.width; text: "Включи трек в плеере или браузере.\nОбложка и управление подключатся автоматически."; horizontalAlignment: Text.AlignHCenter; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 10 + 2 * root.expansion; wrapMode: Text.Wrap; lineHeight: 1.5 }
+            Text { width: parent.width; text: I18n.tr("music.empty_title"); horizontalAlignment: Text.AlignHCenter; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 13 + 5 * root.expansion }
+            Text { width: parent.width; text: I18n.tr("music.empty_desc"); horizontalAlignment: Text.AlignHCenter; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 10 + 2 * root.expansion; wrapMode: Text.Wrap; lineHeight: 1.5 }
         }
     }
     Rectangle {
@@ -73,12 +73,12 @@ ColumnLayout {
                 spacing: 3 + 6 * root.expansion
                 Text {
                     Layout.fillWidth: true
-                    text: root.player ? (root.player.trackTitle || "Без названия") : ""
+                    text: root.player ? (root.player.trackTitle || I18n.tr("music.untitled")) : ""
                     textFormat: Text.PlainText; color: Session.foreground
                     font.family: Session.fontFamily; font.pixelSize: 13 + 8 * root.expansion; font.weight: Font.Medium
                     wrapMode: Text.Wrap; maximumLineCount: 2; elide: Text.ElideRight
                 }
-                Text { Layout.fillWidth: true; text: root.player ? (root.player.trackArtist || "Неизвестный исполнитель") : ""; textFormat: Text.PlainText; color: PolyTheme.Theme.color("#b1bfa6"); font.family: Session.fontFamily; font.pixelSize: 11 + 2 * root.expansion; elide: Text.ElideRight }
+                Text { Layout.fillWidth: true; text: root.player ? (root.player.trackArtist || I18n.tr("music.unknown_artist")) : ""; textFormat: Text.PlainText; color: PolyTheme.Theme.color("#b1bfa6"); font.family: Session.fontFamily; font.pixelSize: 11 + 2 * root.expansion; elide: Text.ElideRight }
                 Text { Layout.fillWidth: true; visible: text.length > 0; text: root.player ? root.player.trackAlbum : ""; textFormat: Text.PlainText; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 10; elide: Text.ElideRight }
                 Item { Layout.preferredHeight: 5 * root.expansion }
                 Slider {
@@ -89,7 +89,7 @@ ColumnLayout {
                     value: pressed ? pendingPosition : (root.length > 0 ? Math.min(root.position, to) : 0)
                     enabled: root.seekable
                     opacity: enabled ? 1 : 0.45
-                    Accessible.name: "Позиция воспроизведения"
+                    Accessible.name: I18n.tr("music.playback_position")
                     onMoved: {
                         pendingPosition = value;
                         if (!pressed && root.seekable) root.player.position = value;
@@ -120,17 +120,17 @@ ColumnLayout {
                 RowLayout {
                     Layout.alignment: Qt.AlignHCenter
                     spacing: 10
-                    BarButton { symbol: "previous"; hint: "Предыдущий трек"; implicitWidth: 36; implicitHeight: 36; enabled: !!root.player && root.player.canControl && root.player.canGoPrevious; opacity: enabled ? 1 : 0.3; onClicked: if (root.player) root.player.previous() }
+                    BarButton { symbol: "previous"; hint: I18n.tr("music.prev_track"); implicitWidth: 36; implicitHeight: 36; enabled: !!root.player && root.player.canControl && root.player.canGoPrevious; opacity: enabled ? 1 : 0.3; onClicked: if (root.player) root.player.previous() }
                     Button {
                         id: play
                         implicitWidth: 32 + 20 * root.expansion; implicitHeight: 32 + 20 * root.expansion; padding: 0; hoverEnabled: true
                         enabled: !!root.player && root.player.canControl && root.player.canTogglePlaying
-                        Accessible.name: root.player && root.player.isPlaying ? "Пауза" : "Воспроизвести"
+                        Accessible.name: root.player && root.player.isPlaying ? I18n.tr("music.pause") : I18n.tr("music.play")
                         background: Rectangle { radius: 17; color: play.down ? PolyTheme.Theme.color("#7f966f") : (play.hovered ? PolyTheme.Theme.color("#b6c8a3") : PolyTheme.Theme.color("#9baf86")); border.width: play.visualFocus ? 2 : 0; border.color: Session.foreground; opacity: play.enabled ? 1 : 0.4; Behavior on color { ColorAnimation { duration: Session.settings.reducedMotion ? 0 : 140 } } }
                         contentItem: Item { Icon { anchors.centerIn: parent; name: root.player && root.player.isPlaying ? "pause-dark" : "play-dark"; width: 23; height: 23 } }
                         onClicked: if (root.player) { MusicState.select(root.player.dbusName); root.player.togglePlaying(); }
                     }
-                    BarButton { symbol: "next"; hint: "Следующий трек"; implicitWidth: 36; implicitHeight: 36; enabled: !!root.player && root.player.canControl && root.player.canGoNext; opacity: enabled ? 1 : 0.3; onClicked: if (root.player) root.player.next() }
+                    BarButton { symbol: "next"; hint: I18n.tr("music.next_track"); implicitWidth: 36; implicitHeight: 36; enabled: !!root.player && root.player.canControl && root.player.canGoNext; opacity: enabled ? 1 : 0.3; onClicked: if (root.player) root.player.next() }
                 }
             }
         }
@@ -142,7 +142,7 @@ ColumnLayout {
         RowLayout {
             anchors.fill: parent; anchors.margins: 12; spacing: 10
             BarButton {
-                symbol: "shuffle"; hint: "Случайный порядок"
+                symbol: "shuffle"; hint: I18n.tr("music.shuffle")
                 enabled: !!root.player && root.player.canControl && root.player.shuffleSupported
                 marked: !!root.player && root.player.shuffleSupported && root.player.shuffle
                 opacity: enabled ? 1 : 0.3
@@ -150,7 +150,7 @@ ColumnLayout {
             }
             BarButton {
                 symbol: root.player && root.player.loopState === MprisLoopState.Track ? "repeat-one" : "repeat"
-                hint: "Повтор: " + (!root.player || root.player.loopState === MprisLoopState.None ? "выключен" : (root.player.loopState === MprisLoopState.Track ? "трек" : "список"))
+                hint: I18n.tr("music.repeat_prefix") + (!root.player || root.player.loopState === MprisLoopState.None ? I18n.tr("music.repeat_off") : (root.player.loopState === MprisLoopState.Track ? I18n.tr("music.repeat_track") : I18n.tr("music.repeat_playlist")))
                 enabled: !!root.player && root.player.canControl && root.player.loopSupported
                 marked: !!root.player && root.player.loopState !== MprisLoopState.None
                 opacity: enabled ? 1 : 0.3
@@ -164,10 +164,10 @@ ColumnLayout {
                 enabled: !!root.player && root.player.canControl && root.player.volumeSupported
                 opacity: enabled ? 1 : 0.3
                 value: root.player && root.player.volumeSupported ? Math.min(1, root.player.volume) : 0
-                Accessible.name: "Громкость плеера"
+                Accessible.name: I18n.tr("music.player_volume")
                 onMoved: if (root.player && root.player.canControl && root.player.volumeSupported) root.player.volume = value
             }
-            DayAction { text: "Открыть плеер"; enabled: !!root.player && root.player.canRaise; onClicked: { if (root.player) root.player.raise(); BarState.close(); } }
+            DayAction { text: I18n.tr("music.open_player"); enabled: !!root.player && root.player.canRaise; onClicked: { if (root.player) root.player.raise(); BarState.close(); } }
         }
     }
     ScrollView {

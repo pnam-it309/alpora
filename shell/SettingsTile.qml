@@ -31,7 +31,7 @@ SettingsCard {
         SettingsToggle { visible: root.showToggle; checked: root.toggled; enabled: root.toggleAvailable; Accessible.name: root.title; onToggled: root.toggleRequested() }
         ToolButton {
             Layout.preferredWidth: 22; Layout.preferredHeight: 32
-            Accessible.name: "Открыть: " + root.title
+            Accessible.name: I18n.tr("common.open_colon") + " " + root.title
             background: Item {}
             contentItem: Icon { name: "chevron-right" }
             onClicked: root.clicked()

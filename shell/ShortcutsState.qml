@@ -48,7 +48,7 @@ Singleton {
                 if(![data.values,data.actions,data.globals,data.external].every(v=>Array.isArray(v)))throw new Error("Invalid shortcut response");
                 root.values=data.values;root.draft=root.copy(data.values);root.actions=data.actions;
                 root.globals=data.globals;root.external=data.external;root.loaded=true;
-            }catch(_){root.error="Не удалось прочитать горячие клавиши";}
+            }catch(_){root.error=I18n.tr("shortcuts.error_read");}
         }}
         stderr:StdioCollector {onStreamFinished:if(text.trim())root.error=text.trim().replace(/^poly-shell: /,"")}
     }
@@ -59,8 +59,8 @@ Singleton {
         onExited:exitCode=> {
             if(exitCode===0 && root.response && root.response.saved && Array.isArray(root.response.values)) {
                 root.values=root.copy(root.response.values);root.draft=root.copy(root.values);
-                root.message="Сохранено и применено · резервная копия создана";
-            }else if(!root.error)root.error="Не удалось применить сочетания; проверь журнал";
+                root.message=I18n.tr("shortcuts.saved");
+            }else if(!root.error)root.error=I18n.tr("shortcuts.error_apply");
         }
     }
 }

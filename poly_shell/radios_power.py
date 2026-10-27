@@ -30,12 +30,12 @@ def power_status(run):
 
 def set_profile(value, run):
     if value not in PROFILES:
-        raise ConfigError("Неизвестный режим питания")
+        raise ConfigError("Unknown power mode")
     available = power_status(run)
     if not available["powerProfilesAvailable"]:
-        raise ConfigError("Служба power-profiles-daemon недоступна")
+        raise ConfigError("power-profiles-daemon service unavailable")
     if value not in available["powerProfiles"]:
-        raise ConfigError("Этот режим не поддерживается устройством")
+        raise ConfigError("Power profile is not supported by device")
     run(["powerprofilesctl", "set", value])
 
 
@@ -64,7 +64,7 @@ def radio_status():
 def snapshot(run):
     devices = radios()
     if not devices or not shutil.which("rfkill"):
-        raise ConfigError("Радиомодули недоступны")
+        raise ConfigError("Radios unavailable")
     nm = None
     if shutil.which("nmcli"):
         response = run(["nmcli", "-t", "-f", "WIFI,WWAN", "radio"], check=False)
@@ -80,15 +80,15 @@ def snapshot(run):
 
 def valid_snapshot(data):
     if data.get("schemaVersion") != 1 or not isinstance(data.get("radios"), list):
-        raise ConfigError("Повреждена сохранённая конфигурация радиомодулей; файл сохранён")
+        raise ConfigError("Corrupted saved radio configuration; file preserved")
     for item in data["radios"]:
         if not isinstance(item, dict) or not isinstance(item.get("id"), str) or not item["id"].isdigit() or not isinstance(item.get("type"), str) or not isinstance(item.get("name"), str) or type(item.get("soft")) is not bool:
-            raise ConfigError("Повреждена запись радиомодуля; файл сохранён")
+            raise ConfigError("Corrupted radio entry; file preserved")
     nm = data.get("networkManager")
     if nm is not None and (not isinstance(nm, dict) or any(type(nm.get(key)) is not bool for key in ("wifi", "wwan"))):
-        raise ConfigError("Повреждена конфигурация сети; файл сохранён")
+        raise ConfigError("Corrupted network configuration; file preserved")
     if type(data.get("bluetoothPowered")) is not bool:
-        raise ConfigError("Повреждена конфигурация Bluetooth; файл сохранён")
+        raise ConfigError("Corrupted Bluetooth configuration; file preserved")
     return data
 
 
@@ -111,12 +111,12 @@ def restore(data, run):
     if data["bluetoothPowered"] and any(item["type"] == "bluetooth" and not item["soft"] and (item["id"], item["type"], item["name"]) in current for item in data["radios"]):
         apply(["bluetoothctl", "--timeout", "3", "power", "on"])
     if failures:
-        raise ConfigError("Не удалось полностью восстановить радиомодули: " + "; ".join(failures))
+        raise ConfigError("Failed to fully restore radios: " + "; ".join(failures))
 
 
 def set_airplane(paths, value, run):
     if value not in ("on", "off"):
-        raise ConfigError("Авиарежим: допустимы on и off")
+        raise ConfigError("Airplane mode: only 'on' and 'off' are supported")
     target = paths.state / "airplane-restore.json"
     with state_lock(paths):
         if value == "on":
@@ -128,7 +128,7 @@ def set_airplane(paths, value, run):
                     run(["nmcli", "radio", "all", "off"])
                 run(["rfkill", "block", "all"])
                 if not radio_status()["airplane"]:
-                    raise ConfigError("Не все радиомодули удалось отключить")
+                    raise ConfigError("Failed to turn off all radios")
             except Exception:
                 try:
                     restore(data, run)
@@ -143,7 +143,7 @@ def set_airplane(paths, value, run):
             else:
                 # Mode may have been enabled outside this shell: no prior state.
                 if not radio_status()["airplaneAvailable"]:
-                    raise ConfigError("Радиомодули недоступны")
+                    raise ConfigError("Radios unavailable")
                 if not radio_status()["airplane"]: return
                 run(["rfkill", "unblock", "all"])
                 if shutil.which("nmcli"): run(["nmcli", "radio", "all", "on"])

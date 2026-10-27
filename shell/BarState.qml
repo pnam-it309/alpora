@@ -212,15 +212,15 @@ Singleton {
         printErrors: false
         onLoaded: {
             try { const data = JSON.parse(text()); if (Array.isArray(data.hidden)) root.hiddenHistory = data.hidden.filter(item => typeof item === "string"); }
-            catch (_) { root.notificationActionError = "Не удалось прочитать настройки истории"; }
+            catch (_) { root.notificationActionError = I18n.tr("bar.error_read_history"); }
         }
-        onSaveFailed: root.notificationActionError = "Не удалось сохранить настройки истории"
+        onSaveFailed: root.notificationActionError = I18n.tr("bar.error_save_history")
     }
     Process {
         id: notificationWriter
         stderr: StdioCollector { onStreamFinished: if (text.trim()) root.notificationActionError = text.trim() }
         onExited: exitCode => {
-            root.notificationActionError = exitCode === 0 ? "" : "Не удалось выполнить действие уведомления";
+            root.notificationActionError = exitCode === 0 ? "" : I18n.tr("bar.error_notif_action");
             notificationDebounce.restart();
         }
     }
@@ -239,10 +239,10 @@ Singleton {
                     if (!Array.isArray(data)) throw new Error("Invalid notification list");
                     root.notifications = data; root.notificationReadError = "";
                 }
-                catch (_) { root.notificationReadError = "Не удалось получить уведомления Mako"; }
+                catch (_) { root.notificationReadError = I18n.tr("bar.error_mako_read"); }
             }
         }
-        onExited: exitCode => { if (exitCode !== 0) root.notificationReadError = "Mako недоступен"; }
+        onExited: exitCode => { if (exitCode !== 0) root.notificationReadError = I18n.tr("bar.mako_unavailable"); }
     }
     Process {
         id: historyReader

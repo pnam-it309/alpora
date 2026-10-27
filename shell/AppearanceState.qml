@@ -34,12 +34,12 @@ Singleton {
         if (busy) return;
         const next = Object.assign({}, draft);
         Catalog.keys(element).forEach(key => next[key] = defaults[key]);
-        draft = next; error = ""; message = "Параметры элемента сброшены. Нажми «Применить».";
+        draft = next; error = ""; message = I18n.tr("appearance.reset_element_msg");
     }
     function reset(): void {
         if (busy) return;
         draft = Object.assign({}, defaults);
-        message = "Исходный пресет выбран. Нажми «Применить», чтобы сохранить.";
+        message = I18n.tr("appearance.preset_chosen_msg");
         error = "";
     }
     function cancel(): void {
@@ -58,7 +58,7 @@ Singleton {
         stdout: StdioCollector {
             onStreamFinished: {
                 try { root.result = JSON.parse(text); }
-                catch (failure) { root.error = "Не удалось прочитать результат сохранения."; }
+                catch (failure) { root.error = I18n.tr("appearance.error_read_result"); }
             }
         }
         stderr: StdioCollector {
@@ -70,8 +70,8 @@ Singleton {
                 root.draft = Object.assign({}, root.result.values);
                 root.defaults = root.result.defaults;
                 root.error = "";
-                root.message = "Сохранено · применяется сразу и после входа в систему";
-            } else if (!root.error) root.error = "Не удалось применить настройки. Предыдущий вид сохранён.";
+                root.message = I18n.tr("appearance.saved_msg");
+            } else if (!root.error) root.error = I18n.tr("appearance.error_apply_msg");
         }
     }
     Connections {

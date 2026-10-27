@@ -61,8 +61,13 @@ def atomic_json(path, value):
             json.dump(value, stream, ensure_ascii=False, indent=2)
             stream.write("\n")
             stream.flush()
-            os.fsync(stream.fileno())
-        os.replace(temporary, path)
+        for attempt in range(10):
+            try:
+                os.replace(temporary, path)
+                break
+            except PermissionError:
+                if attempt == 9: raise
+                import time; time.sleep(0.01)
         if hasattr(os, "O_DIRECTORY"):
             descriptor = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY)
             try:

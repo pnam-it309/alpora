@@ -230,12 +230,12 @@ PanelWindow {
                 // idle; hiding an ancestor would invalidate this prepared focus.
                 focus: true
                 Layout.fillWidth: true; Layout.preferredHeight: 42 + 6 * launcher.expansionCurve
-                placeholderText: "Поиск приложений"
+                placeholderText: I18n.tr("launcher.search")
                 onTextChanged: launcher.query = text
                 color: Session.foreground; placeholderTextColor: Session.muted
                 font.family: Session.fontFamily; font.pixelSize: 14
                 leftPadding: 42; rightPadding: 12
-                Accessible.name: "Поиск приложений"
+                Accessible.name: I18n.tr("launcher.search")
                 background: Rectangle { radius: 13; color: Glass.tint(PolyTheme.Theme.color("#293130"), 0.5); border.width: search.activeFocus ? 2 : 1; border.color: search.activeFocus ? PolyTheme.Theme.color("#a9b99a") : PolyTheme.Theme.color("#46564d") }
                 Icon { x: 14; anchors.verticalCenter: parent.verticalCenter; width: 20; height: 20; name: "search" }
                 Keys.onDownPressed: launcher.moveSelection(launcher.columnCount)
@@ -256,13 +256,13 @@ PanelWindow {
                 Layout.fillWidth: true
                 Text {
                     Layout.fillWidth: true
-                    text: launcher.query.trim() ? "Результаты поиска" + (launcher.preview ? " · " + launcher.shown.length : "") : launcher.category ? AppCatalog.categories.find(item => item.id === launcher.category).name : launcher.allApps ? "Все приложения" : "Избранное"
+                    text: launcher.query.trim() ? I18n.tr("launcher.search_results") + (launcher.preview ? " · " + launcher.shown.length : "") : launcher.category ? (AppCatalog.categories.find(item => item.id === launcher.category)?.name || "") : launcher.allApps ? I18n.tr("launcher.all_apps") : I18n.tr("launcher.favorites")
                     color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 13; font.weight: Font.Medium
                 }
                 Button {
                     id: back
                     visible: launcher.browsing
-                    text: "Назад"
+                    text: I18n.tr("common.back")
                     onClicked: { search.clear(); launcher.category = ""; launcher.allApps = false; search.forceActiveFocus(); }
                     contentItem: Text { text: back.text; color: PolyTheme.Theme.color("#b9c9a7"); font.family: Session.fontFamily; font.pixelSize: 11 }
                     background: Rectangle { radius: 6; color: PolyTheme.Theme.color("#303c34") }
@@ -315,7 +315,7 @@ PanelWindow {
                     }
                     Text {
                         width: parent.width; visible: !launcher.shown.length
-                        text: launcher.browsing ? "Ничего не найдено. Попробуй другое название." : "Добавь приложения в избранное кнопкой ☆ в полном списке."
+                        text: launcher.browsing ? I18n.tr("launcher.not_found_hint") : I18n.tr("launcher.empty_favorites_hint")
                         wrapMode: Text.Wrap; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 12
                     }
                     Item {
@@ -347,7 +347,7 @@ PanelWindow {
                 clip: true
             SettingsRow {
                 width: parent.width; height: 40
-                symbol: "settings"; text: "Все приложения"; subtitle: AppCatalog.entries.length + " установлено"
+                symbol: "settings"; text: I18n.tr("launcher.all_apps"); subtitle: I18n.trWith("launcher.installed_count", {count: AppCatalog.entries.length})
                 onClicked: { BarState.expandLauncher(); launcher.allApps = true; launcher.category = ""; search.clear(); search.forceActiveFocus(); }
             }
             }
@@ -357,7 +357,7 @@ PanelWindow {
                 clip: true
             Text {
                 width: parent.width
-                text: "↑↓ выбрать · Enter открыть · Esc закрыть"
+                text: I18n.tr("launcher.footer_hint")
                 color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 10
                 horizontalAlignment: Text.AlignHCenter
             }

@@ -14,7 +14,7 @@ def empty():
 
 def text(value, limit=200):
     if not isinstance(value, str) or not value.strip() or len(value) > limit or "\0" in value:
-        raise ConfigError(f"Введите текст (до {limit} символов)")
+        raise ConfigError(f"Enter text (up to {limit} characters)")
     return value.strip()
 
 
@@ -23,36 +23,36 @@ def day(value):
         if date.fromisoformat(value).isoformat() != value:
             raise ValueError()
     except (ValueError, TypeError):
-        raise ConfigError("Дата должна быть в формате ГГГГ-ММ-ДД") from None
+        raise ConfigError("Date must be in YYYY-MM-DD format") from None
     return value
 
 
 def validate(data):
     if data.get("schemaVersion") != 1 or not isinstance(data.get("events"), list) or not isinstance(data.get("tasks"), list):
-        raise ConfigError("Неизвестный формат планировщика; исходный файл сохранён")
+        raise ConfigError("Unknown planner schema; original file preserved")
     if not isinstance(data.get("note"), str):
-        raise ConfigError("Повреждена заметка; исходный файл сохранён")
+        raise ConfigError("Corrupt note; original file preserved")
     identifiers = set()
     for kind in ("events", "tasks"):
         for item in data[kind]:
             if not isinstance(item, dict):
-                raise ConfigError("Повреждены записи планировщика")
+                raise ConfigError("Corrupt planner entries")
             identifier = text(item.get("id"))
             if identifier in identifiers:
-                raise ConfigError("Повторяющийся идентификатор записи")
+                raise ConfigError("Duplicate entry identifier")
             identifiers.add(identifier)
             day(item.get("date")); text(item.get("title"))
             if kind == "events":
                 clock_time(item.get("time"))
             elif type(item.get("done")) is not bool:
-                raise ConfigError("Повреждён статус задачи")
+                raise ConfigError("Corrupt task status")
     timer = data.get("timer")
     if not isinstance(timer, dict) or type(timer.get("duration")) is not int or not 60 <= timer["duration"] <= 7200:
-        raise ConfigError("Повреждена длительность таймера")
+        raise ConfigError("Corrupted timer duration")
     if type(timer.get("remaining")) is not int or not 0 <= timer["remaining"] <= timer["duration"]:
-        raise ConfigError("Повреждён остаток таймера")
+        raise ConfigError("Corrupted timer remaining")
     if type(timer.get("endsAt")) not in (int, float) or not 0 <= timer["endsAt"] < 10**12:
-        raise ConfigError("Повреждено время таймера")
+        raise ConfigError("Corrupted timer endsAt")
     return data
 
 
@@ -61,7 +61,7 @@ def clock_time(value):
         if not isinstance(value, str) or datetime.strptime(value, "%H:%M").strftime("%H:%M") != value:
             raise ValueError()
     except (ValueError, TypeError):
-        raise ConfigError("Время должно быть в формате ЧЧ:ММ") from None
+        raise ConfigError("Time must be in HH:MM format") from None
     return value
 
 
@@ -69,7 +69,7 @@ def organizer(paths, action="get", payload=None, *, now=None):
     now = time.time() if now is None else now
     payload = {} if payload is None else payload
     if not isinstance(payload, dict):
-        raise ConfigError("Ожидается объект JSON")
+        raise ConfigError("Expected JSON object")
     target = paths.state / "organizer.json"
     with state_lock(paths):
         data = validate(read_object(target)) if target.exists() else empty()
@@ -87,14 +87,14 @@ def organizer(paths, action="get", payload=None, *, now=None):
             identifier = payload.get("id")
             items = data["tasks"] if action == "task-toggle" else data["tasks"] + data["events"]
             item = next((item for item in items if item["id"] == identifier), None)
-            if item is None: raise ConfigError("Запись уже удалена")
+            if item is None: raise ConfigError("Entry already deleted")
             if action == "task-toggle": item["done"] = not item["done"]
             else:
                 for kind in ("tasks", "events"): data[kind] = [entry for entry in data[kind] if entry["id"] != identifier]
         elif action == "note":
             note = payload.get("text")
             if not isinstance(note, str) or len(note) > 100000 or "\0" in note:
-                raise ConfigError("Заметка слишком длинная или содержит недопустимый символ")
+                raise ConfigError("Note too long or contains invalid character")
             data["note"] = note
         elif action == "timer-start":
             if not timer["endsAt"]:
@@ -108,8 +108,8 @@ def organizer(paths, action="get", payload=None, *, now=None):
         elif action == "timer-duration":
             minutes = payload.get("minutes")
             if type(minutes) is not int or not 1 <= minutes <= 120:
-                raise ConfigError("Продолжительность: от 1 до 120 минут")
+                raise ConfigError("Duration must be between 1 and 120 minutes")
             timer.update(duration=minutes * 60, remaining=minutes * 60, endsAt=0)
-        elif action != "get": raise ConfigError("Неизвестное действие планировщика")
+        elif action != "get": raise ConfigError("Unknown planner action")
         if data != previous or not target.exists(): atomic_json(target, data)
         return data

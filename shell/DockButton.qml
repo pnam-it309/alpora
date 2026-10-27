@@ -51,7 +51,7 @@ Item {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
         Accessible.role: Accessible.Button
-        Accessible.name: root.group.name + (root.group.windows.length ? " · " + root.group.windows.length + " окон" : " · открыть")
+        Accessible.name: root.group.name + (root.group.windows.length ? " · " + root.group.windows.length + " " + I18n.tr("dock.windows") : " · " + I18n.tr("dock.open"))
         onClicked: event => {
             if (event.button === Qt.RightButton) root.menuRequested();
             else if (event.button === Qt.MiddleButton) DockState.launch(root.group.id);

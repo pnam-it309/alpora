@@ -14,8 +14,8 @@ ColumnLayout {
     SettingsRow {
         Layout.fillWidth: true; Layout.preferredHeight: 54
         symbol: BarState.dnd ? "bell-muted" : "bell"
-        text: "Не беспокоить"
-        subtitle: BarState.dnd ? "Включён · сообщения остаются в центре" : "Выключен · показывать всплывающие уведомления"
+        text: I18n.tr("notification.dnd")
+        subtitle: BarState.dnd ? I18n.tr("notification.dnd_on_desc") : I18n.tr("notification.dnd_off_desc")
         selected: BarState.dnd; enabled: !BarState.notificationBusy
         onClicked: BarState.toggleDnd()
     }
@@ -38,7 +38,7 @@ ColumnLayout {
                     clip: true
                     Text {
                         visible: row.heading
-                        text: row.modelData.archived ? "Ранее · " + BarState.visibleHistory.length : "Активные · " + BarState.notifications.length
+                        text: row.modelData.archived ? I18n.trWith("notification.history_count", {count: BarState.visibleHistory.length}) : I18n.trWith("notification.active_count", {count: BarState.notifications.length})
                         color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 10
                     }
                     NotificationCard {
@@ -53,23 +53,23 @@ ColumnLayout {
                 visible: panel.entries.length === 0
                 width: parent.width; topPadding: 16 + 16 * panel.expansion; spacing: 10
                 Icon { anchors.horizontalCenter: parent.horizontalCenter; name: "bell"; width: 24; height: 24 }
-                Text { width: parent.width; text: "Всё спокойно"; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 13; horizontalAlignment: Text.AlignHCenter }
+                Text { width: parent.width; text: I18n.tr("notification.all_quiet"); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 13; horizontalAlignment: Text.AlignHCenter }
             }
         }
     }
     Item {
         Layout.fillWidth: true; Layout.minimumHeight: 0; Layout.preferredHeight: 40 * (1 - panel.expansion)
         clip: true
-        SettingsRow { width: parent.width; height: 40; text: "Открыть все уведомления"; symbol: "bell"; enabled: panel.expansion < 0.1; onClicked: panel.expandRequested() }
+        SettingsRow { width: parent.width; height: 40; text: I18n.tr("notification.open_all"); symbol: "bell"; enabled: panel.expansion < 0.1; onClicked: panel.expandRequested() }
     }
     Item {
         Layout.fillWidth: true; Layout.minimumHeight: 0; Layout.preferredHeight: 34 * panel.expansion
         clip: true
         RowLayout {
             width: parent.width; height: 34
-            DayAction { text: "Закрыть активные"; visible: BarState.notifications.length > 0; enabled: !BarState.notificationBusy; onClicked: BarState.dismissAll() }
+            DayAction { text: I18n.tr("notification.dismiss_active"); visible: BarState.notifications.length > 0; enabled: !BarState.notificationBusy; onClicked: BarState.dismissAll() }
             Item { Layout.fillWidth: true }
-            DayAction { text: "Очистить историю"; visible: BarState.visibleHistory.length > 0; onClicked: BarState.hideHistory() }
+            DayAction { text: I18n.tr("notification.clear_history"); visible: BarState.visibleHistory.length > 0; onClicked: BarState.hideHistory() }
         }
     }
 }

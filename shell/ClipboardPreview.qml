@@ -9,7 +9,7 @@ ColumnLayout {
     spacing: 8
     Text {
         Layout.fillWidth: true
-        text: ClipboardState.error || (ClipboardState.paused ? "Запись приостановлена" : "История · " + ClipboardState.entries.length)
+        text: ClipboardState.error || (ClipboardState.paused ? I18n.tr("clipboard.history_paused") : I18n.trWith("clipboard.history_count", {count: ClipboardState.entries.length}))
         textFormat: Text.PlainText; elide: Text.ElideRight
         color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 10
     }
@@ -24,13 +24,13 @@ ColumnLayout {
     Text {
         visible: root.entries.length === 0
         Layout.fillWidth: true; Layout.preferredHeight: 64
-        text: "Здесь появятся скопированные\nтексты и изображения"
+        text: I18n.tr("clipboard.empty_hint")
         horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
         color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 12
     }
     SettingsRow {
         Layout.fillWidth: true; Layout.preferredHeight: 40
-        text: "Открыть всю историю"; symbol: "clipboard"
+        text: I18n.tr("clipboard.open_all"); symbol: "clipboard"
         onClicked: root.expandRequested()
     }
 }

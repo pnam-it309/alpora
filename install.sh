@@ -7,6 +7,7 @@ install_skip_packages=false
 install_replace_config=false
 install_ui_only=false
 install_core_only=false
+install_ignore_distro=false
 install_theme=''
 install_wizard=false
 install_preview=false
@@ -17,7 +18,11 @@ for argument in "$@"; do
         --skip-packages) install_skip_packages=true ;;
         --replace-config) install_replace_config=true ;;
         --ui-only) install_ui_only=true; install_skip_packages=true ;;
-        --core-only) install_core_only=true ;;
+        --core-only|--minimal) install_core_only=true ;;
+        --ignore-distro-check|--force-distro) install_ignore_distro=true ;;
+        --uninstall)
+            exec "$project_dir/uninstall.sh" "${@:2}"
+            ;;
         --theme=*) install_theme=${argument#--theme=} ;;
         --wizard) install_wizard=true ;;
         --preview) install_preview=true ;;
@@ -26,18 +31,20 @@ for argument in "$@"; do
 ALPORA installer for Arch Linux and Arch-based distributions
 Usage: ./install.sh [OPTIONS]
 
-  --ui-only         Install standalone ALPORA UI shell only. Does NOT install system
-                    packages and does NOT alter existing Hyprland configuration.
-                    Ideal for custom Arch kernels, non-Arch distros, or personal setups.
-  --core-only       Install only core compositor & shell packages; skips bundled
-                    applications (Firefox, Nautilus, Kitty, Foot, Fuzzel, etc.).
-  --dry-run         Print the plan without downloading or changing anything.
-  --skip-packages   Use already installed dependencies (development/testing).
-  --replace-config  Back up and replace an existing Hyprland configuration.
-  --theme=ID        Choose alpine, moon-lake, forest-mist, warm-desert,
-                    northern-lights, rose-sunset or timeline.
-  --wizard          Show the theme chooser, including with --dry-run.
-  --preview         Show only the welcome screen; never install or change files.
+  --ui-only               Install standalone ALPORA UI shell only. Does NOT install system
+                          packages and does NOT alter existing Hyprland configuration.
+                          Ideal for custom Arch kernels (zen/lts/hardened), non-Arch distros, or custom setups.
+  --minimal, --core-only  Install only core compositor & shell packages (~28 packages);
+                          skips bundled applications (Firefox, Nautilus, Kitty, Foot, Fuzzel, etc.).
+  --ignore-distro-check   Bypass Arch distribution detection and attempt pacman installation.
+  --uninstall             Cleanly remove ALPORA symlinks, services, and optionally restore configs.
+  --dry-run               Print the plan without downloading or changing anything.
+  --skip-packages         Use already installed dependencies (development/testing).
+  --replace-config        Back up and replace an existing Hyprland configuration.
+  --theme=ID              Choose alpine, moon-lake, forest-mist, warm-desert,
+                          northern-lights, rose-sunset or timeline.
+  --wizard                Show the theme chooser, including with --dry-run.
+  --preview               Show only the welcome screen; never install or change files.
 
 Run as a normal user, not with sudo. The package step invokes sudo itself.
 An existing session configuration requires explicit replacement consent.
@@ -79,11 +86,12 @@ if [[ -f /etc/os-release ]]; then
     fi
 fi
 
-if [[ "$install_ui_only" != true ]]; then
+if [[ "$install_ui_only" != true && "$install_ignore_distro" != true ]]; then
     if [[ "$is_arch_based" != true ]]; then
         printf 'This full installer currently supports Arch Linux and Arch-based distributions.\n' >&2
         printf 'Detected: %s (%s)\n' "${NAME:-Unknown}" "${ID:-unknown}" >&2
-        printf 'Tip: Use ./install.sh --ui-only to install the standalone ALPORA UI on any distro or custom setup.\n' >&2
+        printf 'Tip: Use ./install.sh --ui-only to install the standalone ALPORA UI on any distro or custom kernel setup.\n' >&2
+        printf '     Use ./install.sh --ignore-distro-check to force pacman package installation on this system.\n' >&2
         exit 1
     fi
 fi

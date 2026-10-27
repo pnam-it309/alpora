@@ -147,11 +147,11 @@ PanelWindow {
             }
             Repeater {
                 model: [
-                    {symbol:"sun", label:"Яркость", action:"brightness"},
-                    {symbol:"wallpaper", label:"Темы и обои", action:"themes"},
-                    {symbol:"moon", label:"Ночной свет", action:"night"},
-                    {symbol:"settings", label:"Настройки", action:"settings"},
-                    {symbol:"lock", label:"Заблокировать", action:"lock"}
+                    {symbol:"sun", label:I18n.tr("osd.brightness"), action:"brightness"},
+                    {symbol:"wallpaper", label:I18n.tr("settings.themes_wallpaper"), action:"themes"},
+                    {symbol:"moon", label:I18n.tr("quick.night_light"), action:"night"},
+                    {symbol:"settings", label:I18n.tr("settings.title"), action:"settings"},
+                    {symbol:"lock", label:I18n.tr("quick.lock"), action:"lock"}
                 ]
                 LandscapeButton {
                     id: sunButton
@@ -175,13 +175,13 @@ PanelWindow {
             Rectangle {
                 x: 5; y: 60; width: 164; height: 58; radius: Math.min(16, Session.visual.panelRadius)
                 color: Glass.tint(Session.surface, 0.9); border.width: 0.8; border.color: Glass.tint(Session.accent,0.4)
-                Text { x: 13; y: 8; text: "Яркость · " + Desktop.data.brightness + "%"; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 11 }
+                Text { x: 13; y: 8; text: I18n.tr("osd.brightness") + " · " + Desktop.data.brightness + "%"; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 11 }
                 ControlSlider {
                     id: brightness
                     x: 13; y: 29; width: 138; height: 20
                     from: 5; to: 100; stepSize: 1; value: Desktop.data.brightness
                     enabled: Desktop.data.brightnessAvailable
-                    Accessible.name: "Яркость экрана"
+                    Accessible.name: I18n.tr("quick.screen_brightness")
                     onMoved: Desktop.request("brightness", String(Math.round(value)))
                 }
             }
@@ -200,7 +200,7 @@ PanelWindow {
                     }
                 }
             }
-            Text { x: 5; y: 166; text: root.scene.name + " · оформление"; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 11; style: Text.Outline; styleColor: Glass.tint(Session.background, 0.8) }
+            Text { x: 5; y: 166; text: root.scene.name + " · " + I18n.tr("landscape.decor"); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 11; style: Text.Outline; styleColor: Glass.tint(Session.background, 0.8) }
             Text { x: 5; y: 292; width: 175; text: Desktop.error || ThemeState.error; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 11; wrapMode: Text.Wrap; visible: text.length > 0 }
         }
     }
@@ -216,13 +216,13 @@ PanelWindow {
             Item {
                 id: musicContent
                 width: 480; height: 155
-                Text { x: 25; y: 2; width: 430; horizontalAlignment: Text.AlignHCenter; text: MusicState.player ? MusicState.player.trackTitle || "Без названия" : "Музыка у воды"; textFormat: Text.PlainText; elide: Text.ElideRight; font.family: Session.fontFamily; font.pixelSize: 19; font.weight: Font.Medium; color: Session.foreground; style: Text.Outline; styleColor: Glass.tint(Session.background, 0.8) }
-                Text { x: 25; y: 30; width: 430; horizontalAlignment: Text.AlignHCenter; text: MusicState.player ? MusicState.player.trackArtist || MusicState.player.identity : "Включи трек в любимом плеере"; textFormat: Text.PlainText; elide: Text.ElideRight; font.family: Session.fontFamily; font.pixelSize: 12; color: Session.foreground; style: Text.Outline; styleColor: Glass.tint(Session.background, 0.8) }
+                Text { x: 25; y: 2; width: 430; horizontalAlignment: Text.AlignHCenter; text: MusicState.player ? MusicState.player.trackTitle || I18n.tr("music.untitled") : I18n.tr("landscape.music_by_water"); textFormat: Text.PlainText; elide: Text.ElideRight; font.family: Session.fontFamily; font.pixelSize: 19; font.weight: Font.Medium; color: Session.foreground; style: Text.Outline; styleColor: Glass.tint(Session.background, 0.8) }
+                Text { x: 25; y: 30; width: 430; horizontalAlignment: Text.AlignHCenter; text: MusicState.player ? MusicState.player.trackArtist || MusicState.player.identity : I18n.tr("landscape.play_track_hint"); textFormat: Text.PlainText; elide: Text.ElideRight; font.family: Session.fontFamily; font.pixelSize: 12; color: Session.foreground; style: Text.Outline; styleColor: Glass.tint(Session.background, 0.8) }
                 Row {
                     x: (parent.width-width)/2; y: 60; spacing: 18
-                    LandscapeButton { symbol: "previous"; hint: "Предыдущий трек"; enabled: !!MusicState.player && MusicState.player.canControl && MusicState.player.canGoPrevious; onClicked: MusicState.player.previous() }
-                    LandscapeButton { id: playButton; width: 50; height: 50; selected: true; symbol: MusicState.player && MusicState.player.isPlaying ? "pause-dark" : "play-dark"; hint: MusicState.player && MusicState.player.isPlaying ? "Пауза" : "Воспроизвести"; enabled: !!MusicState.player && MusicState.player.canControl && MusicState.player.canTogglePlaying; onClicked: MusicState.player.togglePlaying() }
-                    LandscapeButton { symbol: "next"; hint: "Следующий трек"; enabled: !!MusicState.player && MusicState.player.canControl && MusicState.player.canGoNext; onClicked: MusicState.player.next() }
+                    LandscapeButton { symbol: "previous"; hint: I18n.tr("music.prev_track"); enabled: !!MusicState.player && MusicState.player.canControl && MusicState.player.canGoPrevious; onClicked: MusicState.player.previous() }
+                    LandscapeButton { id: playButton; width: 50; height: 50; selected: true; symbol: MusicState.player && MusicState.player.isPlaying ? "pause-dark" : "play-dark"; hint: MusicState.player && MusicState.player.isPlaying ? I18n.tr("music.pause") : I18n.tr("music.play"); enabled: !!MusicState.player && MusicState.player.canControl && MusicState.player.canTogglePlaying; onClicked: MusicState.player.togglePlaying() }
+                    LandscapeButton { symbol: "next"; hint: I18n.tr("music.next_track"); enabled: !!MusicState.player && MusicState.player.canControl && MusicState.player.canGoNext; onClicked: MusicState.player.next() }
                 }
                 Item {
                     x: 0; y: 108; width: 480; height: 47
@@ -263,7 +263,7 @@ PanelWindow {
                 property real motion: Motion.reduced ? 0 : 1
                 fragmentShader: Qt.resolvedUrl("shaders/landscape-reflection.frag.qsb")
             }
-            Text { x: 0; y: 254; width: 480; horizontalAlignment: Text.AlignHCenter; text: root.scene.water ? "" : "Ритм песков"; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11 }
+            Text { x: 0; y: 254; width: 480; horizontalAlignment: Text.AlignHCenter; text: root.scene.water ? "" : I18n.tr("landscape.rhythm_of_sands"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11 }
         }
     }
     Item {
@@ -297,7 +297,7 @@ PanelWindow {
             TextField {
                 id: searchField
                 x: 110; y: 256; width: 280; height: 38
-                placeholderText: "Найти приложение"; text: root.search
+                placeholderText: I18n.tr("launcher.search_placeholder"); text: root.search
                 color: Session.foreground; placeholderTextColor: Session.muted
                 font.family: Session.fontFamily; font.pixelSize: 12
                 leftPadding: 16; rightPadding: 16; selectByMouse: true
@@ -306,7 +306,7 @@ PanelWindow {
                 onAccepted: if (root.appChoices.length) root.launch(root.appChoices[0])
                 Keys.onEscapePressed: root.close()
             }
-            Text { x: 100; y: 307; width: 300; horizontalAlignment: Text.AlignHCenter; text: root.search.length && !root.appChoices.length ? "Ничего не найдено" : "Вершина · приложения"; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 11; style: Text.Outline; styleColor: Glass.tint(Session.background, 0.8) }
+            Text { x: 100; y: 307; width: 300; horizontalAlignment: Text.AlignHCenter; text: root.search.length && !root.appChoices.length ? I18n.tr("launcher.not_found") : I18n.tr("landscape.peak_apps"); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 11; style: Text.Outline; styleColor: Glass.tint(Session.background, 0.8) }
         }
     }
     IpcHandler {

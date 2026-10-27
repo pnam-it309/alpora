@@ -64,12 +64,17 @@ def settings_desktop_plan():
         return '"' + str(value).replace("\\", "\\\\").replace('"', '\\"').replace("`", "\\`").replace("$", "\\$").replace("%", "%%") + '"'
     # A separate desktop ID gives the normal settings window its own icon.
     target = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share")) / "applications/poly-shell-settings.desktop"
-    text = ("[Desktop Entry]\nType=Application\nName=Настройки Poly\n"
-            "GenericName=Настройки рабочего стола\nComment=Внешний вид рабочего стола Poly Shell\n"
+    text = ("[Desktop Entry]\nType=Application\nName=Poly Settings\n"
+            "Name[ru]=Настройки Poly\nName[vi]=Cài đặt Poly\n"
+            "GenericName=Desktop Settings\nGenericName[ru]=Настройки рабочего стола\nGenericName[vi]=Cài đặt màn hình nền\n"
+            "Comment=Poly Shell desktop appearance and preferences\n"
+            "Comment[ru]=Внешний вид рабочего стола Poly Shell\nComment[vi]=Giao diện và tùy chọn màn hình nền Poly Shell\n"
             f"Exec={quote(ROOT / 'bin/poly-shell')} settings\n"
             f"Icon={ROOT / 'assets/settings-app.svg'}\n"
             "Terminal=false\nCategories=Settings;DesktopSettings;\n"
-            "Keywords=Poly;Alpine;appearance;blur;theme;настройки;оформление;\n"
+            "Keywords=Poly;Alpine;appearance;blur;theme;settings;\n"
+            "Keywords[ru]=Poly;Alpine;appearance;blur;theme;настройки;оформление;\n"
+            "Keywords[vi]=Poly;Alpine;giao diện;mờ;chủ đề;cài đặt;\n"
             "StartupWMClass=poly-shell-settings\nStartupNotify=false\n")
     if target.exists() and target.read_text(encoding="utf-8") != text:
         raise ConfigError(f"Existing settings launcher differs; preserved: {target}")

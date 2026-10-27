@@ -12,7 +12,7 @@ Button {
     hoverEnabled: true
     focusPolicy: Qt.StrongFocus
     padding: 0
-    Accessible.name: "Рабочий стол " + workspace
+    Accessible.name: I18n.tr("overview.workspace") + " " + workspace
     background: Item {
         Shape {
         preferredRendererType: Shape.CurveRenderer

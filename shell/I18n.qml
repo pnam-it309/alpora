@@ -17,6 +17,12 @@ Singleton {
     // Current locale code, updated from Session.settings.locale.
     readonly property string locale: Session.loaded ? (Session.settings.locale || "en") : "en"
 
+    // Current Qt.locale object for date/time formatting.
+    readonly property var qtLocale: {
+        const map = { "ru": "ru_RU", "vi": "vi_VN", "en": "en_US" };
+        return Qt.locale(map[root.locale] || "en_US");
+    }
+
     // Merged string table (requested locale on top of English fallback).
     property var strings: ({})
 

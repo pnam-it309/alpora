@@ -1,3 +1,4 @@
+function _tr(k, fallback) { return (typeof I18n !== "undefined" && I18n && typeof I18n.tr === "function") ? I18n.tr(k) : fallback; }
 .pragma library
 
 // Screen-normalized positions; speed and clearance are measured in logical pixels.
@@ -109,4 +110,4 @@ function step(previous,elapsed,ctx) {
     }
     return s;
 }
-function label(mode) {return ({fly:"Летит к поверхности",perch:"Гуляет по краю",floor:"Гуляет по рабочему столу",return:"Возвращается",land:"Приземляется"})[mode]||"На панели";}
+function label(mode) {return ({fly:_tr("companion.travel.fly","Летит к поверхности"),perch:_tr("companion.travel.perch","Гуляет по краю"),floor:_tr("companion.travel.floor","Гуляет по рабочему столу"),return:_tr("companion.travel.return","Возвращается"),land:_tr("companion.travel.land","Приземляется")})[mode]||_tr("companion.travel.panel","На панели");}

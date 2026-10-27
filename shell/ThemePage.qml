@@ -22,8 +22,8 @@ ColumnLayout {
             RowLayout {
                 Layout.fillWidth: true; spacing: 9
                 Icon { name: "wallpaper"; Layout.preferredWidth: 20; Layout.preferredHeight: 20 }
-                Text { Layout.fillWidth: true; text: "Коллекция"; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 15; font.weight: Font.DemiBold }
-                AppearanceButton { text: "Свои обои"; symbol: "plus"; implicitHeight: 32; enabled: !ThemeState.busy; onClicked: root.importRequested() }
+                Text { Layout.fillWidth: true; text: I18n.tr("theme.collection"); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 15; font.weight: Font.DemiBold }
+                AppearanceButton { text: I18n.tr("theme.custom_wallpaper"); symbol: "plus"; implicitHeight: 32; enabled: !ThemeState.busy; onClicked: root.importRequested() }
             }
             ScrollView {
                 id: galleryScroll
@@ -81,7 +81,7 @@ ColumnLayout {
             RowLayout {
                 Layout.fillWidth: true; spacing: 9
                 Icon { name: "monitor"; Layout.preferredWidth: 20; Layout.preferredHeight: 20 }
-                Text { Layout.fillWidth: true; text: "Предпросмотр"; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 15; font.weight: Font.DemiBold }
+                Text { Layout.fillWidth: true; text: I18n.tr("theme.preview"); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 15; font.weight: Font.DemiBold }
             }
             Item {
                 Layout.fillWidth: true; Layout.fillHeight: true; Layout.minimumHeight: 210
@@ -100,7 +100,7 @@ ColumnLayout {
                     border.width: 1; border.color: root.previewAccent
                     ColumnLayout {
                         anchors.fill: parent; anchors.margins: 11; spacing: 11
-                        Text { text: "Быстрые настройки"; color: root.previewPalette.text || Session.foreground; font.family: Session.fontFamily; font.pixelSize: 9 }
+                        Text { text: I18n.tr("theme.quick_settings"); color: root.previewPalette.text || Session.foreground; font.family: Session.fontFamily; font.pixelSize: 9 }
                         Repeater {
                             model: ["volume", "sun", "microphone"]
                             RowLayout {
@@ -123,7 +123,7 @@ ColumnLayout {
                     color: Qt.rgba(root.previewSurface.r,root.previewSurface.g,root.previewSurface.b,0.95)
                     border.width: 1; border.color: Qt.rgba(root.previewAccent.r,root.previewAccent.g,root.previewAccent.b,0.4)
                     Column { anchors.fill: parent; anchors.margins: 10; spacing: 9
-                        Text { text: "Окно приложения"; color: root.previewPalette.text || Session.foreground; font.family: Session.fontFamily; font.pixelSize: 9 }
+                        Text { text: I18n.tr("theme.app_window"); color: root.previewPalette.text || Session.foreground; font.family: Session.fontFamily; font.pixelSize: 9 }
                         Rectangle { width: 100; height: 4; radius: 2; color: root.previewAccent }
                         Rectangle { width: 73; height: 4; radius: 2; color: root.previewPalette.muted || Session.muted; opacity: 0.5 }
                         Rectangle { width: 90; height: 4; radius: 2; color: root.previewPalette.muted || Session.muted; opacity: 0.5 }
@@ -132,8 +132,8 @@ ColumnLayout {
             }
             ColumnLayout {
                 Layout.fillWidth: true; spacing: 5
-                Text { Layout.fillWidth: true; text: root.selected ? root.selected.label : "Загрузка коллекции…"; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 18; font.weight: Font.DemiBold; elide: Text.ElideRight; textFormat: Text.PlainText }
-                Text { text: "Палитра из обоев"; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 12 }
+                Text { Layout.fillWidth: true; text: root.selected ? root.selected.label : I18n.tr("theme.loading"); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 18; font.weight: Font.DemiBold; elide: Text.ElideRight; textFormat: Text.PlainText }
+                Text { text: I18n.tr("theme.palette_label"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 12 }
             }
             Rectangle {
                 Layout.fillWidth: true; Layout.preferredHeight: 60; radius: 10; color: PolyTheme.Theme.color("#26303d"); border.width: 1; border.color: PolyTheme.Theme.color("#49586d")
@@ -146,10 +146,10 @@ ColumnLayout {
                 Icon { name: "palette"; Layout.preferredWidth: 22; Layout.preferredHeight: 22 }
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 4
-                    Text { text: "Цвета из обоев"; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12 }
-                    Text { Layout.fillWidth: true; text: "Бар, меню, приложения\nи экран блокировки"; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 10; wrapMode: Text.Wrap }
+                    Text { text: I18n.tr("theme.palette_colors"); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12 }
+                    Text { Layout.fillWidth: true; text: I18n.tr("theme.palette_applies"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 10; wrapMode: Text.Wrap }
                 }
-                SettingsToggle { checked: ThemeState.automatic; enabled: !ThemeState.busy; Accessible.name: "Цвета из обоев"; onToggled: ThemeState.automatic = checked }
+                SettingsToggle { checked: ThemeState.automatic; enabled: !ThemeState.busy; Accessible.name: I18n.tr("theme.palette_colors"); onToggled: ThemeState.automatic = checked }
             }
         }
     }
@@ -157,8 +157,8 @@ ColumnLayout {
     RowLayout {
         Layout.fillWidth: true; Layout.preferredHeight: 43; spacing: 10
         Icon { name: ThemeState.dirty ? "note" : "check"; Layout.preferredWidth: 18; Layout.preferredHeight: 18; opacity: 0.7 }
-        Text { Layout.fillWidth: true; text: ThemeState.error || ThemeState.message || "Обои и цвета применяются вместе"; color: ThemeState.error ? PolyTheme.Theme.color("#f4b7a0") : Session.muted; font.family: Session.fontFamily; font.pixelSize: 10; wrapMode: Text.Wrap }
-        AppearanceButton { text: "Отменить"; symbol: "close"; enabled: ThemeState.dirty && !ThemeState.busy; onClicked: ThemeState.cancel() }
-        AppearanceButton { text: ThemeState.busy ? "Применение…" : "Применить тему"; symbol: "check"; primary: true; enabled: ThemeState.dirty && !ThemeState.busy; onClicked: ThemeState.apply() }
+        Text { Layout.fillWidth: true; text: ThemeState.error || ThemeState.message || I18n.tr("theme.hint"); color: ThemeState.error ? PolyTheme.Theme.color("#f4b7a0") : Session.muted; font.family: Session.fontFamily; font.pixelSize: 10; wrapMode: Text.Wrap }
+        AppearanceButton { text: I18n.tr("common.cancel"); symbol: "close"; enabled: ThemeState.dirty && !ThemeState.busy; onClicked: ThemeState.cancel() }
+        AppearanceButton { text: ThemeState.busy ? I18n.tr("theme.applying") : I18n.tr("theme.apply"); symbol: "check"; primary: true; enabled: ThemeState.dirty && !ThemeState.busy; onClicked: ThemeState.apply() }
     }
 }

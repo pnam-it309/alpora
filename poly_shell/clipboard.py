@@ -46,7 +46,7 @@ class History:
             elif data.startswith((b'GIF87a', b'GIF89a')): mime = 'image/gif'
             elif data.startswith(b'RIFF') and data[8:12] == b'WEBP': mime = 'image/webp'
             else: return False
-            preview = 'Изображение · ' + mime.split('/')[1].upper()
+            preview = 'Image · ' + mime.split('/')[1].upper()
         else:
             try: value = data.decode('utf-8')
             except UnicodeDecodeError: return False
@@ -90,21 +90,21 @@ class History:
     def action(self, action, ident=''):
         if action == 'copy':
             row = self.db.execute('SELECT mime,body FROM clips WHERE id=?', (ident,)).fetchone()
-            if not row: raise ValueError('Запись уже удалена')
+            if not row: raise ValueError('Entry already deleted')
             subprocess.run(['wl-copy', '--type', row['mime']], input=row['body'], check=True, timeout=5)
         else:
             with self.db:
                 self.db.execute('BEGIN IMMEDIATE')
                 if action == 'pin':
                     row = self.db.execute('SELECT pinned FROM clips WHERE id=?', (ident,)).fetchone()
-                    if not row: raise ValueError('Запись уже удалена')
+                    if not row: raise ValueError('Entry already deleted')
                     if not row['pinned'] and self.db.execute('SELECT COUNT(*) FROM clips WHERE pinned=1').fetchone()[0] >= MAX_PINS:
-                        raise ValueError('Можно закрепить до 50 записей')
+                        raise ValueError('Can pin up to 50 entries')
                     self.db.execute('UPDATE clips SET pinned=1-pinned WHERE id=?', (ident,))
                 elif action == 'delete': self.db.execute('DELETE FROM clips WHERE id=?', (ident,))
                 elif action == 'clear': self.db.execute('DELETE FROM clips WHERE pinned=0')
                 elif action == 'pause': self.db.execute("UPDATE preferences SET value=1-value WHERE key='paused'")
-                elif action != 'list': raise ValueError('Неизвестное действие')
+                elif action != 'list': raise ValueError('Unknown action')
 
 
 def directory():
@@ -148,7 +148,7 @@ def serve(history):
                 line = key.fileobj.readline()
                 if not line:
                     if key.data == 'command': return
-                    raise RuntimeError('Служба буфера обмена остановилась')
+                    raise RuntimeError('Clipboard service stopped')
                 if key.data == 'change':
                     emit()
                     continue

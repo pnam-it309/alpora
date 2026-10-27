@@ -251,7 +251,7 @@ PanelWindow {
                 }
                 Text {
                     visible: popup.page === "tray" && popup.overflowItems.length === 0
-                    text: "Все значки уже на панели"
+                    text: I18n.tr("bar.all_icons_on_bar")
                     color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11
                 }
                 Item { visible: popup.page === "tray"; Layout.fillHeight: true }

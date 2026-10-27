@@ -90,7 +90,7 @@ PanelWindow {
     readonly property var context: ({music:music,charging:Session.batteryCharging,lowBattery:lowBattery,lively:CompanionState.lively})
     property var behavior: Logic.create(Date.now() % 4294967296)
     readonly property string activity: Motion.reduced ? "sit" : pressing ? "grabbed" : tossing ? toss.mode : airborne ? "fly" : away ? travel.walking ? "walk" : behavior.activity === "walk" ? "look" : behavior.activity : behavior.activity
-    readonly property string label: tossing ? "Играет" : away ? Travel.label(travel.mode) : Logic.labels()[activity] || "Рядом с тобой"
+    readonly property string label: tossing ? I18n.tr("companion.playing") : away ? Travel.label(travel.mode) : Logic.labels()[activity] || I18n.tr("companion.near_you")
     property real gaitPhase: 0
     property real walkAmount: 0
     property real lastTick: 0

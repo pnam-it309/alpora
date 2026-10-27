@@ -22,7 +22,7 @@ Item {
         id: iconButton
         x: 4; y: 15; width: 34; height: 34; padding: 0
         enabled: root.hasMute && root.adjustable
-        Accessible.name: root.muted ? "Включить звук" : "Выключить звук"
+        Accessible.name: root.muted ? I18n.tr("audio.unmute") : I18n.tr("audio.mute")
         background: Rectangle { visible: iconButton.hovered || iconButton.visualFocus; radius: Math.min(Session.visual.panelRadius, height / 2); color: Glass.tint(Session.accent, 0.10); border.width: 1; border.color: iconButton.visualFocus ? Session.accent : "transparent" }
         contentItem: Item {
             Icon { anchors.fill: parent; anchors.margins: 2; visible: !root.statusKind; name: root.symbol; opacity: root.adjustable ? 1 : 0.4 }

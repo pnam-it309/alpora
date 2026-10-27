@@ -127,7 +127,7 @@ def install_hook(paths):
     with state_lock(paths):
         target = paths.config.parent / "hypr/hyprland.lua"
         if not target.is_file():
-            raise ConfigError("Не найден hyprland.lua; подключение внешнего вида не установлено")
+            raise ConfigError("hyprland.lua not found; appearance hook not installed / Не найден hyprland.lua")
         original = target.read_text()
         if HOOK_BEGIN in original or HOOK_END in original:
             start = original.find(HOOK_BEGIN)
@@ -135,7 +135,7 @@ def install_hook(paths):
             block = original[start:end + len(HOOK_END)] if start >= 0 and end >= 0 else ""
             # Accept formatting-only changes while retaining the user's block.
             if re.sub(r"[\s;]+", "", block) != re.sub(r"[\s;]+", "", HOOK):
-                raise ConfigError("Подключение внешнего вида изменено вручную; файл сохранён")
+                raise ConfigError("Appearance hook modified manually / вручную; file preserved")
             updated = original
         else:
             updated = original.rstrip() + "\n\n" + HOOK
@@ -150,7 +150,7 @@ def install_hook(paths):
         if PANEL_RULE_BEGIN not in updated:
             updated = updated.rstrip() + "\n\n" + PANEL_RULE
         elif PANEL_RULE not in updated:
-            raise ConfigError("Правила анимации панелей изменены вручную; файл сохранён")
+            raise ConfigError("Panel animation rules modified manually / вручную; file preserved")
         if "-- BEGIN POLY SHELL THEME REVEAL" not in updated:
             updated = updated.rstrip() + "\n\n" + THEME_REVEAL_RULE
         if updated == original:
@@ -186,19 +186,19 @@ def atomic_text(path, text):
 def hypr(*args):
     result = subprocess.run(["hyprctl", *args], capture_output=True, text=True, timeout=5)
     if result.returncode:
-        raise ConfigError((result.stderr or result.stdout).strip() or "Hyprland недоступен")
+        raise ConfigError((result.stderr or result.stdout).strip() or "Hyprland unavailable / Hyprland недоступен")
     return result.stdout
 
 
 def runtime_apply(values):
     if not os.environ.get("HYPRLAND_INSTANCE_SIGNATURE"):
-        raise ConfigError("Применение доступно внутри сеанса Hyprland")
+        raise ConfigError("Apply is only available inside Hyprland session / сеанса Hyprland")
     # hyprctl treats an argument beginning with '--' as a CLI option, even
     # when that argument is Lua source. Keep the file header out of IPC.
     code = "\n".join(lua_for(values).splitlines()[1:])
     reply = hypr("eval", code).strip()
     if reply != "ok":
-        raise ConfigError("Hyprland отклонил настройки: " + reply)
+        raise ConfigError("Hyprland rejected settings: " + reply)
     expected = {
         "decoration:rounding": values["windowRadius"],
         "decoration:active_opacity": values["activeOpacity"] / 100,
@@ -216,11 +216,11 @@ def runtime_apply(values):
             # Hyprland returns gap values as a CSS-style TRBL list.
             parts = data.get("css", "").split()
             if not 1 <= len(parts) <= 4 or any(part != str(wanted) for part in parts):
-                raise ConfigError(f"Hyprland не подтвердил значение {option}")
+                raise ConfigError(f"Hyprland did not confirm / не подтвердил value {option}")
             continue
         actual = data.get("int", data.get("float", data.get("bool")))
         if not isinstance(actual, (int, float)) or abs(actual - wanted) > 0.001:
-            raise ConfigError(f"Hyprland не подтвердил значение {option}")
+            raise ConfigError(f"Hyprland did not confirm / не подтвердил value {option}")
 
 
 def apply(paths, patch, expected=None):
@@ -228,7 +228,7 @@ def apply(paths, patch, expected=None):
     with state_lock(paths):
         old = visual_for(paths)
         if expected is not None and validate(expected) != old:
-            raise ConfigError("Настройки изменены в другом окне. Открой раздел заново.")
+            raise ConfigError("Settings changed in another window / в другом окне. Reopen section.")
         value = validate(old | patch) if isinstance(patch, dict) else validate(patch)
         snapshot = {"schemaVersion": 1, "mode": current_mode(paths),
                     "settings": settings_for(paths), "appearance": appearance_for(paths),
@@ -263,8 +263,8 @@ def apply(paths, patch, expected=None):
                 runtime_apply(old)
             except (ConfigError, OSError, ValueError, subprocess.SubprocessError) as exc:
                 failures.append(str(exc))
-            detail = ("; Ошибка восстановления: " + "; ".join(failures)) if failures else ""
-            raise ConfigError(f"Изменения не сохранены: {failure}{detail}") from failure
+            detail = ("; Rollback error: " + "; ".join(failures)) if failures else ""
+            raise ConfigError(f"Changes not saved / не сохранены: {failure}{detail}") from failure
         try:
             subprocess.run(["makoctl", "reload"], capture_output=True, timeout=3, check=False)
         except (OSError, subprocess.SubprocessError):
@@ -291,6 +291,6 @@ def appearance_control(paths, action, payload):
         with state_lock(paths):
             return {"values": visual_for(paths), "defaults": dict(DEFAULTS)}
     if not isinstance(payload, dict) or set(payload) - {"values", "expected"}:
-        raise ConfigError("Неверный запрос настроек внешнего вида")
+        raise ConfigError("Invalid appearance settings request / Неверный запрос настроек")
     return apply(paths, dict(DEFAULTS) if action == "reset" else payload.get("values"),
                  payload.get("expected"))

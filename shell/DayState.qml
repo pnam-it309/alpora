@@ -60,7 +60,7 @@ Singleton {
             onStreamFinished: {
                 if (!text.trim()) return;
                 try { root.data = JSON.parse(text); root.now = Date.now() / 1000; root.loaded = true; root.saved(worker.command[2]); }
-                catch (_) { root.error = "Не удалось прочитать планировщик"; }
+                catch (_) { root.error = I18n.tr("day.error_read"); }
             }
         }
         stderr: StdioCollector {

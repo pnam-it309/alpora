@@ -123,10 +123,10 @@ def validate_transition(value):
     if value is None:
         return None
     if not isinstance(value, dict) or set(value) != {'x', 'y'}:
-        raise ConfigError('Неверная точка появления обоев')
+        raise ConfigError('Invalid wallpaper origin point')
     for coordinate in value.values():
         if type(coordinate) not in (int, float) or not math.isfinite(coordinate) or not 0 <= coordinate <= 1:
-            raise ConfigError('Точка появления обоев должна быть внутри экрана')
+            raise ConfigError('Wallpaper origin point must be inside screen')
     return value
 
 
@@ -137,7 +137,7 @@ def _animated_wallpaper(paths, image, saved, transition, seed=None):
     client = executable('awww') or executable('swww')
     daemon = executable('awww-daemon') or executable('swww-daemon')
     if not client or not daemon:
-        raise ConfigError('Для анимации обоев требуется awww (или swww)')
+        raise ConfigError('awww (or swww) required for wallpaper animation')
     def send(image_path, origin=None):
         args = [client, 'img', str(image_path), '--resize', 'crop',
                 '--transition-type', 'grow' if origin else 'none']
@@ -162,7 +162,7 @@ def _animated_wallpaper(paths, image, saved, transition, seed=None):
             time.sleep(.05)
         else:
             command(['systemctl', '--user', 'stop', 'poly-shell-animated-wallpaper'], check=False)
-            raise ConfigError('Не удалось запустить анимацию обоев')
+            raise ConfigError('Failed to start wallpaper animation')
     old_image = seed or saved.get('image')
     previous = command(['pgrep', '-u', str(os.getuid()), '-x', 'swaybg'], check=False)
     try:
@@ -190,7 +190,7 @@ def _wallpaper(paths, image=None, *, reset=False, quiet=False, transition=None, 
     saved = read_object(preference) if preference.exists() and not reset and image is None else {}
     image = Path(image or saved.get('image') or ROOT / 'assets/wallpapers/alpine-dawn.png').expanduser().resolve()
     if image.suffix.lower() not in ('.png', '.jpg', '.jpeg', '.webp') or not image.is_file():
-        raise ConfigError('Выбери существующее изображение PNG, JPG или WebP')
+        raise ConfigError('Select an existing PNG, JPG, or WebP image')
     if not image.exists():
         raise ConfigError(f'Wallpaper is missing: {image}')
     if transition is not None or previous_saved.get('renderer') == 'animated':
@@ -215,8 +215,8 @@ def _wallpaper(paths, image=None, *, reset=False, quiet=False, transition=None, 
         time.sleep(.25)
         active = command(['systemctl', '--user', 'is-active', '--quiet', unit], check=False)
         if active.returncode:
-            raise ConfigError('Не удалось запустить обои; предыдущий фон сохранён. '
-                              'Подробности: journalctl --user -u ' + unit)
+            raise ConfigError('Failed to start wallpaper; previous background preserved. '
+                              'Details: journalctl --user -u ' + unit)
         atomic_json(preference, {'image': str(image)})
     except Exception:
         command(['systemctl', '--user', 'stop', unit], check=False)

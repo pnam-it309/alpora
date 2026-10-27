@@ -21,8 +21,8 @@ ColumnLayout {
         Qt.callLater(() => titleField.forceActiveFocus());
     }
     function submit(): void {
-        if (!titleField.text.trim()) { localError = "Введите название"; return; }
-        if (editing === "event" && !/^([01][0-9]|2[0-3]):[0-5][0-9]$/.test(timeField.text)) { localError = "Время: ЧЧ:ММ, например 09:30"; return; }
+        if (!titleField.text.trim()) { localError = I18n.tr("day.enter_title"); return; }
+        if (editing === "event" && !/^([01][0-9]|2[0-3]):[0-5][0-9]$/.test(timeField.text)) { localError = I18n.tr("day.enter_time_format"); return; }
         waitingForAdd = true;
         DayState.request(editing === "event" ? "event-add" : "task-add", {date: DayState.dateKey(selectedDate), title: titleField.text.trim(), time: timeField.text});
     }
@@ -35,8 +35,8 @@ ColumnLayout {
         function onErrorChanged(): void { if (DayState.error) root.waitingForAdd = false; }
     }
     PanelHeader {
-        title: root.page === "main" ? "Мой день" : (root.page === "note" ? "Заметка" : (root.editing === "event" ? "Новое событие" : "Новая задача"))
-        subtitle: root.selectedDate.toLocaleDateString(Qt.locale("ru_RU"), "dddd, d MMMM")
+        title: root.page === "main" ? I18n.tr("day.my_day") : (root.page === "note" ? I18n.tr("day.note") : (root.editing === "event" ? I18n.tr("day.new_event") : I18n.tr("day.new_task")))
+        subtitle: root.selectedDate.toLocaleDateString(I18n.qtLocale, "dddd, d MMMM")
     }
     Text { visible: text.length > 0; Layout.fillWidth: true; text: root.localError || DayState.error; color: PolyTheme.Theme.color("#e2af95"); wrapMode: Text.Wrap; font.family: Session.fontFamily; font.pixelSize: 11 }
     RowLayout {
@@ -70,14 +70,14 @@ ColumnLayout {
                     RowLayout {
                         Layout.fillWidth: true
                         Rectangle { implicitWidth: 3; implicitHeight: 14; radius: 2; color: PolyTheme.Theme.color("#c4a282") }
-                        Text { Layout.fillWidth: true; text: Qt.formatDateTime(root.selectedDate, "yyyy-MM-dd") === Qt.formatDateTime(ClockState.date, "yyyy-MM-dd") ? "Сегодня" : root.selectedDate.toLocaleDateString(Qt.locale("ru_RU"), "d MMMM"); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12 }
-                        BarButton { symbol: "plus"; hint: "Добавить событие"; implicitWidth: 24; implicitHeight: 24; onClicked: root.add("event") }
+                        Text { Layout.fillWidth: true; text: Qt.formatDateTime(root.selectedDate, "yyyy-MM-dd") === Qt.formatDateTime(ClockState.date, "yyyy-MM-dd") ? I18n.tr("day.today") : root.selectedDate.toLocaleDateString(I18n.qtLocale, "d MMMM"); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12 }
+                        BarButton { symbol: "plus"; hint: I18n.tr("day.add_event"); implicitWidth: 24; implicitHeight: 24; onClicked: root.add("event") }
                     }
                     ScrollView {
                         Layout.fillWidth: true; Layout.fillHeight: true; contentWidth: availableWidth; clip: true
                         Column {
                             width: parent.width; spacing: 6
-                            Text { visible: root.events.length === 0; width: parent.width; text: "Пока нет событий\nДобавь первое кнопкой +"; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11; lineHeight: 1.5 }
+                            Text { visible: root.events.length === 0; width: parent.width; text: I18n.tr("day.no_events"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11; lineHeight: 1.5 }
                             Repeater {
                                 model: root.events
                                 Rectangle {
@@ -89,7 +89,7 @@ ColumnLayout {
                                         Text { text: event.modelData.time; color: PolyTheme.Theme.color("#d0b293"); font.family: Session.fontFamily; font.pixelSize: 11 }
                                         Rectangle { implicitWidth: 1; implicitHeight: 20; color: PolyTheme.Theme.color("#74634e") }
                                         Text { Layout.fillWidth: true; text: event.modelData.title; textFormat: Text.PlainText; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 11; elide: Text.ElideRight }
-                                        BarButton { symbol: "close"; hint: "Удалить событие"; implicitWidth: 22; implicitHeight: 24; onClicked: DayState.request("item-remove", {id: event.modelData.id}) }
+                                        BarButton { symbol: "close"; hint: I18n.tr("day.remove_event"); implicitWidth: 22; implicitHeight: 24; onClicked: DayState.request("item-remove", {id: event.modelData.id}) }
                                     }
                                 }
                             }
@@ -106,14 +106,14 @@ ColumnLayout {
                     RowLayout {
                         Layout.fillWidth: true
                         Rectangle { implicitWidth: 3; implicitHeight: 14; radius: 2; color: PolyTheme.Theme.color("#9eaf8e") }
-                        Text { Layout.fillWidth: true; text: "Задачи"; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12 }
-                        BarButton { symbol: "plus"; hint: "Добавить задачу"; implicitWidth: 24; implicitHeight: 24; onClicked: root.add("task") }
+                        Text { Layout.fillWidth: true; text: I18n.tr("day.tasks"); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12 }
+                        BarButton { symbol: "plus"; hint: I18n.tr("day.add_task"); implicitWidth: 24; implicitHeight: 24; onClicked: root.add("task") }
                     }
                     ScrollView {
                         Layout.fillWidth: true; Layout.fillHeight: true; contentWidth: availableWidth; clip: true
                         Column {
                             width: parent.width; spacing: 6
-                            Text { visible: root.tasks.length === 0; width: parent.width; text: "На этот день задач нет\nМожно спокойно спланировать день"; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11; lineHeight: 1.5; wrapMode: Text.Wrap }
+                            Text { visible: root.tasks.length === 0; width: parent.width; text: I18n.tr("day.no_tasks"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11; lineHeight: 1.5; wrapMode: Text.Wrap }
                             Repeater {
                                 model: root.tasks
                                 Rectangle {
@@ -136,7 +136,7 @@ ColumnLayout {
                                             onClicked: DayState.request("task-toggle", {id: task.modelData.id})
                                         }
                                         Text { Layout.fillWidth: true; text: task.modelData.title; textFormat: Text.PlainText; color: task.modelData.done ? Session.muted : Session.foreground; font.family: Session.fontFamily; font.pixelSize: 11; font.strikeout: task.modelData.done; elide: Text.ElideRight }
-                                        BarButton { symbol: "close"; hint: "Удалить задачу"; implicitWidth: 22; implicitHeight: 24; onClicked: DayState.request("item-remove", {id: task.modelData.id}) }
+                                        BarButton { symbol: "close"; hint: I18n.tr("day.remove_task"); implicitWidth: 22; implicitHeight: 24; onClicked: DayState.request("item-remove", {id: task.modelData.id}) }
                                     }
                                 }
                             }
@@ -161,11 +161,11 @@ ColumnLayout {
             radius: 13; color: Glass.tint(PolyTheme.Theme.color("#242d2d"), 0.4); border.width: 0.7; border.color: PolyTheme.Theme.color("#36423c")
             ColumnLayout {
                 anchors.fill: parent; anchors.margins: 10; spacing: 7
-                Text { text: "Быстрый доступ"; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12 }
+                Text { text: I18n.tr("quick.quick_access"); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12 }
                 RowLayout {
                     Layout.fillWidth: true; Layout.fillHeight: true; spacing: 8
                     Repeater {
-                        model: [{name: "Заметки", icon: "note", action: "note"}, {name: "Файлы", icon: "folder", action: "files"}, {name: "Терминал", icon: "terminal", action: "terminal"}]
+                        model: [{name: I18n.tr("day.notes"), icon: "note", action: "note"}, {name: I18n.tr("day.files"), icon: "folder", action: "files"}, {name: I18n.tr("day.terminal"), icon: "terminal", action: "terminal"}]
                         Button {
                             id: shortcut
                             required property var modelData
@@ -200,12 +200,12 @@ ColumnLayout {
     ColumnLayout {
         visible: root.page === "add"
         Layout.fillWidth: true; Layout.fillHeight: true; spacing: 12
-        Text { text: "Дата: " + root.selectedDate.toLocaleDateString(Qt.locale("ru_RU"), "d MMMM yyyy"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 12 }
-        DayField { id: titleField; Layout.fillWidth: true; placeholderText: root.editing === "event" ? "Название события" : "Что нужно сделать?"; maximumLength: 200; onAccepted: root.submit(); Accessible.name: "Название" }
-        DayField { id: timeField; visible: root.editing === "event"; Layout.preferredWidth: 120; placeholderText: "09:30"; maximumLength: 5; onAccepted: root.submit(); Accessible.name: "Время события" }
+        Text { text: I18n.tr("day.date_prefix") + " " + root.selectedDate.toLocaleDateString(I18n.qtLocale, "d MMMM yyyy"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 12 }
+        DayField { id: titleField; Layout.fillWidth: true; placeholderText: root.editing === "event" ? I18n.tr("day.event_name_placeholder") : I18n.tr("day.task_name_placeholder"); maximumLength: 200; onAccepted: root.submit(); Accessible.name: I18n.tr("day.title_field") }
+        DayField { id: timeField; visible: root.editing === "event"; Layout.preferredWidth: 120; placeholderText: "09:30"; maximumLength: 5; onAccepted: root.submit(); Accessible.name: I18n.tr("day.time_field") }
         RowLayout {
-            DayAction { text: "Добавить"; primary: true; enabled: !root.waitingForAdd && DayState.loaded; onClicked: root.submit() }
-            DayAction { text: "Отмена"; onClicked: { root.page = "main"; root.localError = ""; } }
+            DayAction { text: I18n.tr("common.add"); primary: true; enabled: !root.waitingForAdd && DayState.loaded; onClicked: root.submit() }
+            DayAction { text: I18n.tr("common.cancel"); onClicked: { root.page = "main"; root.localError = ""; } }
         }
         Item { Layout.fillHeight: true }
     }
@@ -216,7 +216,7 @@ ColumnLayout {
             Layout.fillWidth: true; Layout.fillHeight: true
             TextArea {
                 id: noteField
-                placeholderText: "Идеи, ссылки и мысли на потом…"
+                placeholderText: I18n.tr("day.note_placeholder")
                 wrapMode: TextEdit.Wrap
                 selectByMouse: true
                 textFormat: TextEdit.PlainText
@@ -224,13 +224,13 @@ ColumnLayout {
                 selectionColor: PolyTheme.Theme.color("#697d5d"); selectedTextColor: PolyTheme.Theme.color("#f0f3e9")
                 font.family: Session.fontFamily; font.pixelSize: 12; padding: 12
                 background: Rectangle { radius: 12; color: Glass.tint(PolyTheme.Theme.color("#20292a"), 0.45); border.width: 0.7; border.color: PolyTheme.Theme.color("#455249") }
-                Accessible.name: "Заметка"
+                Accessible.name: I18n.tr("day.note")
                 onTextChanged: if (root.page === "note" && text !== DayState.data.note) noteDebounce.restart()
             }
         }
         RowLayout {
-            DayAction { text: "Назад"; onClicked: { if (noteField.text !== DayState.data.note) DayState.request("note", {text: noteField.text}); root.page = "main"; } }
-            Text { text: DayState.error ? "Ошибка сохранения" : (noteField.text === DayState.data.note ? "Сохранено" : "Сохранение…"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11 }
+            DayAction { text: I18n.tr("common.back"); onClicked: { if (noteField.text !== DayState.data.note) DayState.request("note", {text: noteField.text}); root.page = "main"; } }
+            Text { text: DayState.error ? I18n.tr("day.save_error") : (noteField.text === DayState.data.note ? I18n.tr("day.saved") : I18n.tr("common.saving")); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11 }
         }
     }
     Timer { id: noteDebounce; interval: 600; onTriggered: DayState.request("note", {text: noteField.text}) }

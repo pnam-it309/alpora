@@ -1,3 +1,4 @@
+function _tr(k, fallback) { return (typeof I18n !== "undefined" && I18n && typeof I18n.tr === "function") ? I18n.tr(k) : fallback; }
 .pragma library
 
 // Bounded, deterministic behavior. No shell commands, input hooks or polling.
@@ -50,5 +51,5 @@ function step(previous, elapsed, context) {
     return state;
 }
 function labels() {
-    return {walk:"Гуляет", look:"Наблюдает", stretch:"Разминает шарниры", service:"Проверяет механизмы", catch:"Ловит искры", balance:"Держит равновесие", sit:"Отдыхает", nap:"Дремлет", dance:"Танцует под музыку", charge:"Заряжается", greet:"Приветствует тебя"};
+    return {walk:_tr("companion.act.walk","Гуляет"), look:_tr("companion.act.look","Наблюдает"), stretch:_tr("companion.act.stretch","Разминает шарниры"), service:_tr("companion.act.service","Проверяет механизмы"), catch:_tr("companion.act.catch","Ловит искры"), balance:_tr("companion.act.balance","Держит равновесие"), sit:_tr("companion.act.sit","Отдыхает"), nap:_tr("companion.act.nap","Дремлет"), dance:_tr("companion.act.dance","Танцует под музыку"), charge:_tr("companion.act.charge","Заряжается"), greet:_tr("companion.act.greet","Приветствует тебя")};
 }

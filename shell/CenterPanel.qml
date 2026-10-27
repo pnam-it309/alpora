@@ -109,7 +109,7 @@ ColumnLayout {
     Item {
         Layout.fillWidth: true; Layout.minimumHeight: 0; Layout.preferredHeight: 40 * (1 - root.expansion)
         clip: true
-        SettingsRow { width: parent.width; height: 40; text: BarState.centerPage === 0 ? "Открыть панель" : "Открыть плеер"; symbol: BarState.centerPage === 0 ? "calendar" : "music"; enabled: root.expansion < 0.1; onClicked: root.expandRequested() }
+        SettingsRow { width: parent.width; height: 40; text: BarState.centerPage === 0 ? I18n.tr("center.open_panel") : I18n.tr("center.open_player"); symbol: BarState.centerPage === 0 ? "calendar" : "music"; enabled: root.expansion < 0.1; onClicked: root.expandRequested() }
     }
     Rectangle {
         Layout.fillWidth: true; Layout.preferredHeight: 34; Layout.fillHeight: false
@@ -118,7 +118,7 @@ ColumnLayout {
             anchors.fill: parent; anchors.margins: 4
             spacing: 6
             BarButton {
-                symbol: "chevron-left"; hint: "Мой день"
+                symbol: "chevron-left"; hint: I18n.tr("center.my_day")
                 implicitWidth: 26; implicitHeight: 26
                 enabled: pages.currentIndex > 0
                 opacity: enabled ? 1 : 0.3
@@ -126,7 +126,7 @@ ColumnLayout {
             }
             Item { Layout.fillWidth: true }
             Repeater {
-                model: ["Мой день", "Музыка"]
+                model: [I18n.tr("center.my_day"), I18n.tr("music.title")]
                 Button {
                     id: tab
                     transform: InteractionMotion { item: tab; pressed: tab.down; hovered: tab.hovered || tab.visualFocus; hoverScale: 1.02; pressScale: 0.96 }
@@ -154,7 +154,7 @@ ColumnLayout {
             }
             Item { Layout.fillWidth: true }
             BarButton {
-                symbol: "chevron-right"; hint: "Музыка"
+                symbol: "chevron-right"; hint: I18n.tr("music.title")
                 implicitWidth: 26; implicitHeight: 26
                 enabled: pages.currentIndex < pages.count - 1
                 opacity: enabled ? 1 : 0.3

@@ -36,32 +36,32 @@ ShellRoot {
     // Native Wayland shortcuts avoid spawning an IPC client before input can
     // reach the launcher. Keep registration once per shell, not per monitor.
     NativeShortcut {
-        appid: "poly-shell"; name: "overview"; description: "Обзор рабочих столов"
+        appid: "poly-shell"; name: "overview"; description: I18n.tr("shortcut.overview")
         onActivated: OverviewState.toggle(root.focusedScreen())
     }
     NativeShortcut {
-        appid: "poly-shell"; name: "overview-open"; description: "Открыть обзор жестом вверх"
+        appid: "poly-shell"; name: "overview-open"; description: I18n.tr("shortcut.overview_open")
         onActivated: OverviewState.open(root.focusedScreen())
     }
     NativeShortcut {
-        appid: "poly-shell"; name: "overview-close"; description: "Закрыть обзор жестом вниз"
+        appid: "poly-shell"; name: "overview-close"; description: I18n.tr("shortcut.overview_close")
         onActivated: OverviewState.close()
     }
     NativeShortcut {
-        appid: "poly-shell"; name: "launcher"; description: "Открыть приложения"
+        appid: "poly-shell"; name: "launcher"; description: I18n.tr("shortcut.launcher")
         onActivated: BarState.toggle("launcher", root.focusedScreen())
     }
     NativeShortcut {
-        appid: "poly-shell"; name: "quick-settings"; description: "Быстрые настройки"
+        appid: "poly-shell"; name: "quick-settings"; description: I18n.tr("shortcut.quick_settings")
         onActivated: Session.toggleQuickSettings(root.focusedScreen())
     }
     NativeShortcut {
-        appid: "poly-shell"; name: "notifications"; description: "Уведомления"
+        appid: "poly-shell"; name: "notifications"; description: I18n.tr("shortcut.notifications")
         onActivated: BarState.toggle("notifications", root.focusedScreen())
     }
 
     NativeShortcut {
-        appid: "poly-shell"; name: "clipboard"; description: "История буфера обмена"
+        appid: "poly-shell"; name: "clipboard"; description: I18n.tr("shortcut.clipboard")
         onActivated: BarState.toggle("clipboard", root.focusedScreen())
     }
 

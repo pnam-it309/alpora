@@ -28,7 +28,7 @@ Rectangle {
         id: toggle
         anchors.fill: parent; anchors.rightMargin: tile.details ? 33 : 0
         hoverEnabled: true; padding: 0
-        Accessible.name: tile.title + ", " + (tile.subtitle || (tile.active ? "включено" : "выключено"))
+        Accessible.name: tile.title + ", " + (tile.subtitle || (tile.active ? I18n.tr("common.enabled") : I18n.tr("common.disabled")))
         Accessible.checkable: true; Accessible.checked: tile.active
         background: Item {}
         contentItem: Item {
@@ -72,7 +72,7 @@ Rectangle {
         visible: tile.details
         anchors.right: parent.right; anchors.top: parent.top; anchors.bottom: parent.bottom
         width: 33; hoverEnabled: true; padding: 0
-        Accessible.name: tile.title + " — выбрать устройство"
+        Accessible.name: tile.title + " — " + I18n.tr("quick.select_device")
         background: Rectangle {
             radius: 10; color: detailButton.hovered ? Glass.tint(Session.accent, 0.12) : "transparent"
             Rectangle { width: 1; height: parent.height - 28; anchors.verticalCenter: parent.verticalCenter; color: Glass.tint(Session.accent, 0.20) }

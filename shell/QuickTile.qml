@@ -70,7 +70,7 @@ Button {
         padding: 0
         topInset: 0; bottomInset: 0; leftInset: 0; rightInset: 0
         focusPolicy: Qt.StrongFocus
-        Accessible.name: control.title + " — подробнее"
+        Accessible.name: control.title + " — " + I18n.tr("common.details")
         background: Item {
             Shape {
         preferredRendererType: Shape.CurveRenderer

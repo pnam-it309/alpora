@@ -27,7 +27,7 @@ ColumnLayout {
         value: TimelineState.minute
         enabled: TimelineState.active && TimelineState.loaded
         wheelEnabled: true; live: true
-        Accessible.name: "Время суток для обоев"
+        Accessible.name: I18n.tr("timeline.time_of_day_wallpaper")
         onMoved: TimelineState.move(value)
         onPressedChanged: { TimelineState.dragging = pressed; if (!pressed) TimelineState.commit(); }
         background: Rectangle {

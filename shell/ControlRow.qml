@@ -36,7 +36,7 @@ Item {
                 Icon { anchors.fill: parent; visible: !root.statusKind; name: root.symbol; opacity: root.adjustable ? 1 : 0.4 }
                 StatusIcon { anchors.fill: parent; visible: !!root.statusKind; kind: root.statusKind; level: root.statusLevel }
             }
-            Accessible.name: root.label + (root.muted ? " — включить" : " — выключить")
+            Accessible.name: root.label + (root.muted ? " — " + I18n.tr("common.enable") : " — " + I18n.tr("common.disable"))
             onClicked: root.muteRequested()
         }
         Text {
@@ -73,7 +73,7 @@ Item {
         visible: root.hasDetails
         enabled: root.adjustable && root.hasDetails
         hoverEnabled: true
-        Accessible.name: root.label + " — выбрать устройство"
+        Accessible.name: root.label + " — " + I18n.tr("quick.select_device")
         background: Rectangle {
             radius: 5
             color: deviceButton.down ? PolyTheme.Theme.color("#18ffffff") : (deviceButton.hovered ? PolyTheme.Theme.color("#10ffffff") : (root.hasDetails ? PolyTheme.Theme.color("#06ffffff") : "transparent"))
@@ -96,7 +96,7 @@ Item {
             Text {
                 anchors.right: parent.right; anchors.rightMargin: 22
                 anchors.verticalCenter: parent.verticalCenter
-                visible: root.hasDetails; text: "Выбрать"
+                visible: root.hasDetails; text: I18n.tr("common.select")
                 color: root.accent; font.family: Session.fontFamily; font.pixelSize: 11
             }
             Icon {

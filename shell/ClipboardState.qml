@@ -27,13 +27,13 @@ Singleton {
                     root.entries = data.entries; root.paused = data.paused;
                     root.error = data.error; root.ready = true; root.busy = false;
                     if (data.action === "copy") BarState.close();
-                } catch (_) { root.error = "Не удалось прочитать историю буфера"; }
+                } catch (_) { root.error = I18n.tr("clipboard.error_read"); }
             }
         }
         stderr: SplitParser { onRead: message => { root.error = message; } }
         onExited: {
             root.ready = false; root.busy = false;
-            if (!root.error) root.error = "Буфер обмена недоступен";
+            if (!root.error) root.error = I18n.tr("clipboard.unavailable");
             retry.restart();
         }
     }

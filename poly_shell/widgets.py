@@ -14,7 +14,7 @@ DEFAULTS = {
     "clock": {"enabled": True, "x": 0, "y": 0},
     "weather": {"enabled": True, "x": 100, "y": 0},
     "music": {"enabled": True, "x": 100, "y": 238},
-    "location": {"name": "Алматы", "latitude": 43.25, "longitude": 76.95},
+    "location": {"name": "Almaty", "latitude": 43.25, "longitude": 76.95},
 }
 
 
@@ -23,26 +23,26 @@ def validate(value):
     if isinstance(value, dict) and 'animations' not in value:
         value = value | {'animations': True}
     if not isinstance(value, dict) or set(value) != set(DEFAULTS):
-        raise ConfigError("Неверные настройки виджетов")
+        raise ConfigError("Invalid widget settings")
     if type(value['animations']) is not bool:
-        raise ConfigError("Неверная настройка анимаций")
+        raise ConfigError("Invalid animation settings")
     if not isinstance(value['screen'], str) or len(value['screen']) > 128 or '\0' in value['screen']:
-        raise ConfigError("Неверный монитор")
+        raise ConfigError("Invalid monitor")
     for key in ('clock', 'weather', 'music'):
         item = value[key]
         if not isinstance(item, dict) or set(item) != {'enabled', 'x', 'y'} or type(item['enabled']) is not bool:
-            raise ConfigError("Неверные параметры виджета: " + key)
+            raise ConfigError("Invalid widget parameters: " + key)
         for axis, limit in (('x', 100), ('y', 8192)):
             if type(item[axis]) is not int or not 0 <= item[axis] <= limit:
-                raise ConfigError("Положение виджета вне экрана: " + key)
+                raise ConfigError("Widget coordinates out of bounds: " + key)
     loc = value['location']
     if not isinstance(loc, dict) or set(loc) != {'name', 'latitude', 'longitude'}:
-        raise ConfigError("Неверный город")
+        raise ConfigError("Invalid city")
     if not isinstance(loc['name'], str) or not loc['name'].strip() or len(loc['name']) > 160:
-        raise ConfigError("Укажи название города")
+        raise ConfigError("Specify city name")
     for key, limit in (('latitude', 90), ('longitude', 180)):
         if type(loc[key]) not in (int, float) or not math.isfinite(loc[key]) or abs(loc[key]) > limit:
-            raise ConfigError("Неверные координаты города")
+            raise ConfigError("Invalid city coordinates")
     return deepcopy(value)
 
 
@@ -52,7 +52,7 @@ def values_for(paths):
         return deepcopy(DEFAULTS)
     saved = read_object(target)
     if saved.get('schemaVersion') != 1:
-        raise ConfigError("Неизвестная версия настроек виджетов")
+        raise ConfigError("Unknown widget settings schema")
     return validate(saved.get('values'))
 
 
@@ -64,12 +64,12 @@ def request_json(base, params):
             raise ValueError('invalid response')
         return data
     except (OSError, ValueError) as exc:
-        raise ConfigError("Нет связи с сервисом погоды. Попробуй позже.") from exc
+        raise ConfigError("Weather service unreachable. Try again later.") from exc
 
 
 def search(city):
     if not isinstance(city, str) or not 2 <= len(city.strip()) <= 100:
-        raise ConfigError("Введи название города (от 2 букв)")
+        raise ConfigError("Enter city name (at least 2 letters)")
     data = request_json('https://geocoding-api.open-meteo.com/v1/search',
                         {'name': city.strip(), 'count': 5, 'language': 'ru', 'format': 'json'})
     return {'results': [{'name': item['name'], 'latitude': item['latitude'],
@@ -116,7 +116,7 @@ def weather(paths):
         return result | {'location': location['name'], 'stale': False, 'error': ''}
     except (ConfigError, KeyError, IndexError, TypeError, ValueError, OSError):
         return cached | {'location': location['name'], 'stale': bool(cached),
-                         'error': 'Погода недоступна · проверь подключение'}
+                         'error': 'Weather unavailable · check connection'}
 
 
 def widgets_control(paths, action, payload):
@@ -129,9 +129,9 @@ def widgets_control(paths, action, payload):
         if action == 'get':
             return {'values': current, 'defaults': deepcopy(DEFAULTS)}
         if not isinstance(payload, dict) or set(payload) - {'values', 'expected'}:
-            raise ConfigError("Неверный запрос виджетов")
+            raise ConfigError("Invalid widgets request")
         if 'expected' in payload and validate(payload['expected']) != current:
-            raise ConfigError("Настройки изменились. Отмени изменения и попробуй снова.")
+            raise ConfigError("Settings have changed. Discard changes and try again.")
         value = validate(payload.get('values'))
         atomic_json(paths.config / 'widgets.json', {'schemaVersion': 1, 'values': value})
         return {'saved': True, 'values': value}

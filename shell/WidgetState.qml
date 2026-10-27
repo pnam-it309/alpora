@@ -7,7 +7,7 @@ Singleton {
     id: root
     property var values: ({animations: true, screen: "", clock: {enabled: true, x: 0, y: 0},
         weather: {enabled: true, x: 100, y: 0}, music: {enabled: true, x: 100, y: 238},
-        location: {name: "Алматы", latitude: 43.25, longitude: 76.95}})
+        location: {name: "Almaty", latitude: 43.25, longitude: 76.95}})
     property var base: ({})
     property var draft: ({})
     property bool editing: false
@@ -53,7 +53,7 @@ Singleton {
         const next = clone(draft);
         next.clock = {enabled: next.clock.enabled, x: 0, y: 0};
         next.weather = {enabled: next.weather.enabled, x: 100, y: 0};
-        next.music = {enabled: next.music.enabled, x: 100, y: 238}; draft = next; message = "Исходное расположение выбрано";
+        next.music = {enabled: next.music.enabled, x: 100, y: 238}; draft = next; message = I18n.tr("widgets.initial_pos_chosen");
     }
     function apply(): void {
         if (busy || !dirty) return;
@@ -67,7 +67,7 @@ Singleton {
         command: [Session.controller, "widgets", "get"]
         stdout: StdioCollector { onStreamFinished: {
             try { root.values = JSON.parse(text).values; root.loaded = true; if (root.editing && !root.dirty && !root.busy) root.begin(); }
-            catch (_) { root.error = "Не удалось прочитать настройки виджетов"; }
+            catch (_) { root.error = I18n.tr("widgets.error_read"); }
         } }
         stderr: StdioCollector { onStreamFinished: if (text.trim()) root.error = text.trim().replace(/^poly-shell: /, "") }
     }
@@ -80,8 +80,8 @@ Singleton {
                 root.values = root.clone(root.result.values);
                 root.loaded = true;
                 root.base = root.clone(root.result.values); root.draft = root.clone(root.result.values);
-                root.message = "Сохранено · расположение восстановится после входа";
-            } else if (!root.error) root.error = "Не удалось сохранить расположение";
+                root.message = I18n.tr("widgets.saved_pos");
+            } else if (!root.error) root.error = I18n.tr("widgets.error_save");
         }
     }
     FileView {

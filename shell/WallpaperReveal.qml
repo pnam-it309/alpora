@@ -77,7 +77,7 @@ PanelWindow {
     Connections {
         target: ThemeState
         function onMessageChanged(): void {
-            if (root.showing && ThemeState.action === "apply" && ThemeState.message === "Тема сохранена") handoff.restart();
+            if (root.showing && ThemeState.action === "apply" && (ThemeState.message === I18n.tr("theme.applied") || ThemeState.message === I18n.tr("theme.saved"))) handoff.restart();
         }
         function onErrorChanged(): void { if (root.showing && ThemeState.error.length) root.clear(); }
     }

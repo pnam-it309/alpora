@@ -21,7 +21,7 @@ ColumnLayout {
     readonly property var selectedBox: Geometry.bounds(selected, chosen, screenWidth, screenHeight, safeTop)
     spacing: 12
     Component.onCompleted: WidgetState.begin()
-    function title(kind: string): string { return kind === "clock" ? "Часы" : kind === "weather" ? "Погода" : "Музыка"; }
+    function title(kind: string): string { return kind === "clock" ? I18n.tr("center.clock") : kind === "weather" ? I18n.tr("center.weather") : I18n.tr("music.title"); }
     ScrollView {
         id: scroll
         Layout.fillWidth: true; Layout.fillHeight: true
@@ -40,49 +40,49 @@ ColumnLayout {
                 }
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 4
-                    Text { text: "Грань · робот-компаньон"; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 15; font.weight: Font.Medium }
-                    Text { Layout.fillWidth: true; text: "Гуляет по панели, садится на виджеты и окна. Его можно поймать мышкой, перенести и отпустить."; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 12; wrapMode: Text.Wrap }
+                    Text { text: I18n.tr("companion.title"); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 15; font.weight: Font.Medium }
+                    Text { Layout.fillWidth: true; text: I18n.tr("companion.desc"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 12; wrapMode: Text.Wrap }
                 }
             }
             RowLayout {
                 Layout.fillWidth: true
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 3
-                    Text { text: "Показывать робота"; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 13 }
-                    Text { Layout.fillWidth: true; text: CompanionState.enabled ? "Включён · выключи, чтобы убрать робота с рабочего стола. Сохраняется сразу." : "Выключен · включи, чтобы вернуть робота на рабочий стол. Сохраняется сразу."; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11; wrapMode: Text.Wrap }
+                    Text { text: I18n.tr("companion.show_robot"); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 13 }
+                    Text { Layout.fillWidth: true; text: CompanionState.enabled ? I18n.tr("companion.on_desc") : I18n.tr("companion.off_desc"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11; wrapMode: Text.Wrap }
                 }
-                SettingsToggle { checked: CompanionState.enabled; enabled: CompanionState.loaded; Accessible.name: "Показывать робота"; onToggled: CompanionState.setEnabled(checked) }
+                SettingsToggle { checked: CompanionState.enabled; enabled: CompanionState.loaded; Accessible.name: I18n.tr("companion.show_robot"); onToggled: CompanionState.setEnabled(checked) }
             }
             RowLayout {
                 Layout.fillWidth: true
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 3
-                    Text { text: "Активный характер"; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12 }
-                    Text { Layout.fillWidth: true; text: "Включён — больше прогулок и игр. Выключен — спокойнее, чаще отдыхает. Настройки сохраняются сразу."; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11; wrapMode: Text.Wrap }
+                    Text { text: I18n.tr("companion.active_nature"); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12 }
+                    Text { Layout.fillWidth: true; text: I18n.tr("companion.active_nature_desc"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11; wrapMode: Text.Wrap }
                 }
-                SettingsToggle { checked: CompanionState.lively; enabled: CompanionState.enabled; Accessible.name: "Активный характер Грани"; onToggled: CompanionState.setLively(checked) }
+                SettingsToggle { checked: CompanionState.lively; enabled: CompanionState.enabled; Accessible.name: I18n.tr("companion.active_nature"); onToggled: CompanionState.setLively(checked) }
             }
             RowLayout {
                 Layout.fillWidth: true
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 3
-                    Text { text: "Полёты по рабочему столу"; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12 }
-                    Text { Layout.fillWidth: true; text: "Сам летает между виджетами и окнами, садится и гуляет по их краям. Выключи полёты — робот вернётся на панель. При низком заряде остаётся на панели."; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11; wrapMode: Text.Wrap }
+                    Text { text: I18n.tr("companion.flights"); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12 }
+                    Text { Layout.fillWidth: true; text: I18n.tr("companion.flights_desc"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11; wrapMode: Text.Wrap }
                 }
-                SettingsToggle { checked: CompanionState.flights; enabled: CompanionState.enabled; Accessible.name: "Полёты Грани по рабочему столу"; onToggled: CompanionState.setFlights(checked) }
+                SettingsToggle { checked: CompanionState.flights; enabled: CompanionState.enabled; Accessible.name: I18n.tr("companion.flights_accessible"); onToggled: CompanionState.setFlights(checked) }
             }
             Text { visible: !!CompanionState.error; Layout.fillWidth: true; text: CompanionState.error; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11; wrapMode: Text.Wrap }
             Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 1; color: Session.accent; opacity: 0.15 }
             RowLayout {
                 Layout.fillWidth: true
-                Text { Layout.fillWidth: true; text: "Живой пейзаж · интерактивные точки"; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 13 }
-                SettingsToggle { checked: LandscapeState.enabled; Accessible.name: "Живой пейзаж — интерактивные точки на обоях"; onToggled: LandscapeState.setEnabled(checked) }
+                Text { Layout.fillWidth: true; text: I18n.tr("landscape.living_landscape_title"); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 13 }
+                SettingsToggle { checked: LandscapeState.enabled; Accessible.name: I18n.tr("landscape.living_landscape_accessible"); onToggled: LandscapeState.setEnabled(checked) }
             }
-            Text { Layout.fillWidth: true; text: "Светящиеся точки на обоях открывают оформление и музыку при наведении, приложения — по нажатию. Переключатель включает или выключает весь режим сразу. По умолчанию выключен; изменение сохраняется сразу."; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 12; wrapMode: Text.Wrap }
+            Text { Layout.fillWidth: true; text: I18n.tr("widgets.landscape_hint"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 12; wrapMode: Text.Wrap }
             RowLayout {
                 Layout.fillWidth: true
-                Text { Layout.fillWidth: true; text: "Анимации виджетов"; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12 }
-                SettingsToggle { checked: !!root.config.animations; enabled: !WidgetState.busy; Accessible.name: "Анимации виджетов"; onToggled: WidgetState.setAnimations(checked) }
+                Text { Layout.fillWidth: true; text: I18n.tr("widgets.animations"); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12 }
+                SettingsToggle { checked: !!root.config.animations; enabled: !WidgetState.busy; Accessible.name: I18n.tr("widgets.animations"); onToggled: WidgetState.setAnimations(checked) }
             }
             Item {
                 Layout.fillWidth: true; Layout.preferredHeight: 240
@@ -133,50 +133,50 @@ ColumnLayout {
                     model: ["clock", "weather", "music"]
                     AppearanceButton { required property string modelData; Layout.fillWidth: true; text: root.title(modelData); symbol: modelData === "clock" ? "calendar" : modelData === "weather" ? "sun" : "music"; selected: root.selected === modelData; onClicked: root.selected = modelData }
                 }
-                SettingsToggle { checked: root.chosen.enabled; enabled: !WidgetState.busy; Accessible.name: "Показывать " + root.title(root.selected); onToggled: WidgetState.edit(root.selected, "enabled", checked) }
+                SettingsToggle { checked: root.chosen.enabled; enabled: !WidgetState.busy; Accessible.name: I18n.tr("widgets.show_prefix") + root.title(root.selected); onToggled: WidgetState.edit(root.selected, "enabled", checked) }
             }
             RowLayout {
                 Layout.fillWidth: true; spacing: 20
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 0
-                    Text { text: "По горизонтали · " + root.chosen.x + "%"; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11 }
-                    ControlSlider { Layout.fillWidth: true; wheelEnabled: false; from: 0; to: 100; stepSize: 1; value: root.chosen.x; enabled: !WidgetState.busy; Accessible.name: "Положение по горизонтали"; onMoved: WidgetState.edit(root.selected, "x", Math.round(value)) }
+                    Text { text: I18n.trWith("widgets.horizontal", {value: root.chosen.x}); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11 }
+                    ControlSlider { Layout.fillWidth: true; wheelEnabled: false; from: 0; to: 100; stepSize: 1; value: root.chosen.x; enabled: !WidgetState.busy; Accessible.name: I18n.tr("widgets.pos_horizontal"); onMoved: WidgetState.edit(root.selected, "x", Math.round(value)) }
                 }
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 0
-                    Text { text: "Сверху · " + Math.round((root.selectedBox.y - root.selectedBox.top) / root.selectedBox.scale) + " px"; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11 }
-                    ControlSlider { Layout.fillWidth: true; wheelEnabled: false; from: 0; to: Math.max(1, (root.screenHeight - root.selectedBox.top - root.selectedBox.margin - root.selectedBox.height) / root.selectedBox.scale); stepSize: 1; value: Math.min(root.chosen.y, to); enabled: !WidgetState.busy; Accessible.name: "Положение по вертикали"; onMoved: WidgetState.edit(root.selected, "y", Math.round(value)) }
+                    Text { text: I18n.trWith("widgets.vertical", {value: Math.round((root.selectedBox.y - root.selectedBox.top) / root.selectedBox.scale)}); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11 }
+                    ControlSlider { Layout.fillWidth: true; wheelEnabled: false; from: 0; to: Math.max(1, (root.screenHeight - root.selectedBox.top - root.selectedBox.margin - root.selectedBox.height) / root.selectedBox.scale); stepSize: 1; value: Math.min(root.chosen.y, to); enabled: !WidgetState.busy; Accessible.name: I18n.tr("widgets.pos_vertical"); onMoved: WidgetState.edit(root.selected, "y", Math.round(value)) }
                 }
             }
             RowLayout {
                 Layout.fillWidth: true
-                Text { text: "Монитор"; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 12 }
+                Text { text: I18n.tr("widgets.monitor"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 12 }
                 ComboBox {
                     id: monitorSelect
                     Layout.fillWidth: true
                     implicitHeight: 36
-                    model: ["Автоматически"].concat(Quickshell.screens.map(s => s.name))
+                    model: [I18n.tr("widgets.auto")].concat(Quickshell.screens.map(s => s.name))
                     currentIndex: Math.max(0, model.indexOf(root.config.screen))
-                    enabled: !WidgetState.busy; Accessible.name: "Монитор для виджетов"
+                    enabled: !WidgetState.busy; Accessible.name: I18n.tr("widgets.monitor_accessible")
                     onActivated: index => WidgetState.setScreen(index ? model[index] : "")
                     background: Rectangle { radius: 8; color: Session.surface; border.width: 1; border.color: monitorSelect.visualFocus ? Session.accent : Session.muted; opacity: 0.7 }
                     contentItem: Text { leftPadding: 10; rightPadding: 26; text: monitorSelect.displayText; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12; verticalAlignment: Text.AlignVCenter; elide: Text.ElideRight }
                     indicator: Icon { anchors.right: parent.right; anchors.rightMargin: 10; anchors.verticalCenter: parent.verticalCenter; width: 14; height: 14; name: "chevron-down" }
                 }
-                AppearanceButton { text: "Сбросить позиции"; symbol: "refresh"; enabled: !WidgetState.busy; onClicked: WidgetState.reset() }
+                AppearanceButton { text: I18n.tr("widgets.reset_positions"); symbol: "refresh"; enabled: !WidgetState.busy; onClicked: WidgetState.reset() }
             }
             Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 1; color: Session.accent; opacity: 0.2 }
-            Text { text: "Город для погоды · " + root.config.location.name; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12 }
+            Text { text: I18n.trWith("widgets.weather_city", {city: root.config.location.name}); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12 }
             RowLayout {
                 Layout.fillWidth: true
                 TextField {
-                    id: city; Layout.fillWidth: true; placeholderText: "Название города"; color: Session.foreground
+                    id: city; Layout.fillWidth: true; placeholderText: I18n.tr("widgets.city_name_placeholder"); color: Session.foreground
                     enabled: !citySearch.running && !WidgetState.busy
                     background: Rectangle { radius: 8; color: Session.surface; border.width: 1; border.color: city.activeFocus ? Session.accent : Session.muted; opacity: 0.7 }
                     onAccepted: findCity.clicked()
                 }
                 AppearanceButton {
-                    id: findCity; text: citySearch.running ? "Поиск…" : "Найти"; symbol: "search"
+                    id: findCity; text: citySearch.running ? I18n.tr("widgets.searching_city") : I18n.tr("widgets.search_city"); symbol: "search"
                     enabled: city.text.trim().length >= 2 && !citySearch.running && !WidgetState.busy
                     onClicked: {
                         if (!enabled) return;
@@ -190,20 +190,20 @@ ColumnLayout {
                 model: root.cities
                 AppearanceButton { required property var modelData; Layout.fillWidth: true; text: modelData.name + " · " + modelData.description; symbol: "home"; enabled: !WidgetState.busy; onClicked: { WidgetState.setLocation(modelData); root.cities = []; city.text = ""; } }
             }
-            Text { Layout.fillWidth: true; text: "Прогноз: Open-Meteo · обновление раз в 30 минут. Музыка подключается к плееру автоматически."; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 10; wrapMode: Text.Wrap }
+            Text { Layout.fillWidth: true; text: I18n.tr("widgets.sources_hint"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 10; wrapMode: Text.Wrap }
         }
     }
     RowLayout {
         Layout.fillWidth: true; spacing: 10
-        Text { Layout.fillWidth: true; text: WidgetState.error || WidgetState.message || (WidgetState.dirty ? "Есть несохранённые изменения" : "Всё сохранено"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11; wrapMode: Text.Wrap }
-        AppearanceButton { text: "Отменить"; symbol: "close"; enabled: !WidgetState.busy && (WidgetState.dirty || !!WidgetState.error); onClicked: WidgetState.cancel() }
-        AppearanceButton { text: WidgetState.busy ? "Сохранение…" : "Применить"; symbol: "check"; primary: true; enabled: WidgetState.dirty && !WidgetState.busy; onClicked: WidgetState.apply() }
+        Text { Layout.fillWidth: true; text: WidgetState.error || WidgetState.message || (WidgetState.dirty ? I18n.tr("common.unsaved_changes") : I18n.tr("common.all_saved")); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11; wrapMode: Text.Wrap }
+        AppearanceButton { text: I18n.tr("common.cancel"); symbol: "close"; enabled: !WidgetState.busy && (WidgetState.dirty || !!WidgetState.error); onClicked: WidgetState.cancel() }
+        AppearanceButton { text: WidgetState.busy ? I18n.tr("common.saving") : I18n.tr("common.apply"); symbol: "check"; primary: true; enabled: WidgetState.dirty && !WidgetState.busy; onClicked: WidgetState.apply() }
     }
     Process {
         id: citySearch
         stdout: StdioCollector { onStreamFinished: {
-            try { root.cities = JSON.parse(text).results; if (!root.cities.length) root.searchError = "Город не найден. Попробуй другое название."; }
-            catch (_) { root.searchError = "Не удалось прочитать список городов"; }
+            try { root.cities = JSON.parse(text).results; if (!root.cities.length) root.searchError = I18n.tr("widgets.city_not_found"); }
+            catch (_) { root.searchError = I18n.tr("widgets.error_city_list"); }
         } }
         stderr: StdioCollector { onStreamFinished: if (text.trim()) root.searchError = text.trim().replace(/^poly-shell: /, "") }
     }

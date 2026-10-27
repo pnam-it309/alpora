@@ -47,7 +47,7 @@ Rectangle {
     clip: true
     Column {
      anchors.fill: parent; anchors.margins: 8; spacing: 8
-     Text { text: "Окно " + (mockWindow.index + 1); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 10 }
+     Text { text: I18n.tr("appearance.preview_window_num") + " " + (mockWindow.index + 1); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 10 }
      Rectangle { width: Math.max(0, parent.width); height: 4; radius: 2; color: Glass.tint(Session.accent, 0.65) }
      Rectangle { width: Math.max(0, parent.width * 0.65); height: 4; radius: 2; color: Glass.tint(Session.accent, 0.35) }
     }
@@ -73,17 +73,17 @@ Rectangle {
     Row {
      spacing: 7
      Icon { width: 15; height: 15; name: preview.element === "launcher" ? "search" : preview.element === "notification" ? "bell" : preview.element === "widget" ? "music" : "settings" }
-     Text { text: preview.element === "window" ? "Окно приложения" : preview.element === "launcher" ? "Поиск приложений" : preview.element === "notification" ? "Уведомление" : preview.element === "widget" ? "Музыка" : "Быстрые настройки"; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 10 }
+     Text { text: preview.element === "window" ? I18n.tr("appearance.preview_app_window") : preview.element === "launcher" ? I18n.tr("appearance.preview_search_apps") : preview.element === "notification" ? I18n.tr("appearance.preview_notification") : preview.element === "widget" ? I18n.tr("music.title") : I18n.tr("quick.title"); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 10 }
     }
     MountainRidge { width: parent.width; height: 34; visible: preview.element !== "notification" }
     Row {
      spacing: 7; visible: preview.element === "panel"
      Repeater { model: ["Wi-Fi", "Bluetooth"]; Rectangle { required property string modelData; width: (surface.width - 46) / 2; height: 35; radius: 8; color: Glass.tint(Session.accent, 0.15); border.width: 1; border.color: Glass.tint(Session.accent, 0.3); Text { anchors.centerIn: parent; text: parent.modelData; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 9 } } }
     }
-    Text { visible: preview.element === "notification"; text: "Все изменения сохранены"; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 11 }
+    Text { visible: preview.element === "notification"; text: I18n.tr("common.all_saved"); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 11 }
     Repeater { model: preview.element === "launcher" ? 3 : 2; Rectangle { required property int index; width: parent.width * (index === 0 ? 0.92 : 0.68); height: preview.element === "launcher" ? 20 : 5; radius: 3; color: Glass.tint(Session.accent, index === 0 ? 0.8 : 0.35) } }
    }
   }
  }
- Text { anchors.bottom: parent.bottom; anchors.bottomMargin: 8; anchors.horizontalCenter: parent.horizontalCenter; visible: preview.element === "bar"; text: "Высота · " + preview.draft.barHeight + " px · снизу " + preview.draft.barBottom + " px"; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 11 }
+ Text { anchors.bottom: parent.bottom; anchors.bottomMargin: 8; anchors.horizontalCenter: parent.horizontalCenter; visible: preview.element === "bar"; text: I18n.trWith("appearance.bar_dimensions", {height: preview.draft.barHeight, bottom: preview.draft.barBottom}); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 11 }
 }

@@ -98,11 +98,11 @@ appearance changes have separate backups; stopping the desktop does not undo
 all toolkit, wallpaper or compositor styling. Follow [theme recovery](wallpaper-themes.md)
 and [appearance recovery](appearance-controls.md) for those changes.
 
-There is currently no automatic uninstall command. Keep personal data and inspect
-the installed links, generated service, desktop entry and managed includes before
-removing them. Saved configuration and state are under `poly-shell` in the XDG
-configuration/state directories. They can contain notes, clipboard entries and
-imported wallpapers; keep them private and back them up separately.
+A clean uninstallation script `./uninstall.sh` is provided. Run `./uninstall.sh --help`
+to inspect all available uninstallation options:
+- `./uninstall.sh` removes symlinks and user services.
+- `./uninstall.sh --restore-config` removes symlinks and restores the latest Hyprland configuration backup.
+- `./uninstall.sh --purge` removes all links and cleans user configuration/state directories.
 
 ## Updating a checkout
 

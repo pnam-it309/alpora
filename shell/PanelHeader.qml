@@ -26,7 +26,7 @@ Item {
             Text { width: parent.width; text: root.title; textFormat: Text.PlainText; elide: Text.ElideRight; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 19; font.weight: Font.Medium }
             Text { width: parent.width; text: root.subtitle; textFormat: Text.PlainText; elide: Text.ElideRight; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 10 }
         }
-        BarButton { symbol: "close"; hint: "Закрыть"; onClicked: BarState.close() }
+        BarButton { symbol: "close"; hint: I18n.tr("common.close"); onClicked: BarState.close() }
     }
     Rectangle { anchors.left: parent.left; anchors.right: parent.right; anchors.bottom: parent.bottom; height: 1; color: PolyTheme.Theme.color("#354139") }
 }

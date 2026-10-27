@@ -33,7 +33,7 @@ Singleton {
             const id = entry ? entry.id : "window:" + (app || t.address);
             let group = groups.find(g => g.id === id);
             if (!group) {
-                group = {id: id, entry: entry || null, name: entry ? entry.name : app || t.title || "Приложение", pinned: false, windows: [], active: false, urgent: false};
+                group = {id: id, entry: entry || null, name: entry ? entry.name : app || t.title || I18n.tr("dock.app_fallback"), pinned: false, windows: [], active: false, urgent: false};
                 groups.push(group);
             }
             group.windows.push({address: "0x" + t.address.replace(/^0x/, ""), title: t.title || group.name,

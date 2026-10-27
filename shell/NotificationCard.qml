@@ -10,7 +10,7 @@ Rectangle {
     property bool archived: false
     property bool compact: false
     property real detailProgress: compact ? 0 : 1
-    readonly property var actions: archived ? [] : Object.keys(notification.actions || {}).map(key => ({ key: key, label: String(notification.actions[key]).trim() || (key === "default" ? "Открыть" : "Действие") }))
+    readonly property var actions: archived ? [] : Object.keys(notification.actions || {}).map(key => ({ key: key, label: String(notification.actions[key]).trim() || (key === "default" ? I18n.tr("notification.action_default") : I18n.tr("notification.action_fallback")) }))
     implicitHeight: details.implicitHeight + Session.visual.notificationPadding * 2
     radius: Session.visual.notificationRadius
     color: Glass.tint(Session.surface, Session.visual.notificationOpacity / 100)
@@ -30,9 +30,9 @@ Rectangle {
                 source: card.notification.app_icon ? (card.notification.app_icon.startsWith("/") ? "file://" + card.notification.app_icon : Quickshell.iconPath(card.notification.app_icon, true)) : ""
                 sourceSize.width: 40; sourceSize.height: 40; fillMode: Image.PreserveAspectFit
             }
-            Text { Layout.fillWidth: true; text: card.notification.app_name || "Приложение"; textFormat: Text.PlainText; color: Session.accent; font.family: Session.fontFamily; font.pixelSize: 10; elide: Text.ElideRight }
-            Text { visible: card.archived; text: "История"; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 9 }
-            BarButton { visible: !card.archived; opacity: card.detailProgress; Layout.preferredWidth: 24 * card.detailProgress; Layout.preferredHeight: 12 + 12 * card.detailProgress; symbol: "close"; hint: "Закрыть уведомление"; implicitWidth: 24; implicitHeight: 24; enabled: !BarState.notificationBusy; onClicked: BarState.dismissNotification(card.notification.id) }
+            Text { Layout.fillWidth: true; text: card.notification.app_name || I18n.tr("dock.app_fallback"); textFormat: Text.PlainText; color: Session.accent; font.family: Session.fontFamily; font.pixelSize: 10; elide: Text.ElideRight }
+            Text { visible: card.archived; text: I18n.tr("notification.history"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 9 }
+            BarButton { visible: !card.archived; opacity: card.detailProgress; Layout.preferredWidth: 24 * card.detailProgress; Layout.preferredHeight: 12 + 12 * card.detailProgress; symbol: "close"; hint: I18n.tr("notification.dismiss"); implicitWidth: 24; implicitHeight: 24; enabled: !BarState.notificationBusy; onClicked: BarState.dismissNotification(card.notification.id) }
         }
         Item {
             Layout.fillWidth: true

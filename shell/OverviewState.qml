@@ -152,7 +152,7 @@ Singleton {
         const ws = workspaces.find(w => w.id === id);
         const client = clients.find(c => c.address === address && c.mapped && !c.hidden);
         if (!ws || (next !== "workspace" && !client)) return;
-        if (next === "move" && client.pinned) { error = "Закреплённое окно сначала нужно открепить"; return; }
+        if (next === "move" && client.pinned) { error = I18n.tr("overview.unpin_first"); return; }
         const command = Geometry.dispatch(next, ws, address, Hyprland.usingLua);
         if (!command) return;
         action = next; response = ""; error = "";
@@ -189,11 +189,11 @@ Singleton {
                     if (!Array.isArray(result)) throw new Error("invalid clients");
                     if (!root.dragging) root.clients = result;
                     else root.refreshPending = true;
-                } catch (_) { root.error = "Не удалось получить список окон"; }
+                } catch (_) { root.error = I18n.tr("overview.error_windows_list"); }
             }
         }
         onExited: exitCode => {
-            if (exitCode !== 0) root.error = "Hyprland не ответил на запрос окон";
+            if (exitCode !== 0) root.error = I18n.tr("overview.hyprland_no_response");
             if (root.refreshPending && !root.dragging) refreshDelay.restart();
         }
     }
@@ -203,7 +203,7 @@ Singleton {
         stderr: StdioCollector { onStreamFinished: if (text.trim()) root.error = text.trim() }
         onExited: exitCode => {
             if (exitCode !== 0 || root.response !== "ok") {
-                root.error = root.error || root.response || "Не удалось выполнить действие";
+                root.error = root.error || root.response || I18n.tr("overview.error_action");
                 root.opened = true;
                 root.animateTo(1, Motion.openMs);
             }

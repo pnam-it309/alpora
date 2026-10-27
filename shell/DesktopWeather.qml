@@ -46,13 +46,13 @@ DesktopWidgetCard {
     }
     Text {
         x: 166; y: 37; width: parent.width - 198
-        text: root.preview ? WeatherState.day(root.preview.day) + " · прогноз" : root.current ? (root.current.is_day ? "День" : "Ночь") : ""
+        text: root.preview ? WeatherState.day(root.preview.day) + " · " + I18n.tr("weather.forecast") : root.current ? (root.current.is_day ? I18n.tr("weather.day") : I18n.tr("weather.night")) : ""
         color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 9
         elide: Text.ElideRight
     }
     Text {
         x: 21; y: 40
-        text: "Сейчас"
+        text: I18n.tr("weather.now")
         color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 8
     }
     WidgetAnimatedText {
@@ -63,7 +63,7 @@ DesktopWidgetCard {
     }
     Text {
         x: 21; y: 103; width: 160
-        text: root.current ? WeatherState.label(root.current.weather_code) : WeatherState.busy ? "Загружаю погоду…" : "Нет данных о погоде"
+        text: root.current ? WeatherState.label(root.current.weather_code) : WeatherState.busy ? I18n.tr("weather.loading") : I18n.tr("weather.no_data")
         color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 10; elide: Text.ElideRight
     }
     Rectangle { x: 20; y: 126; width: parent.width - 40; height: 1; color: Glass.tint(Session.accent, 0.22) }
@@ -77,7 +77,7 @@ DesktopWidgetCard {
                 required property var modelData
                 width: (root.width - 50) / 3; height: 47
                 padding: 3; hoverEnabled: true
-                Accessible.name: WeatherState.day(modelData.day) + ": " + WeatherState.label(modelData.code) + ", " + Math.round(modelData.high) + " / " + Math.round(modelData.low) + " градусов. Предпросмотр прогноза"
+                Accessible.name: WeatherState.day(modelData.day) + ": " + WeatherState.label(modelData.code) + ", " + Math.round(modelData.high) + " / " + Math.round(modelData.low) + " " + I18n.tr("weather.degrees") + ". " + I18n.tr("weather.preview_forecast")
                 onHoveredChanged: {
                     if (hovered) root.hoveredDay = index;
                     else if (root.hoveredDay === index) root.hoveredDay = -1;
@@ -124,7 +124,7 @@ DesktopWidgetCard {
     IconButton {
         anchors.right: parent.right; anchors.top: parent.top; anchors.margins: 10
         width: 27; height: 27; symbol: "refresh"
-        hint: WeatherState.error ? (WeatherState.data.stale ? "Сохранённый прогноз · " : "") + WeatherState.error : "Обновить погоду · Open-Meteo"
+        hint: WeatherState.error ? (WeatherState.data.stale ? I18n.tr("weather.saved_forecast") : "") + WeatherState.error : I18n.tr("weather.refresh_open_meteo")
         enabled: !WeatherState.busy; onClicked: WeatherState.refresh()
         RotationAnimator on rotation { from: 0; to: 360; duration: 1000; loops: Animation.Infinite; running: WeatherState.busy && root.living }
     }

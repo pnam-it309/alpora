@@ -62,8 +62,8 @@ Scope {
     readonly property int pageCount: Math.max(1, Math.ceil(ThemeState.items.length / 7))
     readonly property var choices: ThemeState.items.slice(page * 7, page * 7 + 7)
     function shortLabel(theme: var): string {
-        const labels = {"alpine": "Рассвет", "moon-lake": "Лунное озеро", "forest-mist": "Лесной туман",
-            "warm-desert": "Пустыня", "northern-lights": "Сияние", "rose-sunset": "Закат", "timeline": "Timeline"};
+        const labels = {"alpine": I18n.tr("theme.alpine"), "moon-lake": I18n.tr("theme.moon_lake"), "forest-mist": I18n.tr("theme.forest_mist"),
+            "warm-desert": I18n.tr("theme.warm_desert"), "northern-lights": I18n.tr("theme.northern_lights"), "rose-sunset": I18n.tr("theme.rose_sunset"), "timeline": "Timeline"};
         return labels[theme.id] || theme.label;
     }
     function openAt(x: real, y: real): void {
@@ -85,7 +85,7 @@ Scope {
     Connections {
         target: ThemeState
         function onMessageChanged(): void {
-            if (ThemeState.action === "apply" && ThemeState.message === "Тема сохранена") root.opened = false;
+            if (ThemeState.action === "apply" && (ThemeState.message === I18n.tr("theme.applied") || ThemeState.message === I18n.tr("theme.saved"))) root.opened = false;
         }
     }
     Connections {
@@ -326,7 +326,7 @@ Scope {
                     enabled: root.opened
                     opacity: root.reveal
                     scale: Motion.reduced ? 1 : 0.7 + 0.3 * root.reveal
-                    Accessible.name: root.pageCount > 1 ? "Следующие темы" : "Закрыть меню тем"
+                    Accessible.name: root.pageCount > 1 ? I18n.tr("theme.next_themes") : I18n.tr("theme.close_menu")
                     onClicked: {
                         if (root.pageCount > 1) root.page = (root.page + 1) % root.pageCount;
                         else root.opened = false;
@@ -359,7 +359,7 @@ Scope {
                 }
                 Rectangle {
                     id: caption
-                    readonly property string label: ThemeState.error || (ThemeState.busy ? "Применение темы…" : root.hoveredIndex >= 0 && root.choices[root.hoveredIndex] ? root.choices[root.hoveredIndex].label : "")
+                    readonly property string label: ThemeState.error || (ThemeState.busy ? I18n.tr("theme.applying") : root.hoveredIndex >= 0 && root.choices[root.hoveredIndex] ? root.choices[root.hoveredIndex].label : "")
                     x: (parent.width - width) / 2; y: 405
                     width: Math.min(400, captionText.implicitWidth + 24)
                     height: captionText.implicitHeight + 14

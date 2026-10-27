@@ -23,15 +23,15 @@ KEYS = ('background', 'surface', 'text', 'muted', 'accent', 'secondary', 'cool',
 
 def validate_palette(value):
     if not isinstance(value, dict):
-        raise ConfigError('Неверная палитра темы')
+        raise ConfigError('Invalid theme palette')
     for key in ('background', 'surface', 'text', 'muted', 'accent'):
         if not isinstance(value.get(key), str) or not HEX.fullmatch(value[key]):
-            raise ConfigError('Неверный цвет темы: ' + key)
+            raise ConfigError('Invalid theme color: ' + key)
     result = {}
     for key in KEYS:
         color = value.get(key, value['accent'] if key in ('secondary', 'cool') else value['muted'])
         if not isinstance(color, str) or not HEX.fullmatch(color):
-            raise ConfigError('Неверный цвет темы: ' + key)
+            raise ConfigError('Invalid theme color: ' + key)
         result[key] = color
     return result
 
@@ -52,30 +52,30 @@ def data_root(paths):
 def theme_image(paths, document):
     value = document.get('wallpaper')
     if not isinstance(value, str):
-        raise ConfigError('Нет изображения для темы')
+        raise ConfigError('Missing wallpaper for theme')
     path = (ROOT / 'assets' / value).resolve()
     if not (path.is_relative_to((ROOT / 'assets/wallpapers').resolve()) or
             path.is_relative_to(data_root(paths).resolve())):
-        raise ConfigError('Изображение должно принадлежать коллекции')
+        raise ConfigError('Image must belong to collection')
     if path.suffix.lower() not in ('.png', '.jpg', '.jpeg', '.webp') or not path.is_file():
-        raise ConfigError('Изображение темы не найдено')
+        raise ConfigError('Theme wallpaper image not found')
     return path
 
 
 def load_theme(paths, ident):
     if not isinstance(ident, str) or not re.fullmatch(r'[a-z0-9_-]{1,80}', ident):
-        raise ConfigError('Неверное имя темы')
+        raise ConfigError('Invalid theme name')
     path = ROOT / 'assets/themes' / (ident + '.json') if ident in IDS else paths.config / 'themes' / (ident + '.json')
     doc = read_object(path)
     if doc.get('id') != ident:
-        raise ConfigError('Неверный файл темы')
+        raise ConfigError('Invalid theme file')
     theme_image(paths, doc)
     if ident == 'timeline':
         from .timeline import assets
         assets()
     palette = validate_palette(doc.get('themePalette', doc.get('palette')))
     if not isinstance(doc.get('swatches'), list) or len(doc['swatches']) != 5 or any(not isinstance(c, str) or not HEX.fullmatch(c) for c in doc['swatches']):
-        raise ConfigError('Неверные образцы цветов темы')
+        raise ConfigError('Invalid theme color swatches')
     return doc | {'palette': palette}
 
 
@@ -120,13 +120,13 @@ def catalog(paths):
 
 def import_wallpaper(paths, value):
     if not isinstance(value, str) or not Path(value).is_file():
-        raise ConfigError('Выбери изображение для обоев')
+        raise ConfigError('Select an image for wallpaper')
     from PIL import Image, ImageOps
     source = Path(value).resolve()
     try:
         with Image.open(source) as original:
             if original.format not in ('PNG', 'JPEG', 'WEBP'):
-                raise ConfigError('Поддерживаются PNG, JPEG и WebP')
+                raise ConfigError('Supported formats: PNG, JPEG, and WebP')
             original.load()
             sample = ImageOps.exif_transpose(original).convert('RGB')
             sample.thumbnail((96, 96))
@@ -134,7 +134,7 @@ def import_wallpaper(paths, value):
             table = quantized.getpalette()
             counts = sorted(quantized.getcolors(), reverse=True)
     except (OSError, ValueError) as exc:
-        raise ConfigError('Не удалось прочитать изображение') from exc
+        raise ConfigError('Failed to read image') from exc
     candidates = []
     for count, index in counts:
         color = tuple(c / 255 for c in table[index*3:index*3+3])
@@ -153,9 +153,9 @@ def import_wallpaper(paths, value):
     suffix = '.jpg' if source.suffix.lower() in ('.jpg', '.jpeg') else source.suffix.lower()
     if suffix not in ('.png', '.jpg', '.webp'):
         suffix = '.png'  # Actual decoder format, not an arbitrary source suffix.
-        raise ConfigError('Сохрани изображение с расширением PNG, JPG или WebP')
+        raise ConfigError('Save image with PNG, JPG or WebP extension')
     destination = data_root(paths) / (ident + suffix)
-    label = re.sub(r'[\x00-\x1f$#{}<>]', '', source.stem).strip()[:50] or 'Свои обои'
+    label = re.sub(r'[\x00-\x1f$#{}<>]', '', source.stem).strip()[:50] or 'Custom Wallpaper'
     doc = {'id': ident, 'label': label, 'wallpaper': str(destination), 'palette': palette,
            'swatches': [palette[k] for k in ('background', 'surface', 'cool', 'accent', 'secondary')]}
     with state_lock(paths):
@@ -278,7 +278,7 @@ def runtime_border(p):
     if os.environ.get('HYPRLAND_INSTANCE_SIGNATURE'):
         result = subprocess.run(['hyprctl', 'eval', border_lua(p)], capture_output=True, text=True, timeout=5)
         if result.returncode or result.stdout.strip() != 'ok':
-            raise ConfigError('Не удалось применить цвета рамок Hyprland')
+            raise ConfigError('Cannot apply Hyprland border colors')
 
 
 def notify_toolkit(paths, palette, icon_name):
@@ -288,17 +288,17 @@ def notify_toolkit(paths, palette, icon_name):
     for key, value in (('gtk-theme', toolkit_theme_name(palette)), ('icon-theme', icon_name)):
         try:
             result = subprocess.run(['gsettings', 'set', 'org.gnome.desktop.interface', key, value], capture_output=True, text=True, timeout=3)
-            if result.returncode: warnings.append('Не удалось обновить системный параметр ' + key)
+            if result.returncode: warnings.append('Cannot update system setting ' + key)
         except (OSError, subprocess.SubprocessError):
-            warnings.append('Не удалось обновить системный параметр ' + key)
+            warnings.append('Cannot update system setting ' + key)
     from .terminal_colors import refresh
     if refresh(palette):
-        warnings.append('Не удалось обновить цвета некоторых открытых терминалов')
+        warnings.append('Cannot update colors for some open terminals')
     try:
         from .toolkit_refresh import schedule
         schedule(paths)
     except (OSError, subprocess.SubprocessError):
-        warnings.append('Перезапусти проводник, чтобы обновить его палитру')
+        warnings.append('Restart file manager to refresh its palette')
     return warnings
 
 
@@ -340,7 +340,7 @@ def apply_timeline_palette(paths, minute, palette, selection):
         if border_changed:
             try: runtime_border(old_palette)
             except (ConfigError, OSError, subprocess.SubprocessError) as exc: errors.append(str(exc))
-        raise ConfigError('Цвета Timeline не сохранены: '+str(failure)+('; Восстановление: '+'; '.join(errors) if errors else '')) from failure
+        raise ConfigError('Timeline colors not saved: '+str(failure)+('; Restored: '+'; '.join(errors) if errors else '')) from failure
     notify_toolkit(paths, p, resolved.get('iconTheme', 'Poly-Alpine'))
     if paths.config == Paths.current().config:
         try: subprocess.run(['makoctl', 'reload'], capture_output=True, timeout=3, check=False)
@@ -372,7 +372,7 @@ def apply_theme(paths, ident, automatic=True, transition=None, *, activate=True)
     from .lockscreen import lock_style
     from .state import appearance_for
     if type(automatic) is not bool:
-        raise ConfigError('Неверный режим палитры')
+        raise ConfigError('Invalid palette mode')
     transition = validate_transition(transition)
     if not activate and transition is not None:
         raise ConfigError('A prepared theme cannot start a live transition')
@@ -440,7 +440,7 @@ def apply_theme(paths, ident, automatic=True, transition=None, *, activate=True)
                 if activate: runtime_border(old_palette)
                 if changed_wallpaper: _wallpaper(paths, old_image, quiet=True)
             except (ConfigError, OSError, ValueError, subprocess.SubprocessError) as exc: errors.append(str(exc))
-            raise ConfigError('Тема не применена: '+str(failure)+('; Восстановление: '+'; '.join(errors) if errors else '')) from failure
+            raise ConfigError('Theme not applied: '+str(failure)+('; Restored: '+'; '.join(errors) if errors else '')) from failure
     if not activate:
         return catalog(paths) | {'saved': True, 'prepared': True, 'warnings': []}
     try:
@@ -453,8 +453,8 @@ def apply_theme(paths, ident, automatic=True, transition=None, *, activate=True)
 
 def theme_control(paths, action, payload):
     if not isinstance(payload, dict):
-        raise ConfigError('Неверный запрос темы')
+        raise ConfigError('Invalid theme request')
     if action == 'list': return catalog(paths)
     if action == 'import': return import_wallpaper(paths, payload.get('image'))
     if action == 'apply': return apply_theme(paths, payload.get('id'), payload.get('colorsFromWallpaper', True), payload.get('transition'))
-    raise ConfigError('Неизвестное действие темы')
+    raise ConfigError('Unknown theme action')

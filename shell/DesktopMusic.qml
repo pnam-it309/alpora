@@ -109,9 +109,9 @@ DesktopWidgetCard {
             Rectangle { x: 4; y: 53; width: 4; height: 14; radius: 1; rotation: 28; color: Session.foreground }
         }
     }
-    Text { x: 153; y: 20; width: parent.width - 173; text: root.player ? (root.playing ? "Сейчас играет" : "На паузе") : "Музыка"; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 10; elide: Text.ElideRight }
-    WidgetAnimatedText { x: 153; y: 41; width: parent.width - 173; value: root.player ? root.player.trackTitle || "Без названия" : "Твой ритм"; motionActive: root.living; textFormat: Text.PlainText; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 15; font.weight: Font.Medium; elide: Text.ElideRight }
-    WidgetAnimatedText { x: 153; y: 65; width: parent.width - 173; value: root.player ? root.player.trackArtist || root.player.identity : "Включи трек в плеере"; motionActive: root.living; textFormat: Text.PlainText; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11; elide: Text.ElideRight }
+    Text { x: 153; y: 20; width: parent.width - 173; text: root.player ? (root.playing ? I18n.tr("music.now_playing") : I18n.tr("music.paused")) : I18n.tr("music.title"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 10; elide: Text.ElideRight }
+    WidgetAnimatedText { x: 153; y: 41; width: parent.width - 173; value: root.player ? root.player.trackTitle || I18n.tr("music.untitled") : I18n.tr("music.your_rhythm"); motionActive: root.living; textFormat: Text.PlainText; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 15; font.weight: Font.Medium; elide: Text.ElideRight }
+    WidgetAnimatedText { x: 153; y: 65; width: parent.width - 173; value: root.player ? root.player.trackArtist || root.player.identity : I18n.tr("music.play_track_in_player"); motionActive: root.living; textFormat: Text.PlainText; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11; elide: Text.ElideRight }
     Row {
         x: root.width - 40; y: 21; spacing: 3
         visible: !!root.player && root.player.isPlaying
@@ -127,14 +127,14 @@ DesktopWidgetCard {
     }
     Row {
         x: 153; y: 89; spacing: 16
-        IconButton { width: 30; height: 30; symbol: "previous"; hint: "Предыдущий трек"; enabled: !!root.player && root.player.canControl && root.player.canGoPrevious; opacity: enabled ? 1 : 0.3; onClicked: if (root.player) root.player.previous() }
+        IconButton { width: 30; height: 30; symbol: "previous"; hint: I18n.tr("music.prev_track"); enabled: !!root.player && root.player.canControl && root.player.canGoPrevious; opacity: enabled ? 1 : 0.3; onClicked: if (root.player) root.player.previous() }
         Button {
             id: play
             width: 36; height: 36; padding: 0; hoverEnabled: true
             enabled: !!root.player && root.player.canControl && root.player.canTogglePlaying
             opacity: enabled ? 1 : 0.3
             transform: InteractionMotion { item: play; pressed: play.down; hovered: play.hovered }
-            Accessible.name: root.player && root.player.isPlaying ? "Пауза" : "Воспроизвести"
+            Accessible.name: root.player && root.player.isPlaying ? I18n.tr("music.pause") : I18n.tr("music.play")
             background: Rectangle { radius: 18; color: Session.accent; opacity: play.down ? 0.7 : 1; border.width: play.visualFocus ? 2 : 0; border.color: Session.foreground }
             contentItem: Item {
                 Icon { anchors.centerIn: parent; width: 18; height: 18; name: "pause-dark"; opacity: root.player && root.player.isPlaying ? 1 : 0; Behavior on opacity { NumberAnimation { duration: root.living ? 180 : 0 } } }
@@ -142,7 +142,7 @@ DesktopWidgetCard {
             }
             onClicked: if (root.player) root.player.togglePlaying()
         }
-        IconButton { width: 30; height: 30; symbol: "next"; hint: "Следующий трек"; enabled: !!root.player && root.player.canControl && root.player.canGoNext; opacity: enabled ? 1 : 0.3; onClicked: if (root.player) root.player.next() }
+        IconButton { width: 30; height: 30; symbol: "next"; hint: I18n.tr("music.next_track"); enabled: !!root.player && root.player.canControl && root.player.canGoNext; opacity: enabled ? 1 : 0.3; onClicked: if (root.player) root.player.next() }
     }
     ControlSlider {
         id: seek; x: 20; y: 135; width: parent.width - 40; height: 22
@@ -150,7 +150,7 @@ DesktopWidgetCard {
         hoverEnabled: true
         from: 0; to: root.length > 0 ? root.length : 1; value: root.position; stepSize: 1
         enabled: !!root.player && root.player.canControl && root.player.canSeek && root.player.positionSupported && root.length > 0
-        Accessible.name: "Позиция воспроизведения"
+        Accessible.name: I18n.tr("music.playback_position")
         onMoved: {
             pendingPosition = value;
             if (!pressed && enabled) root.player.position = value;

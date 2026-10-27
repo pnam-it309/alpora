@@ -40,14 +40,14 @@ LIMITS.update({prefix + phase + "Ms": (0, 800) for prefix in ("panel", "launcher
 
 def validate(value):
     if not isinstance(value, dict) or set(value) - set(DEFAULTS):
-        raise ConfigError("Неизвестные параметры внешнего вида")
+        raise ConfigError("Unknown appearance parameters")
     result = dict(DEFAULTS, **value)
     for key, (low, high) in LIMITS.items():
         if type(result[key]) is not int or not low <= result[key] <= high:
-            raise ConfigError(f"{key}: нужно целое число от {low} до {high}")
+            raise ConfigError(f"{key}: integer from {low} to {high} required")
     for key in ("blurEnabled", "widgetAnimations"):
         if type(result[key]) is not bool:
-            raise ConfigError(f"{key}: требуется true или false")
+            raise ConfigError(f"{key}: boolean required")
     return result
 
 
@@ -55,7 +55,7 @@ def visual_for(paths):
     path = paths.config / "visual.json"
     document = read_object(path) if path.exists() else {"schemaVersion": 1, "values": {}}
     if document.get("schemaVersion") != 1:
-        raise ConfigError("Неподдерживаемая версия настроек внешнего вида")
+        raise ConfigError("Unsupported appearance schema version")
     value = validate(document.get("values"))
     # Existing user geometry remains authoritative until explicitly saved here.
     from .state import settings_for

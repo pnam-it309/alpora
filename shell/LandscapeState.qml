@@ -25,11 +25,11 @@ Singleton {
                 if (value.version !== 1 || typeof value.enabled !== "boolean") throw new Error("invalid preferences");
                 root.enabled = value.enabled;
                 root.error = "";
-            } catch (_) { root.error = "Не удалось прочитать настройки живого пейзажа"; }
+            } catch (_) { root.error = I18n.tr("landscape.error_read"); }
             root.loaded = true;
         }
         onLoadFailed: root.loaded = true
-        onSaveFailed: root.error = "Не удалось сохранить режим пейзажа"
+        onSaveFailed: root.error = I18n.tr("landscape.error_save")
     }
     IpcHandler {
         target: "landscape"

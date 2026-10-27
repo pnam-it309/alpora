@@ -51,7 +51,7 @@ DesktopWidgetCard {
     }
     Text {
         x: 26; y: 23
-        text: root.now.toLocaleDateString(Qt.locale("ru_RU"), "dddd").toUpperCase()
+        text: root.now.toLocaleDateString(I18n.qtLocale, "dddd").toUpperCase()
         color: Session.accent; font.family: Session.fontFamily; font.pixelSize: 11; font.letterSpacing: 1.5
     }
     Row {
@@ -90,7 +90,7 @@ DesktopWidgetCard {
                 }
             }
         }
-        Text { text: "сек"; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 10 }
+        Text { text: I18n.tr("common.seconds_short"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 10 }
     }
     Rectangle {
         x: 26; y: parent.height - 46; width: parent.width - 52; height: 1
@@ -100,7 +100,7 @@ DesktopWidgetCard {
     }
     Text {
         x: 26; anchors.bottom: parent.bottom; anchors.bottomMargin: 17
-        text: root.now.toLocaleDateString(Qt.locale("ru_RU"), "d MMMM yyyy")
+        text: root.now.toLocaleDateString(I18n.qtLocale, "d MMMM yyyy")
         color: Session.accent; font.family: Session.fontFamily; font.pixelSize: 13
     }
     IpcHandler {

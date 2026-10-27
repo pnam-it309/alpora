@@ -11,8 +11,8 @@ ColumnLayout {
     SettingsRow {
         Layout.fillWidth: true; Layout.preferredHeight: 54
         symbol: BarState.dnd ? "bell-muted" : "bell"
-        text: "Не беспокоить"
-        subtitle: BarState.dnd ? "Включён · сообщения остаются в центре" : "Выключен · показывать всплывающие уведомления"
+        text: I18n.tr("notification.dnd")
+        subtitle: BarState.dnd ? I18n.tr("notification.dnd_on_desc") : I18n.tr("notification.dnd_off_desc")
         selected: BarState.dnd; enabled: !BarState.notificationBusy
         onClicked: BarState.toggleDnd()
     }
@@ -23,7 +23,7 @@ ColumnLayout {
     }
     Text {
         visible: root.entries.length > 0
-        text: BarState.notifications.length ? "Активные · " + BarState.notifications.length : "Ранее · " + BarState.visibleHistory.length
+        text: BarState.notifications.length ? I18n.trWith("notification.active_count", {count: BarState.notifications.length}) : I18n.trWith("notification.history_count", {count: BarState.visibleHistory.length})
         color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 10
     }
     Repeater {
@@ -37,12 +37,12 @@ ColumnLayout {
     Text {
         visible: root.entries.length === 0
         Layout.fillWidth: true; Layout.preferredHeight: 54
-        text: "Всё спокойно"; color: Session.muted; font.family: Session.fontFamily
+        text: I18n.tr("notification.all_quiet"); color: Session.muted; font.family: Session.fontFamily
         font.pixelSize: 12; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
     }
     SettingsRow {
         Layout.fillWidth: true; Layout.preferredHeight: 40
-        text: "Открыть все уведомления"; symbol: "bell"
+        text: I18n.tr("notification.open_all"); symbol: "bell"
         onClicked: root.expandRequested()
     }
 }
