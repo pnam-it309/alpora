@@ -775,5 +775,11 @@
   "wifi.show_password": "Показать пароль",
   "wifi.hide_password": "Скрыть пароль",
   "wifi.enter_ssid": "Введите имя сети (SSID)",
-  "wifi.security_label": "Безопасность: {type}"
+  "wifi.security_label": "Безопасность: {type}",
+  "shortcuts.guide_tab": "Справочник клавиш",
+  "shortcuts.custom_tab": "Настройка и добавление",
+  "shortcuts.group_system": "Система и оболочка",
+  "shortcuts.group_windows": "Окна и приложения",
+  "shortcuts.group_workspaces": "Рабочие столы и навигация",
+  "shortcuts.overview_subtitle": "Горячие клавиши, руководство и настройка"
 }

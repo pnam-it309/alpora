@@ -775,5 +775,11 @@
   "wifi.show_password": "Hiện mật khẩu",
   "wifi.hide_password": "Ẩn mật khẩu",
   "wifi.enter_ssid": "Nhập tên mạng (SSID)",
-  "wifi.security_label": "Bảo mật: {type}"
+  "wifi.security_label": "Bảo mật: {type}",
+  "shortcuts.guide_tab": "Hướng dẫn phím tắt",
+  "shortcuts.custom_tab": "Tùy chỉnh & Thêm mới",
+  "shortcuts.group_system": "Hệ thống & Shell",
+  "shortcuts.group_windows": "Cửa sổ & Ứng dụng",
+  "shortcuts.group_workspaces": "Bàn làm việc & Điều hướng",
+  "shortcuts.overview_subtitle": "Bảng phím tắt, hướng dẫn thao tác & tùy chỉnh"
 }
