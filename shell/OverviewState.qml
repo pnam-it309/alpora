@@ -141,7 +141,10 @@ Singleton {
     }
     function windowLabel(count: int): string {
         const end = count % 10, tens = count % 100;
-        return count + " " + (end === 1 && tens !== 11 ? "окно" : end >= 2 && end <= 4 && (tens < 12 || tens > 14) ? "окна" : "окон");
+        const key = (end === 1 && tens !== 11) ? "overview.window_label_1"
+            : (end >= 2 && end <= 4 && (tens < 12 || tens > 14)) ? "overview.window_label_few"
+            : "overview.window_label_many";
+        return I18n.trWith(key, {count: count});
     }
     function navigate(delta: int): void { selected = Math.max(0, Math.min(workspaces.length - 1, selected + delta)); }
     function run(next: string, id: int, address: string): void {

@@ -48,7 +48,7 @@ PanelWindow {
 
         ActionButton {
             text: "Apps"
-            hint: "Открыть приложения"
+            hint: I18n.tr("bar.open_apps")
             onClicked: Session.launch("launcher")
         }
 
@@ -59,7 +59,7 @@ PanelWindow {
                 readonly property int workspaceId: index + 1
                 text: String(workspaceId)
                 highlighted: bar.activeWorkspace === workspaceId
-                hint: "Рабочий стол " + workspaceId
+                hint: I18n.trWith("bar.workspace", {id: workspaceId})
                 onClicked: Session.focusWorkspace(workspaceId)
             }
         }
@@ -68,7 +68,7 @@ PanelWindow {
             Layout.fillWidth: true
             Layout.minimumWidth: 0
             Layout.leftMargin: 8
-            text: Session.error ? "Ошибка: " + Session.error : (Hyprland.activeToplevel ? Hyprland.activeToplevel.title : "Poly Shell")
+            text: Session.error ? I18n.tr("bar.error_prefix") + Session.error : (Hyprland.activeToplevel ? Hyprland.activeToplevel.title : "Poly Shell")
             color: Session.error ? PolyTheme.Theme.color("#f1aa9b") : Session.muted
             font.family: Session.settings.bar ? Session.settings.bar.fontFamily : "Noto Sans"
             font.pixelSize: Session.settings.bar ? Session.settings.bar.fontSize : 13
@@ -78,7 +78,7 @@ PanelWindow {
 
         ActionButton {
             text: "Term"
-            hint: "Открыть терминал"
+            hint: I18n.tr("bar.open_terminal")
             visible: !bar.compact
             onClicked: Session.launch("terminal")
         }
@@ -87,13 +87,13 @@ PanelWindow {
             text: Session.profile.label || "Work"
             highlighted: true
             enabled: !Session.switching
-            hint: "Переключить Work / Vibe"
+            hint: I18n.tr("bar.toggle_mode")
             onClicked: Session.setMode("toggle")
         }
 
         ActionButton {
             text: !Session.audio ? "Audio —" : (Session.audio.muted ? "Muted" : "Vol " + Math.round(Session.audio.volume * 100) + "%")
-            hint: "Настройки звука"
+            hint: I18n.tr("bar.audio_settings")
             onClicked: Session.launch("audio")
         }
 
@@ -118,7 +118,7 @@ PanelWindow {
 
         ActionButton {
             text: "Lock"
-            hint: "Заблокировать экран"
+            hint: I18n.tr("bar.lock_screen")
             onClicked: Session.launch("lock")
         }
     }

@@ -142,7 +142,7 @@ PanelWindow {
                     if (hovered && !bar.launcherPreviewBlocked) BarState.previewLauncher(bar.screenName);
                     else if (!hovered && bar.launcherPreviewBlocked) appLauncher.closePreviewOutside();
                 }
-                hint: "Открыть приложения"
+                hint: I18n.tr("bar.open_apps")
                 highlighted: BarState.popup === "launcher" && BarState.popupScreen === bar.screenName
                 contentItem: Item {
                     FacetedMark {
@@ -174,7 +174,7 @@ PanelWindow {
             width: Math.max(76, Math.min(440, surface.width - 2 * Math.max(leftGroup.width + 12, rightGroup.width + 12) - 24 - (TimelineState.active ? 88 : 0)))
             height: parent.height - 2
             padding: 0; hoverEnabled: true; focusPolicy: Qt.StrongFocus
-            Accessible.name: "Календарь — " + Qt.formatDateTime(ClockState.date, "HH:mm, d MMMM")
+            Accessible.name: I18n.trWith("bar.calendar_a11y", {time: Qt.formatDateTime(ClockState.date, "HH:mm, d MMMM")})
             background: Item {
                 id: clockBackground
                 // One outline drives both the frame and the landscape mask.
@@ -273,7 +273,7 @@ PanelWindow {
                 width: 32; height: 30
                 hoverEnabled: true; focusPolicy: Qt.StrongFocus; padding: 0
                 enabled: BarState.keyboardName.length > 0
-                Accessible.name: "Раскладка " + BarState.layout + " — переключить"
+                Accessible.name: I18n.trWith("bar.layout_a11y", {layout: BarState.layout})
                 background: Rectangle {
                     radius: 8; color: layoutButton.hovered || layoutButton.visualFocus ? PolyTheme.Theme.color("#353e39") : "transparent"
                     Behavior on color { ColorAnimation { duration: Motion.responseMs } }
@@ -293,14 +293,14 @@ PanelWindow {
             BarButton {
                 id: trayButton
                 visible: BarState.hiddenTray.length > 0 || (bar.compact && BarState.trayItems.length > 0)
-                symbol: "chevron-down"; hint: "Фоновые приложения"
+                symbol: "chevron-down"; hint: I18n.tr("bar.tray")
                 highlighted: BarState.popup === "tray" && BarState.popupScreen === bar.screenName
                 onClicked: bar.openPanel("tray", trayButton)
             }
             BarButton {
                 id: clipboardButton
                 onHoveredChanged: if (hovered) BarState.previewClipboard(bar.screenName)
-                symbol: "clipboard"; hint: "Буфер обмена · Super+V"
+                symbol: "clipboard"; hint: I18n.tr("bar.clipboard")
                 highlighted: BarState.popup === "clipboard" && BarState.popupScreen === bar.screenName
                 marked: ClipboardState.paused || !!ClipboardState.error
                 onClicked: bar.openPanel("clipboard", clipboardButton)
@@ -310,7 +310,7 @@ PanelWindow {
                 HoverHandler { id: bellTransit; margin: (bar.barHeight - bell.height) / 2 + 8 }
                 onHoveredChanged: if (hovered) BarState.previewNotifications(bar.screenName)
                 highlighted: BarState.popup === "notifications" && BarState.popupScreen === bar.screenName
-                symbol: BarState.dnd ? "bell-muted" : "bell"; hint: BarState.dnd ? "Не беспокоить · уведомления и история" : "Уведомления и история"
+                symbol: BarState.dnd ? "bell-muted" : "bell"; hint: BarState.dnd ? I18n.tr("bar.notifications_dnd") : I18n.tr("bar.notifications")
                 marked: BarState.notifications.length > 0
                 onClicked: bar.openPanel("notifications", bell)
             }
@@ -325,7 +325,7 @@ PanelWindow {
                 HoverHandler { id: statusTransit; margin: (bar.barHeight - statusButton.height) / 2 }
                 width: Math.max(36, statusIndicators.implicitWidth + 18); height: 30
                 hoverEnabled: true; focusPolicy: Qt.StrongFocus; padding: 0
-                Accessible.name: "Быстрые настройки" + (networkVisible ? " · " + Session.networkStatus.label : "")
+                Accessible.name: I18n.tr("bar.quick_a11y") + (networkVisible ? " · " + Session.networkStatus.label : "")
                     + (bluetoothVisible ? " · " + Session.bluetoothDescription : "")
                     + (audioVisible ? " · " + Session.audioStatus.label : "")
                     + (batteryVisible ? " · " + Session.batteryDescription : "")

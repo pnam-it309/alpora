@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import json
 from pathlib import Path
 import shutil
@@ -9,8 +10,8 @@ import unittest
 class BarStatusTests(unittest.TestCase):
     def evaluate(self, expression):
         script = Path(__file__).resolve().parents[1] / 'shell/StatusLogic.js'
-        code = script.read_text() + '\nconsole.log(JSON.stringify(' + expression + '));'
-        return json.loads(subprocess.check_output(['node', '-e', code], text=True))
+        code = script.read_text(encoding='utf-8') + '\nconsole.log(JSON.stringify(' + expression + '));'
+        return json.loads(subprocess.check_output(['node', '-e', code], text=True, encoding='utf-8'))
 
     def observation(self, **changes):
         data = dict(wifiAvailable=True, hardwareEnabled=True, wifiEnabled=True,

@@ -43,11 +43,11 @@ Singleton {
     readonly property bool batteryPresent: !!battery && battery.ready && battery.isLaptopBattery
     readonly property bool batteryCharging: batteryPresent && battery.state === UPowerDeviceState.Charging
     readonly property bool onBattery: UPower.onBattery
-    readonly property string batteryStatus: !batteryPresent ? "Питание от сети"
-        : batteryCharging ? "Заряжается"
-        : battery.state === UPowerDeviceState.FullyCharged ? "Полностью заряжен"
-        : !onBattery ? "Подключён к сети · зарядка приостановлена"
-        : "Работа от батареи"
+    readonly property string batteryStatus: !batteryPresent ? I18n.tr("power.ac")
+        : batteryCharging ? I18n.tr("power.charging")
+        : battery.state === UPowerDeviceState.FullyCharged ? I18n.tr("power.full")
+        : !onBattery ? I18n.tr("power.plugged_idle")
+        : I18n.tr("power.battery")
     readonly property string batteryDescription: (batteryPresent ? Math.round(battery.percentage * 100) + "% · " : "") + batteryStatus
     readonly property int focusedWorkspace: Hyprland.focusedWorkspace ? Hyprland.focusedWorkspace.id : 0
     readonly property bool quickSettingsOpen: BarState.selection.name === "quick-settings"
@@ -74,10 +74,10 @@ Singleton {
     readonly property var bluetoothAdapter: bluetoothService.defaultAdapter
     readonly property bool bluetoothEnabled: bluetoothAdapter ? bluetoothAdapter.enabled : false
     readonly property var connectedBluetooth: bluetoothEnabled ? bluetoothAdapter.devices.values.filter(device => device.connected) : []
-    readonly property string bluetoothDescription: !bluetoothAdapter ? "Bluetooth недоступен"
-        : !bluetoothEnabled ? "Bluetooth выключен"
+    readonly property string bluetoothDescription: !bluetoothAdapter ? I18n.tr("bluetooth.unavailable")
+        : !bluetoothEnabled ? I18n.tr("bluetooth.off")
         : connectedBluetooth.length ? connectedBluetooth.map(device => device.name).join(", ")
-        : "Bluetooth · Нет подключённых устройств"
+        : I18n.tr("bluetooth.no_devices")
 
     // One subscription per shell, shared by every monitor. No periodic subprocesses.
     PwObjectTracker {

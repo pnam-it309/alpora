@@ -207,11 +207,11 @@ PanelWindow {
                     GemMark { Layout.preferredWidth: 16; Layout.preferredHeight: 19 }
                     Text {
                         Layout.fillWidth: true
-                        text: popup.page === "clipboard" ? "Буфер обмена" : popup.page === "calendar" ? "Календарь" : (popup.page === "notifications" ? "Уведомления" : "Фоновые приложения")
+                        text: popup.page === "clipboard" ? I18n.tr("popup.clipboard") : popup.page === "calendar" ? I18n.tr("popup.calendar") : (popup.page === "notifications" ? I18n.tr("popup.notifications") : I18n.tr("popup.tray"))
                         color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 13
                         elide: Text.ElideRight
                     }
-                    BarButton { symbol: "close"; hint: "Закрыть"; implicitWidth: 26; implicitHeight: 26; onClicked: BarState.close() }
+                    BarButton { symbol: "close"; hint: I18n.tr("bar.close"); implicitWidth: 26; implicitHeight: 26; onClicked: BarState.close() }
                 }
                 ClipboardPanel {
                     id: clipboardPanel

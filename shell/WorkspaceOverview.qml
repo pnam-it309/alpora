@@ -123,17 +123,17 @@ Scope {
                 transform: Translate { y: Motion.reduced ? 0 : (1 - root.reveal) * 40 }
                 Text {
                     x: 8; y: 0
-                    text: "ПРОСТРАНСТВА"
+                    text: I18n.tr("overview.title")
                     color: Session.accent; font.family: Session.fontFamily; font.pixelSize: 10; font.letterSpacing: 4; font.weight: Font.DemiBold
                 }
                 Text {
                     x: 6; y: 22
-                    text: "Рабочие столы"
+                    text: I18n.tr("overview.subtitle")
                     color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 38; font.weight: Font.DemiBold
                 }
                 Text {
                     x: 10; y: 77
-                    text: PolyTheme.Theme.label + "  /  " + OverviewState.workspaces.length + " столов"
+                    text: I18n.trWith("overview.desks_label", {label: PolyTheme.Theme.label, count: OverviewState.workspaces.length})
                     color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 13
                 }
                 Button {
@@ -141,7 +141,7 @@ Scope {
                     anchors.right: parent.right; anchors.rightMargin: 8
                     y: 30; width: 90; height: 38
                     text: "Esc    ×"; focusPolicy: Qt.NoFocus
-                    Accessible.name: "Закрыть обзор"
+                    Accessible.name: I18n.tr("overview.close")
                     onClicked: OverviewState.close()
                     background: Rectangle { radius: 19; border.width: 1; border.color: PolyTheme.Theme.withAlpha(Session.muted, 0.2); color: closeButton.hovered ? Session.surface : PolyTheme.Theme.withAlpha(Session.surface, 0.5) }
                     contentItem: Text { text: closeButton.text; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 13; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
@@ -262,7 +262,7 @@ Scope {
                             }
                         }
                         Accessible.role: Accessible.Button
-                        Accessible.name: "Рабочий стол " + modelData.name + ", окон: " + windows.length
+                        Accessible.name: I18n.trWith("overview.workspace_a11y", {name: modelData.name, count: windows.length})
                         Accessible.onPressAction: OverviewState.run("workspace", card.modelData.id, "")
                         MouseArea {
                             anchors.fill: parent; hoverEnabled: true
@@ -274,7 +274,7 @@ Scope {
                         }
                         Text {
                             x: 28; y: 12; visible: card.current
-                            text: "СЕЙЧАС ЗДЕСЬ"; font.letterSpacing: 1.2
+                            text: I18n.tr("overview.current"); font.letterSpacing: 1.2
                             color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 8; font.weight: Font.DemiBold
                         }
                         Text {
@@ -284,12 +284,12 @@ Scope {
                         }
                         Text {
                             x: 74; y: parent.height - 50; width: parent.width - 176; elide: Text.ElideRight
-                            text: card.modelData.id > 0 ? "Рабочий стол" : card.modelData.name
+                            text: card.modelData.id > 0 ? I18n.tr("overview.workspace") : card.modelData.name
                             color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 11; font.weight: Font.DemiBold
                         }
                         Text {
                             x: 74; y: parent.height - 31; width: parent.width - 150; elide: Text.ElideRight
-                            text: card.windows.length ? OverviewState.windowLabel(card.windows.length) : content.dragClient ? "Перенести сюда" : "Свободно"
+                            text: card.windows.length ? OverviewState.windowLabel(card.windows.length) : content.dragClient ? I18n.tr("overview.drop_here") : I18n.tr("overview.empty")
                             color: card.current ? Session.accent : Session.muted; font.family: Session.fontFamily; font.pixelSize: 10
                         }
                         Rectangle {
@@ -352,7 +352,7 @@ Scope {
                                     Text {
                                         anchors.centerIn: parent; width: parent.width - 12
                                         visible: !capture.hasContent
-                                        text: preview.modelData.class || "Окно"; elide: Text.ElideRight; horizontalAlignment: Text.AlignHCenter
+                                        text: preview.modelData.class || I18n.tr("overview.window"); elide: Text.ElideRight; horizontalAlignment: Text.AlignHCenter
                                         color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12
                                     }
                                     Rectangle {
@@ -398,7 +398,7 @@ Scope {
                 }
                 Text {
                     x: 8; y: grid.y + grid.height + 18; width: parent.width - 16
-                    text: OverviewState.error || (content.dragClient ? "Отпусти окно над нужным столом · Esc — отмена" : "Три пальца ↑  открыть   /   ↓  закрыть       ·       Перетаскивай окна между столами       ·       Super + Tab")
+                    text: OverviewState.error || (content.dragClient ? I18n.tr("overview.drag_active") : I18n.tr("overview.drag_hint"))
                     color: OverviewState.error ? Session.accent : Session.muted
                     font.family: Session.fontFamily; font.pixelSize: 12; wrapMode: Text.WordWrap
                 }

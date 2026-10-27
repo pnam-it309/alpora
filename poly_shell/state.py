@@ -2,7 +2,10 @@
 from contextlib import contextmanager
 from copy import deepcopy
 from dataclasses import dataclass
-import fcntl
+try:
+    import fcntl
+except ImportError:
+    fcntl = None
 import json
 import os
 from pathlib import Path
@@ -92,6 +95,7 @@ def defaults():
         "bar": {"height": 40, "workspaceCount": 4, "fontFamily": "Noto Sans", "fontSize": 13,
                 "margin": 20, "top": 12},
         "reducedMotion": False,
+        "locale": "en",
     }
 
 
@@ -128,6 +132,10 @@ def settings_for(paths):
         raise ConfigError("bar.fontFamily must be a nonempty string")
     if type(data.get("reducedMotion")) is not bool:
         raise ConfigError("reducedMotion must be true or false")
+    from .i18n import supported_locales
+    locale = data.get("locale", "en")
+    if not isinstance(locale, str) or locale not in supported_locales():
+        data["locale"] = "en"
     return data
 
 
@@ -154,7 +162,8 @@ def profile_for(paths, mode):
 def state_lock(paths):
     paths.state.mkdir(mode=0o700, parents=True, exist_ok=True)
     with (paths.state / "state.lock").open("a") as stream:
-        fcntl.flock(stream, fcntl.LOCK_EX)
+        if fcntl is not None:
+            fcntl.flock(stream, fcntl.LOCK_EX)
         yield
 
 
