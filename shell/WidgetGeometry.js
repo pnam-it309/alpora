@@ -13,13 +13,14 @@ function bounds(kind, setting, width, height, top) {
 }
 
 function boundsForSize(setting, width, height, top, natural) {
+    const s = setting || {x: 50, y: 50};
     const scale = Math.max(0.25, Math.min(1, width / 1000, height / 800));
     const margin = 20 * scale;
     const w = Math.min(natural.width * scale, Math.max(1, width - margin * 2));
     const h = Math.min(natural.height * scale, Math.max(1, height - top - margin));
     const origin = Math.min(top, Math.max(0, height - h - margin));
-    return {x: margin + Math.max(0, width - margin * 2 - w) * setting.x / 100,
-        y: origin + Math.max(0, Math.min(setting.y * scale, height - origin - margin - h)),
+    return {x: margin + Math.max(0, width - margin * 2 - w) * (typeof s.x === "number" ? s.x : 50) / 100,
+        y: origin + Math.max(0, Math.min((typeof s.y === "number" ? s.y : 50) * scale, height - origin - margin - h)),
         width: w, height: h, scale: scale, margin: margin, top: origin};
 }
 

@@ -78,6 +78,22 @@ if [[ "$EUID" -eq 0 && "$install_dry_run" != true ]]; then
     exit 1
 fi
 
+alpora_detect_pkg_manager() {
+    if command -v pacman >/dev/null 2>&1; then
+        echo "pacman"
+    elif command -v dnf >/dev/null 2>&1; then
+        echo "dnf"
+    elif command -v apt-get >/dev/null 2>&1; then
+        echo "apt"
+    elif command -v zypper >/dev/null 2>&1; then
+        echo "zypper"
+    else
+        echo "unknown"
+    fi
+}
+
+detected_pkg_mgr=$(alpora_detect_pkg_manager)
+
 is_arch_based=false
 if [[ -f /etc/os-release ]]; then
     source /etc/os-release
@@ -87,12 +103,14 @@ if [[ -f /etc/os-release ]]; then
 fi
 
 if [[ "$install_ui_only" != true && "$install_ignore_distro" != true ]]; then
-    if [[ "$is_arch_based" != true ]]; then
-        printf 'This full installer currently supports Arch Linux and Arch-based distributions.\n' >&2
-        printf 'Detected: %s (%s)\n' "${NAME:-Unknown}" "${ID:-unknown}" >&2
+    if [[ "$is_arch_based" != true && "$detected_pkg_mgr" == "unknown" ]]; then
+        printf 'This full installer is optimized for Arch Linux and distributions with pacman, dnf, or apt.\n' >&2
+        printf 'Detected: %s (%s) with unsupported package manager.\n' "${NAME:-Unknown}" "${ID:-unknown}" >&2
         printf 'Tip: Use ./install.sh --ui-only to install the standalone ALPORA UI on any distro or custom kernel setup.\n' >&2
-        printf '     Use ./install.sh --ignore-distro-check to force pacman package installation on this system.\n' >&2
+        printf '     Use ./install.sh --skip-packages if you have manually installed dependencies.\n' >&2
         exit 1
+    elif [[ "$is_arch_based" != true ]]; then
+        printf 'Note: Non-Arch distribution detected: %s (%s) using package manager: %s\n' "${NAME:-Unknown}" "${ID:-unknown}" "$detected_pkg_mgr"
     fi
 fi
 
@@ -156,10 +174,49 @@ if [[ "$install_ui_only" == true ]]; then
     alpora_step 1 'Prepare ALPORA Standalone UI'
     printf '    UI-only mode enabled: skipping system package installation and pacman updates.\n'
 else
-    alpora_step 1 'Prepare Arch Linux & Dependencies'
+    alpora_step 1 'Prepare System & Dependencies'
     if [[ "$install_skip_packages" != true ]]; then
         command -v sudo >/dev/null || { echo 'Install sudo and allow your user to manage packages first.' >&2; exit 1; }
-        sudo pacman -Syu --needed "${packages[@]}" 2>&1 | tee -a "$ALPORA_INSTALL_LOG"
+        case "$detected_pkg_mgr" in
+            pacman)
+                sudo pacman -Syu --needed "${packages[@]}" 2>&1 | tee -a "$ALPORA_INSTALL_LOG"
+                ;;
+            dnf)
+                printf '    Installing dependencies via dnf...\n'
+                dnf_pkgs=()
+                for pkg in "${packages[@]}"; do
+                    case "$pkg" in
+                        python-pillow) dnf_pkgs+=(python3-pillow) ;;
+                        python-gobject) dnf_pkgs+=(python3-gobject) ;;
+                        gtk3) dnf_pkgs+=(gtk3) ;;
+                        qt6-svg) dnf_pkgs+=(qt6-qtsvg) ;;
+                        qt6-multimedia) dnf_pkgs+=(qt6-qtmultimedia) ;;
+                        *) dnf_pkgs+=("$pkg") ;;
+                    esac
+                done
+                sudo dnf install -y --skip-broken "${dnf_pkgs[@]}" 2>&1 | tee -a "$ALPORA_INSTALL_LOG" || true
+                ;;
+            apt)
+                printf '    Installing dependencies via apt...\n'
+                apt_pkgs=()
+                for pkg in "${packages[@]}"; do
+                    case "$pkg" in
+                        python-pillow) apt_pkgs+=(python3-pil) ;;
+                        python-gobject) apt_pkgs+=(python3-gi) ;;
+                        gtk3) apt_pkgs+=(libgtk-3-0) ;;
+                        qt6-svg) apt_pkgs+=(libqt6svg6) ;;
+                        qt6-multimedia) apt_pkgs+=(libqt6multimedia6) ;;
+                        git|curl|wireplumber|pipewire|upower|network-manager|foot|kitty|nautilus|firefox|mako-notifier) apt_pkgs+=("$pkg") ;;
+                        *) apt_pkgs+=("$pkg") ;;
+                    esac
+                done
+                sudo apt-get update && sudo apt-get install -y --no-install-recommends "${apt_pkgs[@]}" 2>&1 | tee -a "$ALPORA_INSTALL_LOG" || true
+                ;;
+            *)
+                printf '    Notice: Package manager "%s" is not directly supported for auto-installation.\n' "$detected_pkg_mgr"
+                printf '    Please ensure core tools (Hyprland, Quickshell, Python 3, Qt6) are installed.\n'
+                ;;
+        esac
     else
         printf '    Packages skipped by request; runtime dependencies will be checked.\n'
     fi
