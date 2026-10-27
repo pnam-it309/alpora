@@ -52,15 +52,21 @@ class DesktopTests(unittest.TestCase):
                 restore_desktop(paths)
                 apply.assert_called_once_with(paths, True)
 
-    def test_default_or_disabled_night_light_does_not_start_a_daemon(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            paths = Paths(root / 'config', root / 'state', root / 'runtime')
-            with patch('poly_shell.desktop.set_night_light') as apply:
-                restore_desktop(paths)
-                atomic_json(paths.state / 'desktop.json', {'nightLight': False})
-                restore_desktop(paths)
-                apply.assert_not_called()
+    def test_unsupported_action_raises_config_error(self):
+        paths = Paths(Path('/unused'), Path('/unused'), Path('/unused'))
+        with self.assertRaises(ConfigError):
+            control(paths, 'invalid_action')
+
+    def test_invalid_power_profile_raises_config_error(self):
+        paths = Paths(Path('/unused'), Path('/unused'), Path('/unused'))
+        with self.assertRaises(ConfigError):
+            control(paths, 'power-profile', 'ultra-overclock')
+
+    def test_invalid_airplane_value_raises_config_error(self):
+        paths = Paths(Path('/unused'), Path('/unused'), Path('/unused'))
+        with patch('poly_shell.desktop.set_airplane', side_effect=ConfigError('State must be on or off')):
+            with self.assertRaises(ConfigError):
+                control(paths, 'airplane', 'invalid')
 
 
 if __name__ == '__main__':

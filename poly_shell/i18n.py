@@ -16,7 +16,7 @@ from .state import ROOT
 
 _LOCALES_DIR = ROOT / "assets" / "locales"
 _DEFAULT_LOCALE = "en"
-_SUPPORTED = ("en", "vi", "ru")
+_SUPPORTED = ("en", "vi", "ru", "es")
 
 # Module-level cache: ``{locale_code: {key: string}}``
 _cache: dict[str, dict[str, str]] = {}
