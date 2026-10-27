@@ -49,6 +49,25 @@ can remain after a later failure. The installer reports the backup location.
 `--skip-packages` is for development with dependencies already installed. It is
 not a promise that missing runtime dependencies will work.
 
+`--core-only` installs only the core compositor, shell, audio, and portal packages,
+skipping bundled third-party applications (Firefox, Nautilus, Kitty, Foot, Fuzzel, Pavucontrol).
+
+`--ui-only` installs the standalone ALPORA UI shell (panel, widgets, companion, and settings)
+without altering existing Hyprland configurations or installing packages. This is ideal
+for custom Arch kernels, personal configurations, or other distributions. Launch with
+`poly-shell run` or add `exec-once = poly-shell run` to your existing configuration.
+
+## Uninstallation & recovery
+
+To cleanly remove ALPORA user links and services:
+
+```sh
+./uninstall.sh --dry-run             # Preview changes
+./uninstall.sh                       # Remove symlinks and user service
+./uninstall.sh --restore-config      # Remove links and restore latest Hyprland backup
+./uninstall.sh --purge               # Remove links and purge user config directories
+```
+
 ## First login
 
 Log out and select Hyprland in an existing display manager, or start `Hyprland`

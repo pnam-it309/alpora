@@ -45,7 +45,7 @@ def install(paths):
             raise ConfigError(f"Refusing to overwrite existing {target}")
     unit = paths.config.parent / "systemd/user/poly-shell.service"
     text = unit_text(Path.home() / ".local/bin/poly-shell")
-    if unit.exists() and unit.read_text() != text:
+    if unit.exists() and unit.read_text(encoding="utf-8") != text:
         raise ConfigError(f"Existing service differs; inspect {unit} before replacing it")
     # Validate every owned target before creating even the first command link.
     settings_desktop_plan()
@@ -54,7 +54,7 @@ def install(paths):
         if not target.is_symlink():
             target.symlink_to(source, target_is_directory=source.is_dir())
     unit.parent.mkdir(parents=True, exist_ok=True)
-    unit.write_text(text)
+    unit.write_text(text, encoding="utf-8")
     install_settings_desktop()
     print(f"Installed user-local links and {unit}")
 
@@ -71,7 +71,7 @@ def settings_desktop_plan():
             "Terminal=false\nCategories=Settings;DesktopSettings;\n"
             "Keywords=Poly;Alpine;appearance;blur;theme;настройки;оформление;\n"
             "StartupWMClass=poly-shell-settings\nStartupNotify=false\n")
-    if target.exists() and target.read_text() != text:
+    if target.exists() and target.read_text(encoding="utf-8") != text:
         raise ConfigError(f"Existing settings launcher differs; preserved: {target}")
     return target, text
 
@@ -79,7 +79,7 @@ def settings_desktop_plan():
 def install_settings_desktop():
     target, text = settings_desktop_plan()
     target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(text)
+    target.write_text(text, encoding="utf-8")
 
 
 def managed_autostart(text, launcher):

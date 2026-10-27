@@ -10,11 +10,12 @@ Hyprland 0.56.2, Quickshell 0.3.2 and Qt 6.12.0 on a single 1920×1080 monitor.
 - **Hardware coverage:** physical suspend/resume, monitor hotplug, fractional
   scaling and new network/Bluetooth devices were not exhaustively exercised.
   A clean OS installation is still pending.
-- **Installation:** the full `install.sh` installs Arch dependencies and prepares
-  a complete session; clean-OS installation and first login remain unvalidated.
-  The component installer does not install packages. Optional Waybar handover
-  expects a recognised `autostart.sh` layout. There is no automatic uninstall
-  command or installer for other distributions.
+- **Installation:** `install.sh` supports Arch Linux and Arch-based derivatives
+  (EndeavourOS, CachyOS, Manjaro, Garuda, etc.) with `--core-only` package filtering
+  and `--ui-only` standalone UI mode for custom setups. A clean uninstaller (`uninstall.sh`)
+  is provided with `--restore-config` and `--purge` options. Clean-OS installation
+  and first login remain unvalidated. Optional Waybar handover expects a recognised
+  `autostart.sh` layout.
 - **Input:** the shortcut editor imports supported `hyprland.lua` bindings.
   Unsupported callbacks, submaps and mouse gestures remain external.
 - **System settings:** Bluetooth pairing uses Bluetoothctl in a terminal.

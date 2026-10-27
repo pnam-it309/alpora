@@ -161,6 +161,7 @@ def enable_services():
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--replace-config',action='store_true')
+    parser.add_argument('--ui-only',action='store_true',help='Install standalone UI shell only without modifying Hyprland session configs')
     from .themes import IDS
     parser.add_argument('--theme',choices=IDS)
     args=parser.parse_args(argv)
@@ -169,8 +170,42 @@ def main(argv=None):
     try:
         from .cli import runtime_check
         runtime_check()
-        for program in ('hyprctl','gsettings','systemctl','foot','mako','hyprlock'):
-            if not shutil.which(program): raise ConfigError('Required program missing: '+program)
+        if args.ui_only:
+            if not shutil.which('quickshell'):
+                ui.line('    [Notice] quickshell not detected in PATH. Install Quickshell (0.3+) to run the UI.')
+        else:
+            for program in ('hyprctl','gsettings','systemctl','foot','mako','hyprlock'):
+                if not shutil.which(program): raise ConfigError('Required program missing: '+program)
+        
+        if args.ui_only:
+            with ui.stage(2,'Icons & cursor · Papirus / Bibata'):
+                try: desktop_assets.install(paths)
+                except Exception: pass
+            with ui.stage(3,'Build your ALPORA desktop UI'):
+                seeded=seed_reference_preferences(paths)
+                install(paths)
+                ui.line('    Installed user links: ~/.local/bin/poly-shell, ~/.config/quickshell/poly-shell')
+            signature=os.environ.pop('HYPRLAND_INSTANCE_SIGNATURE',None)
+            try:
+                with ui.stage(4,'Bring the landscape together'):
+                    from .themes import catalog, apply_theme
+                    selected=catalog(paths)
+                    theme=args.theme or selected['selected']
+                    apply_theme(paths,theme,True if args.theme else selected['colorsFromWallpaper'],activate=False)
+                    try: desktop_assets.apply(paths)
+                    except Exception: pass
+            finally:
+                if signature is not None:os.environ['HYPRLAND_INSTANCE_SIGNATURE']=signature
+            ui.line('\n  ALPORA standalone UI shell is ready!')
+            ui.line('  Landscape: '+str(theme))
+            ui.line('  To run in your current Hyprland session:')
+            ui.line('    poly-shell run')
+            ui.line('  To launch automatically with your existing Hyprland config, add:')
+            ui.line('    exec-once = poly-shell run')
+            ui.line('  System card: ~/.local/bin/alpora-fetch · q to exit')
+            if ui.log_path:ui.line('  Installation log: '+ui.log_path)
+            return 0
+
         replace=args.replace_config
         try:configuration_plan(paths,replace)
         except ConfigError:

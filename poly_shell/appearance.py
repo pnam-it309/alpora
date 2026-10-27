@@ -166,17 +166,18 @@ def atomic_text(path, text):
     path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
     temporary = None
     try:
-        with tempfile.NamedTemporaryFile(mode="w", dir=path.parent, delete=False) as stream:
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=path.parent, delete=False) as stream:
             temporary = Path(stream.name)
             stream.write(text)
             stream.flush()
             os.fsync(stream.fileno())
         os.replace(temporary, path)
-        descriptor = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY)
-        try:
-            os.fsync(descriptor)
-        finally:
-            os.close(descriptor)
+        if hasattr(os, "O_DIRECTORY"):
+            descriptor = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY)
+            try:
+                os.fsync(descriptor)
+            finally:
+                os.close(descriptor)
     finally:
         if temporary:
             temporary.unlink(missing_ok=True)

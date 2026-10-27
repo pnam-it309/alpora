@@ -100,6 +100,21 @@ class BootstrapTests(unittest.TestCase):
             self.assertEqual(assets_install.call_count,2);self.assertEqual(assets_apply.call_count,2)
             border.assert_not_called();notify.assert_not_called();wallpaper.assert_not_called()
 
+    @unittest.skipIf(os.name == 'nt', 'Symlink creation requires Linux / POSIX environment')
+    def test_ui_only_install_does_not_touch_hypr_config(self):
+        env={'HOME':str(self.root),'XDG_CONFIG_HOME':str(self.root/'config'),
+             'XDG_STATE_HOME':str(self.root/'local-state'),'XDG_DATA_HOME':str(self.root/'data'),
+             'XDG_RUNTIME_DIR':str(self.root/'runtime')}
+        personal_hypr = self.hypr / 'hyprland.conf'
+        personal_hypr.write_text('# My personal hyprland config\n')
+        with patch.dict(os.environ,env),patch('poly_shell.cli.runtime_check'),patch.object(bootstrap.shutil,'which',return_value='/usr/bin/quickshell'),patch.object(bootstrap.desktop_assets,'install'),patch.object(bootstrap.desktop_assets,'apply'),patch.object(themes,'runtime_border'),patch.object(themes,'notify_toolkit'),patch('poly_shell.desktop._wallpaper'):
+            self.assertEqual(bootstrap.main(['--ui-only']),0)
+            self.assertEqual(personal_hypr.read_text(),'# My personal hyprland config\n')
+            self.assertFalse((self.hypr/'alpora-session.lua').exists())
+            self.assertFalse((self.hypr/'hyprland.lua').exists())
+            self.assertTrue((self.root/'.local/bin/poly-shell').is_symlink())
+            self.assertTrue((self.root/'.local/bin/alpora-fetch').is_symlink())
+
     def test_reference_preset_matches_release_geometry_and_preserves_existing_preferences(self):
         from poly_shell.state import atomic_json
         existing=self.paths.config/'widgets.json'

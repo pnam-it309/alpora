@@ -30,10 +30,11 @@ class Paths:
     @classmethod
     def current(cls):
         home = Path.home()
+        uid = os.getuid() if hasattr(os, "getuid") else 1000
         return cls(
             Path(os.environ.get("XDG_CONFIG_HOME", home / ".config")) / "poly-shell",
             Path(os.environ.get("XDG_STATE_HOME", home / ".local/state")) / "poly-shell",
-            Path(os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}")) / "poly-shell",
+            Path(os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{uid}")) / "poly-shell",
         )
 
     @property
@@ -43,7 +44,7 @@ class Paths:
 
 def read_object(path):
     try:
-        value = json.loads(path.read_text())
+        value = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
         raise ConfigError(f"Cannot read {path}: {exc}") from exc
     if not isinstance(value, dict):
@@ -55,18 +56,19 @@ def atomic_json(path, value):
     path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
     temporary = None
     try:
-        with tempfile.NamedTemporaryFile(mode="w", dir=path.parent, delete=False) as stream:
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=path.parent, delete=False) as stream:
             temporary = Path(stream.name)
             json.dump(value, stream, ensure_ascii=False, indent=2)
             stream.write("\n")
             stream.flush()
             os.fsync(stream.fileno())
         os.replace(temporary, path)
-        descriptor = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY)
-        try:
-            os.fsync(descriptor)
-        finally:
-            os.close(descriptor)
+        if hasattr(os, "O_DIRECTORY"):
+            descriptor = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY)
+            try:
+                os.fsync(descriptor)
+            finally:
+                os.close(descriptor)
     finally:
         if temporary is not None:
             temporary.unlink(missing_ok=True)

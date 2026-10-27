@@ -1,6 +1,9 @@
 """Lifecycle CLI. No shell interpolation and no system-wide package changes."""
 import argparse
-import fcntl
+try:
+    import fcntl
+except ImportError:
+    fcntl = None
 import json
 import os
 from pathlib import Path
@@ -54,7 +57,8 @@ def run(paths):
     ready = paths.runtime / "ready"
     with (paths.runtime / "instance.lock").open("a") as lock:
         try:
-            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            if fcntl is not None:
+                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError as exc:
             raise ConfigError("Poly Shell is already running") from exc
         ready.unlink(missing_ok=True)

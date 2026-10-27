@@ -133,7 +133,10 @@ will be your own.
 | Want to… | Use |
 | :--- | :--- |
 | Choose a theme directly | `./install.sh --theme=northern-lights` |
+| Install standalone UI shell only | `./install.sh --ui-only` |
+| Install core shell (skip bundled apps) | `./install.sh --core-only` |
 | Read the full installation plan | `./install.sh --dry-run` |
+| Cleanly uninstall ALPORA | `./uninstall.sh` (or `./uninstall.sh --restore-config`) |
 | Understand backups and recovery | [Installer guide](docs/arch-installer.md) |
 | Add only the desktop components | [Component installation](docs/installation.md) |
 | See every application and dependency | [Programs & services](docs/programs.md) |
@@ -142,9 +145,14 @@ will be your own.
 <summary><b>Compatibility & current preview limits</b></summary>
 
 The checked local baseline is Arch Linux, Hyprland **0.56.2**, Quickshell **0.3.2**
-and Qt **6.12.0**. Full installation and first login on a clean Arch system remain
-pending. The reference composition targets 1920×1080 at scale 1; other displays
-use the existing adaptive layout and need further validation.
+and Qt **6.12.0**. The installer supports Arch Linux and Arch-based derivatives
+(EndeavourOS, CachyOS, Manjaro, Garuda, Artix, ArcoLinux, Archcraft) as well as custom
+kernels. For users wishing to preserve existing personal Hyprland setups or use other
+distributions, `--ui-only` installs only the standalone ALPORA shell panel and widgets.
+An official `./uninstall.sh` script is provided to cleanly revert symlinks, systemd user
+services, and restore prior Hyprland configuration backups. Full first login on a clean
+Arch system remains pending. The reference composition targets 1920×1080 at scale 1;
+other displays use the existing adaptive layout and need further validation.
 
 Existing preferences are preserved. A fresh account receives the reviewed
 ALPORA preset, rather than the author's notes, clipboard, accounts or location.
