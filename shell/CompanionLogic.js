@@ -1,5 +1,6 @@
-function _tr(k, fallback) { return (typeof I18n !== "undefined" && I18n && typeof I18n.tr === "function") ? I18n.tr(k) : fallback; }
 .pragma library
+
+function _tr(k, fallback) { return (typeof I18n !== "undefined" && I18n && typeof I18n.tr === "function") ? I18n.tr(k) : fallback; }
 
 // Bounded, deterministic behavior. No shell commands, input hooks or polling.
 function random(state) {

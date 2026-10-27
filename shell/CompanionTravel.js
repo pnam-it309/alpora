@@ -1,5 +1,6 @@
-function _tr(k, fallback) { return (typeof I18n !== "undefined" && I18n && typeof I18n.tr === "function") ? I18n.tr(k) : fallback; }
 .pragma library
+
+function _tr(k, fallback) { return (typeof I18n !== "undefined" && I18n && typeof I18n.tr === "function") ? I18n.tr(k) : fallback; }
 
 // Screen-normalized positions; speed and clearance are measured in logical pixels.
 function create(seed) {

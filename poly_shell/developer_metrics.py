@@ -174,7 +174,7 @@ def _gpu():
                     encoding="utf-8", errors="replace"
                 ).strip()
             except OSError:
-                name = "GPU detectada por DRM"
+                name = "DRM Graphics Adapter"
 
             return {
                 "available": True,
@@ -192,7 +192,7 @@ def _gpu():
     return {
         "available": False,
         "provider": "",
-        "name": "GPU no detectada",
+        "name": "",
         "utilization_percent": None,
         "vram_used_mb": None,
         "vram_total_mb": None,
@@ -276,8 +276,10 @@ def snapshot():
     cpu = {"percent": _cpu_percent(), "model": _cpu_model(), "cores": os.cpu_count() or 0,
            "temperature_c": _cpu_temperature(), "load1": load[0], "load5": load[1], "load15": load[2]}
     cpu_top, memory_top = _processes()
+    import platform
+    hostname = os.uname().nodename if hasattr(os, "uname") else platform.node()
     return {
-        "sampled_at": time.time(), "hostname": os.uname().nodename,
+        "sampled_at": time.time(), "hostname": hostname,
         "cpu": cpu, "memory": _memory(), "gpu": _gpu(), "network": _network(),
         "disk": disk, "uptime_seconds": int(uptime),
         "processes_cpu": cpu_top, "processes_memory": memory_top,

@@ -1,5 +1,6 @@
-function _tr(k, fallback) { return (typeof I18n !== "undefined" && I18n && typeof I18n.tr === "function") ? I18n.tr(k) : fallback; }
 .pragma library
+
+function _tr(k, fallback) { return (typeof I18n !== "undefined" && I18n && typeof I18n.tr === "function") ? I18n.tr(k) : fallback; }
 // Shared UI metadata; backend validates every saved value.
 var defaults = {"windowRadius": 16, "barRadius": 20, "panelRadius": 20, "barOpacity": 75, "panelOpacity": 75, "launcherOpacity": 75, "activeOpacity": 100, "inactiveOpacity": 100, "blurEnabled": true, "blurSize": 3, "blurPasses": 1, "launcherRadius": 20, "widgetRadius": 16, "notificationRadius": 13, "widgetOpacity": 75, "notificationOpacity": 75, "panelPadding": 16, "launcherPadding": 18, "notificationPadding": 12, "barBorder": 1, "panelBorder": 1, "launcherBorder": 1, "widgetBorder": 1, "notificationBorder": 1, "barShadow": 20, "panelShadow": 20, "launcherShadow": 20, "widgetShadow": 0, "notificationShadow": 0, "panelOpenMs": 320, "panelCloseMs": 200, "launcherOpenMs": 320, "launcherCloseMs": 200, "widgetAnimations": true, "widgetFadeMs": 420, "barHeight": 40, "barMargin": 20, "barTop": 12, "barLeft": 20, "barRight": 20, "barBottom": 8, "windowGap": 5, "windowMargin": 12};
 

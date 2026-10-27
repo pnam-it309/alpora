@@ -1,11 +1,15 @@
 .pragma library
 
+const SIZES = {
+    clock: {width: 460, height: 200},
+    weather: {width: 370, height: 200},
+    music: {width: 370, height: 190},
+    developer: {width: 410, height: 206},
+    apps: {width: 390, height: 360}
+};
+
 function size(kind) {
-    return kind === "clock" ? {width: 460, height: 200}
-        : kind === "weather" ? {width: 370, height: 200}
-        : kind === "music" ? {width: 370, height: 190}
-        : kind === "developer" ? {width: 410, height: 206}
-        : {width: 390, height: 360};
+    return SIZES[kind] || {width: 390, height: 360};
 }
 
 function bounds(kind, setting, width, height, top) {

@@ -1,5 +1,5 @@
 // Pure presentation rules; services supply observed state, never optimistic state.
-var _i18n = (typeof I18n !== "undefined" && I18n && typeof I18n.tr === "function") ? I18n : {
+const _i18n = (typeof I18n !== "undefined" && I18n && typeof I18n.tr === "function") ? I18n : {
     tr: function(key) {
         const fallback = {
             "network.ethernet": "Ethernet",

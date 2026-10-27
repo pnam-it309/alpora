@@ -43,7 +43,7 @@ def _backlight_device(sys_root: Path) -> str | None:
     for device in devices:
         try:
             maximum = int((device / "max_brightness").read_text(encoding="ascii").strip())
-            int((device / "brightness").read_text(encoding="ascii").strip())
+            _ = int((device / "brightness").read_text(encoding="ascii").strip())
             if maximum > 0:
                 return device.name
         except (OSError, ValueError):
