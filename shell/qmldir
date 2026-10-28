@@ -25,6 +25,7 @@ singleton Desktop 1.0 Desktop.qml
 Bar 1.0 Bar.qml
 ActionButton 1.0 ActionButton.qml
 TopBar 1.0 TopBar.qml
+TopBarMiniPlayer 1.0 TopBarMiniPlayer.qml
 NativeShortcut 1.0 NativeShortcut.qml
 QuickSettings 1.0 QuickSettings.qml
 Icon 1.0 Icon.qml

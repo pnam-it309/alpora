@@ -165,6 +165,10 @@ PanelWindow {
                     }
                 }
             }
+            TopBarMiniPlayer {
+                id: miniPlayer
+                anchors.verticalCenter: parent.verticalCenter
+            }
         }
         Button {
             id: clockButton

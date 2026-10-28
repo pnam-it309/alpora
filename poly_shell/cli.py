@@ -202,6 +202,8 @@ def main(argv=None):
     osd_parser = sub.add_parser("osd", help="show the current system value without changing it")
     osd_parser.add_argument("kind", choices=("volume", "microphone", "brightness"))
     sub.add_parser("lock-date", help="localized lockscreen date, without system locale dependencies")
+    lock_media_parser = sub.add_parser("lock-media", help="hyprlock media player album art, metadata, and controls")
+    lock_media_parser.add_argument("field", choices=("art", "title", "artist", "controls", "status", "summary"), nargs="?", default="summary")
     sub.add_parser("toolkit-refresh", help="refresh a cached file-manager palette after a theme change")
     appearance_parser = sub.add_parser("appearance", help="validated desktop appearance controls")
     appearance_parser.add_argument("action", choices=("get", "apply", "reset", "install"))
@@ -260,6 +262,9 @@ def main(argv=None):
             show_indicator(args.kind)
         elif args.command == "lock-date":
             print(lock_date())
+        elif args.command == "lock-media":
+            from .lock_media import handle_cli
+            handle_cli(args.field)
         elif args.command == "toolkit-refresh":
             from .toolkit_refresh import refresh, schedule
             result = refresh(paths)

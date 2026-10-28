@@ -65,6 +65,7 @@ def lock_style(snapshot):
         f'$lockTitle = {title} · ' + ('SESSION LOCKED' if snapshot.get('settings', {}).get('locale') == 'en' else ('PHIÊN ĐÃ KHÓA' if snapshot.get('settings', {}).get('locale') == 'vi' else 'СЕАНС ЗАБЛОКИРОВАН')),
         f'$lockWallpaper = {image}',
         f'$lockDateCommand = "{ROOT / "bin/poly-shell"}" lock-date',
+        f'$lockMediaCommand = "{ROOT / "bin/poly-shell"}" lock-media',
         '$lockMotion = ' + ('false' if snapshot['settings'].get('reducedMotion') else 'true'),
         '',
     ])
