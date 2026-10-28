@@ -93,7 +93,8 @@ do_link() {
         done
     else
         alpora_log "GNU Stow not found; using internal safe symlink manager..."
-        local backup_dir="$backup_base/$(date +%Y%m%d-%H%M%S)"
+        local backup_dir
+        backup_dir="$backup_base/$(date +%Y%m%d-%H%M%S)"
         local backed_up=false
 
         for pkg in "${packages[@]}"; do
