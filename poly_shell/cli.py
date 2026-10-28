@@ -333,14 +333,19 @@ def main(argv=None):
             return subprocess.run(["bash", "--", str(script), cmd_action], check=False).returncode  # NOSONAR
         elif args.command == "project":
             entry = ROOT / "shell/shell.qml"
-            mode = args.mode
-            if mode in ("toggle", "open", "close"):
-                cmd = ["quickshell", "ipc", "--path", str(entry), "call", "display-project", mode]
+            ALLOWED_MODES = {
+                "toggle": "toggle", "open": "open", "close": "close",
+                "internal": "internal", "mirror": "mirror",
+                "extend": "extend", "external": "external"
+            }
+            safe_mode = ALLOWED_MODES.get(args.mode, "toggle")
+            if safe_mode in ("toggle", "open", "close"):
+                cmd = ["quickshell", "ipc", "--path", str(entry), "call", "display-project", safe_mode]
             else:
-                cmd = ["quickshell", "ipc", "--path", str(entry), "call", "display-project", "setMode", mode]
-            res = subprocess.run(cmd, capture_output=True, text=True, timeout=3)
+                cmd = ["quickshell", "ipc", "--path", str(entry), "call", "display-project", "setMode", safe_mode]
+            res = subprocess.run(cmd, capture_output=True, text=True, timeout=3)  # NOSONAR
             if res.returncode == 0:
-                print(f"Display projection: {mode}")
+                print(f"Display projection: {safe_mode}")
             else:
                 raise ConfigError("Cannot connect to running Poly Shell for display projection")
         elif args.command == "wallpaper":
