@@ -421,13 +421,35 @@ PanelWindow {
                         }
                         Repeater {
                             model: popup.page === "bluetooth" && Session.bluetoothAdapter ? Session.bluetoothAdapter.devices.values.filter(device => device.paired) : []
-                            SettingsRow {
+                            RowLayout {
+                                id: btDeviceRow
                                 required property var modelData
-                                width: parent.width; symbol: "bluetooth"
-                                text: modelData.name; selected: modelData.connected
-                                subtitle: modelData.connected ? "Connected · click to disconnect" : "Paired · click to connect"
-                                enabled: Session.bluetoothEnabled
-                                onClicked: modelData.connected = !modelData.connected
+                                width: parent.width
+                                spacing: 4
+                                SettingsRow {
+                                    Layout.fillWidth: true
+                                    symbol: "bluetooth"
+                                    text: btDeviceRow.modelData.name || btDeviceRow.modelData.address
+                                    selected: btDeviceRow.modelData.connected
+                                    subtitle: btDeviceRow.modelData.connected ? "Connected · click to disconnect" : "Paired · click to connect"
+                                    enabled: Session.bluetoothEnabled
+                                    onClicked: {
+                                        if (Session.bluetoothAdapter && Session.bluetoothAdapter.discovering) {
+                                            Session.bluetoothAdapter.discovering = false;
+                                        }
+                                        btDeviceRow.modelData.connected = !btDeviceRow.modelData.connected;
+                                    }
+                                }
+                                IconButton {
+                                    symbol: "close"
+                                    hint: I18n.tr("bluetooth.unpair")
+                                    implicitWidth: 30; implicitHeight: 30
+                                    onClicked: {
+                                        if (btDeviceRow.modelData.address) {
+                                            Quickshell.execDetached(["bluetoothctl", "remove", btDeviceRow.modelData.address]);
+                                        }
+                                    }
+                                }
                             }
                         }
                         Text {

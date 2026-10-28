@@ -803,5 +803,20 @@
   "launcher.quick_calc": "Calculation Result",
   "launcher.copy_clipboard": "Press Enter to copy to clipboard",
   "launcher.run_command": "Run in terminal: {cmd}",
-  "launcher.search_web": "Search {engine} for '{term}'"
+  "launcher.search_web": "Search {engine} for '{term}'",
+  "bluetooth.unpair": "Unpair",
+  "settings.touchpad": "Touchpad",
+  "settings.touchpad_title": "Touchpad & Gestures",
+  "settings.touchpad_desc": "Configure cursor speed, tapping and gesture scrolling",
+  "settings.touchpad_tap_to_click": "Tap to click",
+  "settings.touchpad_tap_to_click_desc": "Tap the surface with one finger to left-click",
+  "settings.touchpad_natural_scroll": "Natural scrolling",
+  "settings.touchpad_natural_scroll_desc": "Content moves in the direction of your fingers",
+  "settings.touchpad_dwt": "Disable while typing",
+  "settings.touchpad_dwt_desc": "Prevent accidental cursor jumps while typing on the keyboard",
+  "settings.pointer_speed": "Pointer speed & sensitivity",
+  "settings.ui_scale": "UI Scale",
+  "settings.ui_scale_desc": "Adjust interface scale across panels, bars, and widgets",
+  "settings.font_family": "Interface Font",
+  "settings.font_desc": "System font used for text, labels, and clock"
 }

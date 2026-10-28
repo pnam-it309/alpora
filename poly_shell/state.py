@@ -100,7 +100,16 @@ def defaults():
             "network": ["nm-connection-editor"],
         },
         "bar": {"height": 40, "workspaceCount": 4, "fontFamily": "Noto Sans", "fontSize": 13,
-                "margin": 20, "top": 12},
+                "margin": 20, "top": 12, "uiScale": 1.0},
+        "input": {
+            "touchpad": {
+                "tapToClick": True,
+                "naturalScroll": True,
+                "disableWhileTyping": True,
+                "sensitivity": 0.0,
+                "scrollFactor": 1.0,
+            }
+        },
         "reducedMotion": False,
         "locale": "en",
     }
@@ -135,8 +144,26 @@ def settings_for(paths):
     integer(bar.get("fontSize"), 10, 24, "bar.fontSize")
     integer(bar.get("margin"), 0, 64, "bar.margin")
     integer(bar.get("top"), 0, 64, "bar.top")
-    if not isinstance(bar.get("fontFamily"), str) or not bar["fontFamily"].strip():
-        raise ConfigError("bar.fontFamily must be a nonempty string")
+    scale = bar.get("uiScale", 1.0)
+    if not isinstance(scale, (int, float)) or not 0.5 <= scale <= 3.0:
+        bar["uiScale"] = 1.0
+    else:
+        bar["uiScale"] = round(float(scale), 2)
+    inp = data.get("input", {})
+    if not isinstance(inp, dict):
+        data["input"] = defaults()["input"]
+    else:
+        touchpad = inp.get("touchpad", {})
+        if not isinstance(touchpad, dict):
+            inp["touchpad"] = defaults()["input"]["touchpad"]
+        else:
+            for b_key in ("tapToClick", "naturalScroll", "disableWhileTyping"):
+                if type(touchpad.get(b_key)) is not bool:
+                    touchpad[b_key] = True
+            sens = touchpad.get("sensitivity", 0.0)
+            touchpad["sensitivity"] = max(-1.0, min(1.0, float(sens))) if isinstance(sens, (int, float)) else 0.0
+            factor = touchpad.get("scrollFactor", 1.0)
+            touchpad["scrollFactor"] = max(0.1, min(3.0, float(factor))) if isinstance(factor, (int, float)) else 1.0
     if type(data.get("reducedMotion")) is not bool:
         raise ConfigError("reducedMotion must be true or false")
     from .i18n import supported_locales

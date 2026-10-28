@@ -803,5 +803,20 @@
   "launcher.quick_calc": "Kết quả tính toán",
   "launcher.copy_clipboard": "Nhấn Enter để sao chép vào bộ nhớ tạm",
   "launcher.run_command": "Chạy trong terminal: {cmd}",
-  "launcher.search_web": "Tìm trên {engine}: '{term}'"
+  "launcher.search_web": "Tìm trên {engine}: '{term}'",
+  "bluetooth.unpair": "Hủy ghép nối",
+  "settings.touchpad": "Bàn di chuột",
+  "settings.touchpad_title": "Bàn di chuột & Cử chỉ",
+  "settings.touchpad_desc": "Tùy chỉnh tốc độ con trỏ, chạm để nhấp và cuộn tự nhiên",
+  "settings.touchpad_tap_to_click": "Chạm để nhấp",
+  "settings.touchpad_tap_to_click_desc": "Chạm một ngón tay vào bề mặt để nhấp chuột trái",
+  "settings.touchpad_natural_scroll": "Cuộn tự nhiên",
+  "settings.touchpad_natural_scroll_desc": "Nội dung di chuyển theo hướng ngón tay vuốt",
+  "settings.touchpad_dwt": "Vô hiệu hóa khi đang gõ phím",
+  "settings.touchpad_dwt_desc": "Tránh con trỏ bị nhảy bất ngờ khi đang soạn thảo văn bản",
+  "settings.pointer_speed": "Tốc độ & độ nhạy con trỏ",
+  "settings.ui_scale": "Tỉ lệ giao diện (UI Scale)",
+  "settings.ui_scale_desc": "Điều chỉnh tỉ lệ hiển thị cho thanh trạng thái, menu và widget",
+  "settings.font_family": "Phông chữ giao diện",
+  "settings.font_desc": "Phông chữ hệ thống áp dụng cho văn bản, nhãn và đồng hồ"
 }

@@ -803,5 +803,20 @@
   "launcher.quick_calc": "Resultado del cálculo",
   "launcher.copy_clipboard": "Presione Enter para copiar al portapapeles",
   "launcher.run_command": "Ejecutar en terminal: {cmd}",
-  "launcher.search_web": "Buscar en {engine}: '{term}'"
+  "launcher.search_web": "Buscar en {engine}: '{term}'",
+  "bluetooth.unpair": "Desemparejar",
+  "settings.touchpad": "Panel táctil",
+  "settings.touchpad_title": "Panel táctil y gestos",
+  "settings.touchpad_desc": "Configura la velocidad del cursor, toques y desplazamiento",
+  "settings.touchpad_tap_to_click": "Tocar para hacer clic",
+  "settings.touchpad_tap_to_click_desc": "Toca la superficie con un dedo para clic izquierdo",
+  "settings.touchpad_natural_scroll": "Desplazamiento natural",
+  "settings.touchpad_natural_scroll_desc": "El contenido se mueve en la dirección de tus dedos",
+  "settings.touchpad_dwt": "Desactivar al escribir",
+  "settings.touchpad_dwt_desc": "Evita saltos accidentales del cursor mientras escribes en el teclado",
+  "settings.pointer_speed": "Velocidad y sensibilidad del puntero",
+  "settings.ui_scale": "Escala de la interfaz",
+  "settings.ui_scale_desc": "Ajusta la escala de paneles, barra y widgets",
+  "settings.font_family": "Fuente de la interfaz",
+  "settings.font_desc": "Fuente del sistema usada para textos, etiquetas y reloj"
 }

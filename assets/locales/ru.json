@@ -803,5 +803,20 @@
   "launcher.quick_calc": "Результат вычисления",
   "launcher.copy_clipboard": "Нажмите Enter для копирования",
   "launcher.run_command": "Запустить в терминале: {cmd}",
-  "launcher.search_web": "Искать в {engine}: '{term}'"
+  "launcher.search_web": "Искать в {engine}: '{term}'",
+  "bluetooth.unpair": "Забыть устройство",
+  "settings.touchpad": "Тачпад",
+  "settings.touchpad_title": "Тачпад и жесты",
+  "settings.touchpad_desc": "Настройка скорости курсора, касаний и естественной прокрутки",
+  "settings.touchpad_tap_to_click": "Касание для клика",
+  "settings.touchpad_tap_to_click_desc": "Касание поверхности одним пальцем для левого клика",
+  "settings.touchpad_natural_scroll": "Естественная прокрутка",
+  "settings.touchpad_natural_scroll_desc": "Содержимое перемещается в направлении пальцев",
+  "settings.touchpad_dwt": "Отключать при вводе",
+  "settings.touchpad_dwt_desc": "Предотвращает случайные прыжки курсора при наборе текста",
+  "settings.pointer_speed": "Скорость и чувствительность курсора",
+  "settings.ui_scale": "Масштаб интерфейса",
+  "settings.ui_scale_desc": "Настройка масштаба панелей, статус-бара и виджетов",
+  "settings.font_family": "Шрифт интерфейса",
+  "settings.font_desc": "Системный шрифт для текста, подписей и часов"
 }

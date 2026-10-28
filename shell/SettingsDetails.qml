@@ -148,6 +148,30 @@ ScrollView {
             ControlSlider { Layout.fillWidth: true; wheelEnabled: false; visible: Desktop.data.brightnessAvailable; from: 5; to: 100; stepSize: 1; value: Desktop.data.brightness; Accessible.name: I18n.tr("quick.screen_brightness"); onPressedChanged: if (!pressed) Desktop.request("brightness", String(Math.round(value))) }
         }
         SettingsCard {
+            Layout.fillWidth: true; visible: root.page === "monitors"
+            Text { text: I18n.tr("settings.ui_scale"); color: PolyTheme.Theme.color("#eff1f4"); font.family: Session.fontFamily; font.pixelSize: 17 }
+            Text { Layout.fillWidth: true; text: I18n.tr("settings.ui_scale_desc"); wrapMode: Text.Wrap; color: PolyTheme.Theme.color("#bec7ce"); font.family: Session.fontFamily; font.pixelSize: 12 }
+            RowLayout {
+                Layout.fillWidth: true; spacing: 8
+                Repeater {
+                    model: [
+                        {label: "100%", val: 1.0},
+                        {label: "125%", val: 1.25},
+                        {label: "150%", val: 1.5},
+                        {label: "175%", val: 1.75},
+                        {label: "200%", val: 2.0}
+                    ]
+                    AppearanceButton {
+                        required property var modelData
+                        Layout.fillWidth: true
+                        text: modelData.label
+                        selected: Math.abs((Session.settings && Session.settings.bar && Session.settings.bar.uiScale ? Session.settings.bar.uiScale : 1.0) - modelData.val) < 0.05
+                        onClicked: Desktop.request("ui-scale", String(modelData.val))
+                    }
+                }
+            }
+        }
+        SettingsCard {
             Layout.fillWidth: true; visible: root.page === "wallpaper"
             SettingsImage { Layout.fillWidth: true; Layout.preferredHeight: 285; source: root.wallpaper; sourceSize: Qt.size(1100, 570) }
             Text { text: I18n.tr("settings.desktop_wallpaper"); color: PolyTheme.Theme.color("#eff1f4"); font.family: Session.fontFamily; font.pixelSize: 19 }
@@ -212,6 +236,56 @@ ScrollView {
             RowLayout {
                 AppearanceButton { text: "Work"; symbol: "monitor"; selected: Session.mode === "work"; enabled: !Session.switching; onClicked: Session.setMode("work") }
                 AppearanceButton { text: "Vibe"; symbol: "moon"; selected: Session.mode === "vibe"; enabled: !Session.switching; onClicked: Session.setMode("vibe") }
+            }
+        }
+        SettingsCard {
+            Layout.fillWidth: true; visible: root.page === "touchpad"
+            Text { text: I18n.tr("settings.touchpad_title"); color: PolyTheme.Theme.color("#eff1f4"); font.family: Session.fontFamily; font.pixelSize: 19 }
+            Text { Layout.fillWidth: true; text: I18n.tr("settings.touchpad_desc"); wrapMode: Text.Wrap; color: PolyTheme.Theme.color("#bec7ce"); font.family: Session.fontFamily; font.pixelSize: 12 }
+            SettingsToggle {
+                Layout.fillWidth: true
+                text: I18n.tr("settings.touchpad_tap_to_click")
+                subtitle: I18n.tr("settings.touchpad_tap_to_click_desc")
+                checked: !Session.settings.input || !Session.settings.input.touchpad || Session.settings.input.touchpad.tapToClick !== false
+                onToggled: Desktop.request("touchpad", JSON.stringify({tapToClick: checked}))
+            }
+            SettingsToggle {
+                Layout.fillWidth: true
+                text: I18n.tr("settings.touchpad_natural_scroll")
+                subtitle: I18n.tr("settings.touchpad_natural_scroll_desc")
+                checked: !Session.settings.input || !Session.settings.input.touchpad || Session.settings.input.touchpad.naturalScroll !== false
+                onToggled: Desktop.request("touchpad", JSON.stringify({naturalScroll: checked}))
+            }
+            SettingsToggle {
+                Layout.fillWidth: true
+                text: I18n.tr("settings.touchpad_dwt")
+                subtitle: I18n.tr("settings.touchpad_dwt_desc")
+                checked: !Session.settings.input || !Session.settings.input.touchpad || Session.settings.input.touchpad.disableWhileTyping !== false
+                onToggled: Desktop.request("touchpad", JSON.stringify({disableWhileTyping: checked}))
+            }
+            Text { text: I18n.tr("settings.pointer_speed"); color: PolyTheme.Theme.color("#eff1f4"); font.family: Session.fontFamily; font.pixelSize: 15 }
+            ControlSlider {
+                Layout.fillWidth: true; wheelEnabled: false
+                from: -1.0; to: 1.0; stepSize: 0.1
+                value: Session.settings.input && Session.settings.input.touchpad && typeof Session.settings.input.touchpad.sensitivity === "number" ? Session.settings.input.touchpad.sensitivity : 0.0
+                onPressedChanged: if (!pressed) Desktop.request("touchpad", JSON.stringify({sensitivity: Math.round(value * 10) / 10}))
+            }
+        }
+        SettingsCard {
+            Layout.fillWidth: true; visible: root.page === "panel"
+            Text { text: I18n.tr("settings.font_family"); color: PolyTheme.Theme.color("#eff1f4"); font.family: Session.fontFamily; font.pixelSize: 17 }
+            Text { Layout.fillWidth: true; text: I18n.tr("settings.font_desc") + " (" + Session.fontFamily + ")"; wrapMode: Text.Wrap; color: PolyTheme.Theme.color("#bec7ce"); font.family: Session.fontFamily; font.pixelSize: 12 }
+            Flow {
+                Layout.fillWidth: true; spacing: 6
+                Repeater {
+                    model: ["Noto Sans", "Inter", "Roboto", "Cantarell", "JetBrains Mono", "Fira Code", "DejaVu Sans"]
+                    AppearanceButton {
+                        required property string modelData
+                        text: modelData
+                        selected: Session.fontFamily === modelData
+                        onClicked: Desktop.request("font", modelData)
+                    }
+                }
             }
         }
         SettingsCard {

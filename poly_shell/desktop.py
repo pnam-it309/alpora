@@ -9,7 +9,7 @@ import uuid
 import json
 import math
 
-from .state import ConfigError, ROOT, atomic_json, read_object, state_lock
+from .state import ConfigError, ROOT, atomic_json, read_object, state_lock, settings_for, update_session
 from .radios_power import power_status, radio_status, set_airplane, set_profile
 
 
@@ -303,6 +303,51 @@ def control(paths, action, value=None):
             set_hotspot(paths, value)
     elif action == 'wifi-connect':
         return connect_wifi(value)
+    elif action == 'ui-scale':
+        try:
+            scale = round(float(value), 2)
+        except (ValueError, TypeError) as exc:
+            raise ConfigError('Scale must be a number') from exc
+        if not 0.5 <= scale <= 3.0:
+            raise ConfigError('Scale must be between 0.5 and 3.0')
+        with state_lock(paths):
+            data = settings_for(paths)
+            data.setdefault('bar', {})['uiScale'] = scale
+            atomic_json(paths.config / 'settings.json', data)
+            update_session(paths)
+    elif action == 'touchpad':
+        try:
+            payload = json.loads(value) if isinstance(value, str) else dict(value)
+        except Exception as exc:
+            raise ConfigError('Touchpad config must be valid JSON') from exc
+        with state_lock(paths):
+            data = settings_for(paths)
+            data.setdefault('input', {}).setdefault('touchpad', {}).update(payload)
+            atomic_json(paths.config / 'settings.json', data)
+            try:
+                for k, v in payload.items():
+                    if k == 'tapToClick':
+                        command(['hyprctl', 'keyword', 'input:touchpad:tap-to-click', '1' if v else '0'], check=False)
+                    elif k == 'naturalScroll':
+                        command(['hyprctl', 'keyword', 'input:touchpad:natural_scroll', '1' if v else '0'], check=False)
+                    elif k == 'disableWhileTyping':
+                        command(['hyprctl', 'keyword', 'input:touchpad:disable_while_typing', '1' if v else '0'], check=False)
+                    elif k == 'sensitivity':
+                        command(['hyprctl', 'keyword', 'input:sensitivity', str(v)], check=False)
+                    elif k == 'scrollFactor':
+                        command(['hyprctl', 'keyword', 'input:touchpad:scroll_factor', str(v)], check=False)
+            except Exception:
+                pass
+            update_session(paths)
+    elif action == 'font':
+        font_name = str(value).strip()
+        if not font_name:
+            raise ConfigError('Font name cannot be empty')
+        with state_lock(paths):
+            data = settings_for(paths)
+            data.setdefault('bar', {})['fontFamily'] = font_name
+            atomic_json(paths.config / 'settings.json', data)
+            update_session(paths)
     else:
         raise ConfigError('Unsupported desktop action')
     return status(paths)

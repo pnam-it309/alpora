@@ -39,6 +39,18 @@ Singleton {
     readonly property var inputs: pipewireNodes.values.filter(node => !node.isStream && node.audio && !node.isSink)
     readonly property var audioStreams: pipewireNodes.values.filter(node => node && node.isStream && node.audio && node.isSink)
     readonly property var sink: Pipewire.defaultAudioSink
+    property string lastSinkName: ""
+    onSinkChanged: {
+        const nextName = sink ? (sink.description || sink.nickname || sink.name || "") : "";
+        if (lastSinkName && lastSinkName !== nextName) {
+            const wasHeadphone = /headphone|headset|earphone|bluez|airpod|buds/i.test(lastSinkName);
+            const isSpeaker = !nextName || /speaker|built-in|internal|analog-stereo/i.test(nextName);
+            if (wasHeadphone && isSpeaker) {
+                Quickshell.execDetached(["playerctl", "pause"]);
+            }
+        }
+        lastSinkName = nextName;
+    }
     readonly property var hardware: snapshot.hardware || ({deviceClass: "desktop", isLaptop: false, batteryAvailable: false, brightnessAvailable: false})
     readonly property bool isLaptop: hardware.isLaptop === true
     readonly property bool isDesktop: !isLaptop

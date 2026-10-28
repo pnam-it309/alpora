@@ -33,14 +33,19 @@ ShellRoot {
         {group: I18n.tr("settings.group_system"), key: "sound", title: I18n.tr("settings.sound"), icon: "volume", words: "sound volume microphone speakers audio"},
         {group: "", key: "power", title: I18n.tr("settings.power"), icon: "battery", words: "power battery energy profiles"},
         {group: "", key: "notifications", title: I18n.tr("settings.notifications"), icon: "bell", words: "notifications dnd alerts"},
-        {group: "", key: "input", title: I18n.tr("shortcuts.title"), icon: "mouse", words: "keyboard shortcuts hotkeys bindings input"}
+        {group: "", key: "input", title: I18n.tr("shortcuts.title"), icon: "terminal", words: "keyboard shortcuts hotkeys bindings input"},
+        {group: "", key: "touchpad", title: I18n.tr("settings.touchpad"), icon: "mouse", words: "touchpad pointer gestures tap speed sensitivity"}
     ]
     readonly property string pageTitle: page === "modes" ? I18n.tr("settings.operating_mode") : page === "devices" ? I18n.tr("settings.devices") : (navigation.find(n => n.key === page) || {}).title || I18n.tr("settings.title")
     function navigate(next: string): void { if (root.page === "input" && next !== "input" && ShortcutsState.editingForm) {root.statusMessage=I18n.tr("settings.finish_editing_hint");return;} root.statusMessage=""; root.page = next; search.text = ""; root.statusMessage = ""; }
     function close(): void {
-        if (AppearanceState.busy || ThemeState.busy || WidgetState.busy || ShortcutsState.busy || wallpaperWriter.running) return;
-        if (AppearanceState.dirty || ThemeState.dirty || WidgetState.dirty || ShortcutsState.dirty || ShortcutsState.editingForm) root.confirmClose = true;
-        else Qt.quit();
+        if (AppearanceState.dirty || ThemeState.dirty || WidgetState.dirty || ShortcutsState.dirty || ShortcutsState.editingForm) {
+            root.confirmClose = true;
+        } else {
+            settingsWindow.visible = false;
+            settingsWindow.close();
+            Qt.quit();
+        }
     }
     function restoreWindow(): void {
         if (!Hyprland.usingLua || root.restoringWindow) return;
@@ -214,13 +219,13 @@ ShellRoot {
                 Item {
                     Layout.fillWidth: true; Layout.preferredHeight: 90
                     Image { anchors.right: parent.right; anchors.bottom: parent.bottom; width: 460; height: 90; source: Session.appearance.ridge ? "file://" + Session.appearance.ridge : "file://" + Quickshell.env("POLY_SHELL_ASSETS") + "/settings-ridge.svg"; fillMode: Image.PreserveAspectFit; verticalAlignment: Image.AlignBottom; opacity: 0.85 }
-                    MouseArea { anchors.fill: parent; onPressed: settingsWindow.startSystemMove() }
+                    MouseArea { anchors.fill: parent; anchors.rightMargin: 52; onPressed: settingsWindow.startSystemMove() }
                     Column {
                         y: 8; spacing: 8
                         Text { text: root.pageTitle; color: PolyTheme.Theme.color("#f2f3f6"); font.family: Session.fontFamily; font.pixelSize: 28; font.weight: Font.Medium }
                         Text { text: root.page === "overview" ? I18n.tr("settings.subtitle_overview") : root.page === "wallpaper" ? I18n.tr("settings.subtitle_wallpaper") : root.page === "appearance" ? I18n.tr("settings.subtitle_appearance") : I18n.tr("settings.subtitle_generic"); color: PolyTheme.Theme.color("#bdc6d2"); font.family: Session.fontFamily; font.pixelSize: 13 }
                     }
-                    IconButton { anchors.right: parent.right; anchors.top: parent.top; symbol: "close"; hint: I18n.tr("settings.close_settings"); onClicked: root.close() }
+                    IconButton { z: 10; anchors.right: parent.right; anchors.top: parent.top; symbol: "close"; hint: I18n.tr("settings.close_settings"); onClicked: root.close() }
                     Rectangle { anchors.bottom: parent.bottom; width: parent.width; height: 1; color: PolyTheme.Theme.color("#34545e62") }
                 }
                 SettingsOverview { Layout.fillWidth: true; Layout.fillHeight: true; visible: root.page === "overview"; monitors: root.monitors; wallpaper: root.wallpaperUrl; onNavigate: page => root.navigate(page) }
@@ -249,7 +254,7 @@ ShellRoot {
                 RowLayout {
                     Layout.fillWidth: true
                     AppearanceButton { Layout.fillWidth: true; text: I18n.tr("settings.stay"); symbol: "chevron-left"; primary: true; onClicked: root.confirmClose = false }
-                    AppearanceButton { Layout.fillWidth: true; text: I18n.tr("common.close"); symbol: "close"; onClicked: Qt.quit() }
+                    AppearanceButton { Layout.fillWidth: true; text: I18n.tr("common.close"); symbol: "close"; onClicked: { settingsWindow.visible = false; settingsWindow.close(); Qt.quit(); } }
                 }
             }
         }

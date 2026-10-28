@@ -20,7 +20,7 @@ PanelWindow {
     readonly property int outerMargin: Math.min(Session.visual.barLeft, Math.max(0, (width - 500) / 2))
     readonly property int rightMargin: Math.min(Session.visual.barRight, Math.max(0, (width - 500) / 2))
     readonly property int topMargin: Session.visual.barTop
-    readonly property real uiScale: 1
+    readonly property real uiScale: Session.settings && Session.settings.bar && Session.settings.bar.uiScale ? Number(Session.settings.bar.uiScale) : 1.0
     readonly property string screenName: modelData ? modelData.name : ""
     readonly property var monitor: screen ? Hyprland.monitorFor(screen) : null
     readonly property int activeWorkspace: monitor && monitor.activeWorkspace ? monitor.activeWorkspace.id : 1

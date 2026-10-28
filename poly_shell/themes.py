@@ -403,7 +403,7 @@ def apply_theme(paths, ident, automatic=True, transition=None, *, activate=True)
         files[paths.config / 'appearance.json'] = json.dumps(selection, ensure_ascii=False, indent=2)+'\n'
         files[paths.session] = json.dumps(snapshot, ensure_ascii=False, indent=2)+'\n'
         wallpaper_config = paths.config / 'wallpaper.json'
-        originals = {f: f.read_text() if f.exists() else None for f in (*files, wallpaper_config)}
+        originals = {f: f.read_text(encoding="utf-8") if f.exists() else None for f in (*files, wallpaper_config)}
         old_image = read_object(wallpaper_config).get('image') if wallpaper_config.exists() else str(ROOT / 'assets/wallpapers/alpine-dawn.png')
         backup = paths.state / 'backups' / ('theme-' + datetime.now().strftime('%Y%m%d-%H%M%S-%f'))
         changed_wallpaper = False
