@@ -35,6 +35,7 @@ ShellRoot {
     Variants { model: Quickshell.screens; Dock {} }
     Variants { model: Quickshell.screens; ScreenshotOverlay {} }
     Variants { model: Quickshell.screens; PowerMenu {} }
+    Variants { model: Quickshell.screens; DisplayProjectMenu {} }
 
     // Native Wayland shortcuts avoid spawning an IPC client before input can
     // reach the launcher. Keep registration once per shell, not per monitor.
@@ -79,6 +80,11 @@ ShellRoot {
     NativeShortcut {
         appid: "poly-shell"; name: "toggle-mode"; description: I18n.tr("shortcut.toggle_mode")
         onActivated: Session.setMode("toggle")
+    }
+
+    NativeShortcut {
+        appid: "poly-shell"; name: "display-project"; description: I18n.tr("display_project.title")
+        onActivated: DisplayProjectState.toggle(root.focusedScreen())
     }
 
     FileView {

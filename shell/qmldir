@@ -15,6 +15,8 @@ singleton ScreenshotState 1.0 ScreenshotState.qml
 ScreenshotOverlay 1.0 ScreenshotOverlay.qml
 singleton PowerState 1.0 PowerState.qml
 PowerMenu 1.0 PowerMenu.qml
+singleton DisplayProjectState 1.0 DisplayProjectState.qml
+DisplayProjectMenu 1.0 DisplayProjectMenu.qml
 singleton AppearanceState 1.0 AppearanceState.qml
 AppearancePage 1.0 AppearancePage.qml
 AppearanceSlider 1.0 AppearanceSlider.qml

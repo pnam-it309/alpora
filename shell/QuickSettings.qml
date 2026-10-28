@@ -339,6 +339,15 @@ PanelWindow {
                             QuickActionButton { Layout.fillWidth: true; Layout.preferredWidth: 1; text: I18n.tr("settings.power"); symbol: "power"; onClicked: popup.page = "power" }
                             QuickActionButton {
                                 Layout.preferredWidth: 40; Layout.minimumWidth: 40
+                                symbol: "monitor"; Accessible.name: I18n.tr("display_project.title")
+                                ToolTip.visible: hovered; ToolTip.text: I18n.tr("display_project.title") + " (Super+P)"
+                                onClicked: {
+                                    Session.closeQuickSettings();
+                                    DisplayProjectState.open(popup.modelData ? popup.modelData.name : "");
+                                }
+                            }
+                            QuickActionButton {
+                                Layout.preferredWidth: 40; Layout.minimumWidth: 40
                                 symbol: "screenshot"; Accessible.name: I18n.tr("quick.screenshot")
                                 ToolTip.visible: hovered; ToolTip.text: I18n.tr("quick.screenshot")
                                 onClicked: BarState.screenshot()

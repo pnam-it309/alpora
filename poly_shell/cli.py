@@ -229,6 +229,8 @@ def main(argv=None):
     windows_fs_parser.add_argument("target", nargs="?", default="")
     dotfiles_parser = sub.add_parser("dotfiles", help="manage dotfile symlinks (Stow / Chezmoi compatible)")
     dotfiles_parser.add_argument("action", choices=("status", "check", "link", "stow", "apply", "unlink", "unstow", "delete", "restow"), nargs="?", default="status")
+    project_parser = sub.add_parser("project", help="multi-monitor projection modes (internal, mirror, extend, external)")
+    project_parser.add_argument("mode", choices=("toggle", "open", "close", "internal", "mirror", "extend", "external"), nargs="?", default="toggle")
     args = parser.parse_args(argv)
     paths = Paths.current()
     try:
@@ -329,6 +331,18 @@ def main(argv=None):
             else:
                 raise ConfigError(f"Invalid dotfiles action: {args.action}")
             return subprocess.run(["bash", "--", str(script), cmd_action], check=False).returncode  # NOSONAR
+        elif args.command == "project":
+            entry = ROOT / "shell/shell.qml"
+            mode = args.mode
+            if mode in ("toggle", "open", "close"):
+                cmd = ["quickshell", "ipc", "--path", str(entry), "call", "display-project", mode]
+            else:
+                cmd = ["quickshell", "ipc", "--path", str(entry), "call", "display-project", "setMode", mode]
+            res = subprocess.run(cmd, capture_output=True, text=True, timeout=3)
+            if res.returncode == 0:
+                print(f"Display projection: {mode}")
+            else:
+                raise ConfigError("Cannot connect to running Poly Shell for display projection")
         elif args.command == "wallpaper":
             if args.image and (str(args.image).startswith('-') or any(c in str(args.image) for c in ('\x00', '\r', '\n'))):
                 raise ConfigError("Invalid wallpaper argument")
