@@ -37,6 +37,7 @@ Singleton {
     readonly property var pipewireNodes: Pipewire.nodes
     readonly property var outputs: pipewireNodes.values.filter(node => !node.isStream && node.audio && node.isSink)
     readonly property var inputs: pipewireNodes.values.filter(node => !node.isStream && node.audio && !node.isSink)
+    readonly property var audioStreams: pipewireNodes.values.filter(node => node && node.isStream && node.audio && node.isSink)
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property var hardware: snapshot.hardware || ({deviceClass: "desktop", isLaptop: false, batteryAvailable: false, brightnessAvailable: false})
     readonly property bool isLaptop: hardware.isLaptop === true
@@ -84,7 +85,7 @@ Singleton {
 
     // One subscription per shell, shared by every monitor. No periodic subprocesses.
     PwObjectTracker {
-        objects: root.outputs.concat(root.inputs)
+        objects: root.outputs.concat(root.inputs).concat(root.audioStreams)
     }
 
     FileView {

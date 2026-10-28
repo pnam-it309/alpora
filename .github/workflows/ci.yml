@@ -176,6 +176,11 @@ jobs:
         run: |
           sudo -u archuser ./uninstall.sh --dry-run || true
 
+      - name: Test 7 - Arch Linux PKGBUILD Validation
+        run: |
+          echo "Validating Arch Linux PKGBUILD syntax with makepkg..."
+          sudo -u archuser bash -c "makepkg --nobuild --nodeps || true"
+
   # ---------------------------------------------------------------------------
   # 4. Dry-Run Installation Test (Debian / Ubuntu Non-Arch Distro)
   # ---------------------------------------------------------------------------

@@ -1,0 +1,78 @@
+# Maintainer: Alpora Developers <https://github.com/pnam-it309/alpora>
+pkgname=alpora-git
+_pkgname=alpora
+pkgver=0.1.0.r20261028
+pkgrel=1
+pkgdesc="Fluid Wayland desktop shell, multi-compositor HAL, and workspace control center built with Quickshell"
+arch=('any')
+url="https://github.com/pnam-it309/alpora"
+license=('MIT')
+depends=(
+    'hyprland'
+    'quickshell'
+    'python'
+    'python-pillow'
+    'python-gobject'
+    'libxkbcommon'
+    'pipewire'
+    'wireplumber'
+    'upower'
+    'networkmanager'
+    'brightnessctl'
+    'grim'
+    'wl-clipboard'
+    'libnotify'
+)
+optdepends=(
+    'sway: Sway compositor support'
+    'niri: Niri scrolling-tiling compositor support'
+    'mako: Notification daemon with action support'
+    'hyprlock: Fast GPU-accelerated lockscreen'
+    'hypridle: Wayland idle management daemon'
+    'hyprsunset: Night Light blue light temperature filter'
+    'hyprpolkitagent: Polkit authentication agent'
+    'fcitx5: Modular IME framework'
+    'fcitx5-bamboo: Vietnamese IME engine for fcitx5'
+    'ntfs-3g: Read/write support for Windows NTFS partitions'
+    'exfatprogs: Userspace utilities for exFAT filesystems'
+    'dosfstools: Utilities for FAT32 filesystems'
+    'udisks2: Automatic removable storage drive mounting'
+    'cifs-utils: Windows SMB/CIFS network share support'
+    'playerctl: MPRIS media player controls'
+)
+provides=('alpora')
+conflicts=('alpora')
+install='alpora.install'
+source=("git+https://github.com/pnam-it309/alpora.git")
+sha256sums=('SKIP')
+
+pkgver() {
+    cd "$srcdir/$_pkgname"
+    printf "0.1.0.r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short=7 HEAD)"
+}
+
+package() {
+    cd "$srcdir/$_pkgname"
+
+    # Install Python package
+    local python_version
+    python_version=$(python -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
+    install -dm755 "$pkgdir/usr/lib/python${python_version}/site-packages/poly_shell"
+    cp -r poly_shell/* "$pkgdir/usr/lib/python${python_version}/site-packages/poly_shell/"
+
+    # Install Shared Assets & Shell QML
+    install -dm755 "$pkgdir/usr/share/alpora"
+    cp -r shell "$pkgdir/usr/share/alpora/"
+    cp -r assets "$pkgdir/usr/share/alpora/"
+    cp -r integrations "$pkgdir/usr/share/alpora/"
+    cp -r profiles "$pkgdir/usr/share/alpora/"
+
+    # Install Executable Binaries
+    install -dm755 "$pkgdir/usr/bin"
+    install -m755 bin/poly-shell "$pkgdir/usr/bin/poly-shell"
+    install -m755 bin/alpora-fetch "$pkgdir/usr/bin/alpora-fetch"
+
+    # Install License
+    install -dm755 "$pkgdir/usr/share/licenses/$pkgname"
+    install -m644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

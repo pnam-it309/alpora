@@ -797,5 +797,10 @@
   "power.suspend": "Sleep",
   "power.reboot": "Restart",
   "power.poweroff": "Shut Down",
-  "power.logout": "Log Out"
+  "power.logout": "Log Out",
+  "audio.app_streams": "Application Volume Streams",
+  "launcher.quick_calc": "Calculation Result",
+  "launcher.copy_clipboard": "Press Enter to copy to clipboard",
+  "launcher.run_command": "Run in terminal: {cmd}",
+  "launcher.search_web": "Search {engine} for '{term}'"
 }

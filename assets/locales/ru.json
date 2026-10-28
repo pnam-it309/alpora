@@ -797,5 +797,10 @@
   "power.suspend": "Сон",
   "power.reboot": "Перезагрузка",
   "power.poweroff": "Выключение",
-  "power.logout": "Выход"
+  "power.logout": "Выход",
+  "audio.app_streams": "Громкость приложений",
+  "launcher.quick_calc": "Результат вычисления",
+  "launcher.copy_clipboard": "Нажмите Enter для копирования",
+  "launcher.run_command": "Запустить в терминале: {cmd}",
+  "launcher.search_web": "Искать в {engine}: '{term}'"
 }

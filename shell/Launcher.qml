@@ -110,6 +110,54 @@ PanelWindow {
     readonly property var results: AppCatalog.results(query, category)
     readonly property var shown: browsing ? results : AppCatalog.favorites
     readonly property Flickable viewport: scroll.contentItem as Flickable
+
+    // Power-user instant parsing (Calculator, Terminal, Web search)
+    readonly property string trimmedQuery: query.trim()
+    readonly property bool isCommand: trimmedQuery.startsWith(">") || trimmedQuery.startsWith("$")
+    readonly property string commandText: isCommand ? trimmedQuery.replace(/^[>\$]\s*/, "") : ""
+    readonly property var webMatch: trimmedQuery.match(/^(g|gh|yt|w)\s+(.+)$/i)
+    readonly property string webEngine: webMatch ? webMatch[1].toLowerCase() : ""
+    readonly property string webTerm: webMatch ? webMatch[2] : ""
+
+    function evaluateMath(expr: string): string {
+        if (!expr || expr.length < 2) return "";
+        const clean = expr.trim().replace(/\^/g, "**").replace(/\bpi\b/gi, "Math.PI").replace(/\be\b/gi, "Math.E");
+        if (!/^[0-9\s\+\-\*\/\%\.\(\)\,\*\*\s]|Math\.(sin|cos|tan|sqrt|pow|abs|round|floor|ceil|log|PI|E)/i.test(clean))
+            return "";
+        if (!/[\+\-\*\/\%\^]|(sin|cos|tan|sqrt|abs|log)/i.test(expr))
+            return "";
+        try {
+            const fn = new Function("Math", "return (" + clean + ");");
+            const res = fn(Math);
+            if (typeof res === "number" && isFinite(res)) {
+                return Math.abs(res - Math.round(res)) < 1e-9 ? Math.round(res).toString() : res.toFixed(4).replace(/\.?0+$/, "");
+            }
+        } catch (_) {}
+        return "";
+    }
+    readonly property string mathResult: isCommand || webMatch ? "" : evaluateMath(trimmedQuery)
+
+    function activateAction(): void {
+        if (mathResult.length > 0) {
+            Quickshell.execDetached(["wl-copy", mathResult]);
+            close();
+        } else if (isCommand && commandText.length > 0) {
+            Quickshell.execDetached(Session.settings.apps.terminal.concat(["-e", "bash", "-c", commandText + "; echo; read -p 'Press Enter to exit...'"]));
+            close();
+        } else if (webMatch) {
+            const urls = {
+                g: "https://www.google.com/search?q=",
+                gh: "https://github.com/search?q=",
+                yt: "https://www.youtube.com/results?search_query=",
+                w: "https://en.wikipedia.org/wiki/Special:Search?search="
+            };
+            const u = (urls[webEngine] || urls.g) + encodeURIComponent(webTerm);
+            Quickshell.execDetached(["xdg-open", u]);
+            close();
+        } else if (shown.length) {
+            launch(shown[selectedIndex]);
+        }
+    }
     IpcHandler {
         target: "launcher-" + (launcher.modelData ? launcher.modelData.name : "disconnected")
         function inputStatus(): string {
@@ -242,9 +290,140 @@ PanelWindow {
                 Keys.onUpPressed: launcher.moveSelection(-launcher.columnCount)
                 Keys.onLeftPressed: event => { if (event.modifiers & Qt.AltModifier) { launcher.moveSelection(-1); event.accepted = true; } else event.accepted = false; }
                 Keys.onRightPressed: event => { if (event.modifiers & Qt.AltModifier) { launcher.moveSelection(1); event.accepted = true; } else event.accepted = false; }
-                Keys.onReturnPressed: if (launcher.shown.length) launcher.launch(launcher.shown[launcher.selectedIndex])
-                Keys.onEnterPressed: if (launcher.shown.length) launcher.launch(launcher.shown[launcher.selectedIndex])
+                Keys.onReturnPressed: launcher.activateAction()
+                Keys.onEnterPressed: launcher.activateAction()
             }
+
+            // Quick Calculator Instant Card
+            Rectangle {
+                visible: launcher.mathResult.length > 0
+                Layout.fillWidth: true
+                Layout.preferredHeight: 50
+                radius: 12
+                color: Glass.tint(Session.surface, 0.75)
+                border.color: Session.accent
+                border.width: 1
+
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.margins: 10
+                    spacing: 12
+
+                    Icon { name: "calculator"; Layout.preferredWidth: 22; Layout.preferredHeight: 22 }
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 2
+                        Text {
+                            text: "= " + launcher.mathResult
+                            color: Session.accent
+                            font.family: Session.fontFamily
+                            font.pixelSize: 15
+                            font.weight: Font.Bold
+                        }
+                        Text {
+                            text: I18n.tr("launcher.copy_clipboard")
+                            color: Session.muted
+                            font.family: Session.fontFamily
+                            font.pixelSize: 11
+                        }
+                    }
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: launcher.activateAction()
+                }
+            }
+
+            // Quick Command Runner Instant Card
+            Rectangle {
+                visible: launcher.isCommand && launcher.commandText.length > 0
+                Layout.fillWidth: true
+                Layout.preferredHeight: 50
+                radius: 12
+                color: Glass.tint(Session.surface, 0.75)
+                border.color: Session.accent
+                border.width: 1
+
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.margins: 10
+                    spacing: 12
+
+                    Icon { name: "terminal"; Layout.preferredWidth: 22; Layout.preferredHeight: 22 }
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 2
+                        Text {
+                            text: launcher.commandText
+                            color: Session.foreground
+                            font.family: Session.fontFamily
+                            font.pixelSize: 13
+                            font.weight: Font.DemiBold
+                            elide: Text.ElideRight
+                            Layout.fillWidth: true
+                        }
+                        Text {
+                            text: I18n.trWith("launcher.run_command", {cmd: launcher.commandText})
+                            color: Session.muted
+                            font.family: Session.fontFamily
+                            font.pixelSize: 11
+                        }
+                    }
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: launcher.activateAction()
+                }
+            }
+
+            // Quick Web Search Instant Card
+            Rectangle {
+                visible: !!launcher.webMatch
+                Layout.fillWidth: true
+                Layout.preferredHeight: 50
+                radius: 12
+                color: Glass.tint(Session.surface, 0.75)
+                border.color: Session.accent
+                border.width: 1
+
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.margins: 10
+                    spacing: 12
+
+                    Icon { name: "globe"; Layout.preferredWidth: 22; Layout.preferredHeight: 22 }
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 2
+                        Text {
+                            text: launcher.webTerm
+                            color: Session.foreground
+                            font.family: Session.fontFamily
+                            font.pixelSize: 13
+                            font.weight: Font.DemiBold
+                            elide: Text.ElideRight
+                            Layout.fillWidth: true
+                        }
+                        Text {
+                            text: I18n.trWith("launcher.search_web", {
+                                engine: ({g: "Google", gh: "GitHub", yt: "YouTube", w: "Wikipedia"})[launcher.webEngine] || "Web",
+                                term: launcher.webTerm
+                            })
+                            color: Session.muted
+                            font.family: Session.fontFamily
+                            font.pixelSize: 11
+                        }
+                    }
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: launcher.activateAction()
+                }
+            }
+
             Item {
                 Layout.fillWidth: true; Layout.preferredHeight: 22
                 MountainRidge { anchors.right: parent.right; width: 240; height: 30; opacity: 0.65 }

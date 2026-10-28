@@ -453,6 +453,77 @@ PanelWindow {
                             visible: (popup.page === "input" && !Session.inputs.length) || (popup.page === "output" && !Session.outputs.length)
                             text: "No audio devices available"; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 12; padding: 8
                         }
+
+                        // Per-Application Audio Streams (Pipewire)
+                        Column {
+                            width: parent.width
+                            visible: popup.page === "output" && Session.audioStreams && Session.audioStreams.length > 0
+                            spacing: 8
+
+                            Item { width: parent.width; height: 12 }
+                            Rectangle { width: parent.width; height: 1; color: Glass.tint(Session.accent, 0.22) }
+                            Text {
+                                text: I18n.tr("audio.app_streams")
+                                color: Session.foreground
+                                font.family: Session.fontFamily
+                                font.pixelSize: 13
+                                font.weight: Font.Medium
+                                padding: 4
+                            }
+
+                            Repeater {
+                                model: Session.audioStreams
+                                Rectangle {
+                                    id: appRow
+                                    required property var modelData
+                                    width: parent.width
+                                    height: 54
+                                    radius: 10
+                                    color: Glass.tint(Session.surface, 0.6)
+                                    border.color: Glass.tint(Session.accent, 0.3)
+                                    border.width: 1
+
+                                    RowLayout {
+                                        anchors.fill: parent
+                                        anchors.margins: 8
+                                        spacing: 10
+
+                                        Icon {
+                                            name: (modelData.properties && modelData.properties["application.icon-name"]) || "volume"
+                                            Layout.preferredWidth: 22
+                                            Layout.preferredHeight: 22
+                                        }
+
+                                        ColumnLayout {
+                                            Layout.fillWidth: true
+                                            spacing: 2
+                                            Text {
+                                                text: (modelData.properties && (modelData.properties["application.name"] || modelData.properties["node.description"])) || modelData.name || "App"
+                                                color: Session.foreground
+                                                font.family: Session.fontFamily
+                                                font.pixelSize: 12
+                                                font.weight: Font.DemiBold
+                                                elide: Text.ElideRight
+                                                Layout.fillWidth: true
+                                            }
+                                            ControlSlider {
+                                                Layout.fillWidth: true
+                                                Layout.preferredHeight: 18
+                                                value: modelData.audio ? modelData.audio.volume : 0
+                                                onMoved: { if (modelData.audio) { modelData.audio.volume = value; if (value > 0) modelData.audio.muted = false; } }
+                                            }
+                                        }
+
+                                        IconButton {
+                                            symbol: modelData.audio && modelData.audio.muted ? "muted" : "volume"
+                                            Layout.preferredWidth: 28
+                                            Layout.preferredHeight: 28
+                                            onClicked: if (modelData.audio) modelData.audio.muted = !modelData.audio.muted
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
                 SettingsRow {

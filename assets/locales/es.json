@@ -797,5 +797,10 @@
   "power.suspend": "Suspender",
   "power.reboot": "Reiniciar",
   "power.poweroff": "Apagar",
-  "power.logout": "Cerrar sesión"
+  "power.logout": "Cerrar sesión",
+  "audio.app_streams": "Flujos de audio por aplicación",
+  "launcher.quick_calc": "Resultado del cálculo",
+  "launcher.copy_clipboard": "Presione Enter para copiar al portapapeles",
+  "launcher.run_command": "Ejecutar en terminal: {cmd}",
+  "launcher.search_web": "Buscar en {engine}: '{term}'"
 }

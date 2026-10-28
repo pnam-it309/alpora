@@ -797,5 +797,10 @@
   "power.suspend": "Ngủ",
   "power.reboot": "Khởi động lại",
   "power.poweroff": "Tắt máy",
-  "power.logout": "Đăng xuất"
+  "power.logout": "Đăng xuất",
+  "audio.app_streams": "Âm lượng từng ứng dụng",
+  "launcher.quick_calc": "Kết quả tính toán",
+  "launcher.copy_clipboard": "Nhấn Enter để sao chép vào bộ nhớ tạm",
+  "launcher.run_command": "Chạy trong terminal: {cmd}",
+  "launcher.search_web": "Tìm trên {engine}: '{term}'"
 }
