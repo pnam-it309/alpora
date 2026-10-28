@@ -13,10 +13,25 @@ from .state import ConfigError, ROOT, atomic_json, read_object, state_lock, sett
 from .radios_power import power_status, radio_status, set_airplane, set_profile
 
 
+ALLOWED_COMMAND_BINARIES = {
+    'brightnessctl', 'bluetoothctl', 'rfkill', 'makoctl', 'hyprsunset',
+    'hyprctl', 'nmcli', 'pgrep', 'swaybg', 'wpctl'
+}
+
+
 def command(args, *, check=True):
-    result = subprocess.run(args, capture_output=True, text=True, timeout=5)
+    if not isinstance(args, (list, tuple)) or not args:
+        raise ConfigError("Invalid command arguments: must be non-empty sequence")
+    binary = str(args[0])
+    if binary not in ALLOWED_COMMAND_BINARIES:
+        raise ConfigError(f"Unauthorized command binary: {binary}")
+    clean_args = [str(arg) for arg in args]
+    for arg in clean_args:
+        if "\x00" in arg or "\r" in arg:
+            raise ConfigError("Invalid control character in command argument")
+    result = subprocess.run(clean_args, capture_output=True, text=True, timeout=5)
     if check and result.returncode:
-        raise ConfigError((result.stderr or result.stdout).strip() or f"{args[0]} failed")
+        raise ConfigError((result.stderr or result.stdout).strip() or f"{binary} failed")
     return result
 
 
@@ -267,7 +282,16 @@ def restore_desktop(paths):
             set_night_light(paths, True)
 
 
+VALID_CONTROL_ACTIONS = {
+    'status', 'brightness', 'bluetooth', 'dnd', 'nightlight',
+    'power-profile', 'airplane', 'hotspot', 'wifi-connect',
+    'ui-scale', 'touchpad', 'font'
+}
+
+
 def control(paths, action, value=None):
+    if action not in VALID_CONTROL_ACTIONS:
+        raise ConfigError(f'Unknown or unsupported control action: {action}')
     if action == 'status':
         return status(paths)
     if action == 'brightness':

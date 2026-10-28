@@ -15,14 +15,16 @@ TRANSPARENT_1X1_PNG = (
 
 
 def _default_art_path() -> Path:
-    # Use standard Unix /tmp if available or writable, fallback to system temp
-    unix_tmp = Path("/tmp/alpora-lock-art.png")
-    try:
-        if unix_tmp.parent.exists() and os.access(str(unix_tmp.parent), os.W_OK):
-            return unix_tmp
-    except OSError:
-        pass
-    return Path(tempfile.gettempdir()) / "alpora-lock-art.png"
+    # Use private user runtime directory (e.g. /run/user/<uid>/) if available
+    runtime = os.environ.get("XDG_RUNTIME_DIR")
+    if runtime and os.path.isdir(runtime):
+        p = Path(runtime) / "alpora" / "alpora-lock-art.png"
+        p.parent.mkdir(parents=True, exist_ok=True)
+        return p
+    # Fallback to tempfile in user-scoped directory
+    uid_str = str(os.getuid()) if hasattr(os, "getuid") else "user"
+    user_temp = Path(tempfile.gettempdir()) / f"alpora-lock-art-{uid_str}.png"
+    return user_temp
 
 
 def get_status() -> str:

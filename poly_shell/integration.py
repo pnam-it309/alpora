@@ -109,14 +109,17 @@ def managed_autostart(text, launcher):
 
 
 def patch_autostart(paths):
-    target = paths.config.parent / "hypr/autostart.sh"
-    original = target.read_text()
+    base_hypr = (paths.config.parent / "hypr").resolve()
+    target = (base_hypr / "autostart.sh").resolve()
+    if not str(target).startswith(str(base_hypr)):
+        raise ConfigError("Invalid autostart target path")
+    original = target.read_text(encoding="utf-8")
     modified = managed_autostart(original, Path.home() / ".local/bin/poly-shell")
     if original == modified:
         return
     stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S-%f")
-    backup = paths.state / "backups" / stamp / "autostart.sh"
-    backup.parent.mkdir(parents=True)
+    backup = (paths.state / "backups" / stamp / "autostart.sh").resolve()
+    backup.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(target, backup)
     # Record the exact owned block, so rollback preserves unrelated user edits.
     start = modified.index(BEGIN)
@@ -125,9 +128,11 @@ def patch_autostart(paths):
     atomic_json(paths.state / "activation.json", {
         "backup": str(backup), "block": modified[start:stop], "original": original_line,
     })
-    temporary = target.with_name(".autostart.poly-shell.tmp")
+    temporary = (base_hypr / ".autostart.poly-shell.tmp").resolve()
+    if not str(temporary).startswith(str(base_hypr)):
+        raise ConfigError("Invalid temporary target path")
     try:
-        temporary.write_text(modified)
+        temporary.write_text(modified, encoding="utf-8")
         shutil.copymode(target, temporary)
         temporary.replace(target)
     finally:
@@ -136,15 +141,18 @@ def patch_autostart(paths):
 
 
 def restore_autostart(paths):
-    target = paths.config.parent / "hypr/autostart.sh"
-    if not target.exists() or BEGIN not in target.read_text():
+    base_hypr = (paths.config.parent / "hypr").resolve()
+    target = (base_hypr / "autostart.sh").resolve()
+    if not str(target).startswith(str(base_hypr)):
+        raise ConfigError("Invalid autostart target path")
+    if not target.exists() or BEGIN not in target.read_text(encoding="utf-8"):
         return
     manifest = read_object(paths.state / "activation.json")
-    text = target.read_text()
+    text = target.read_text(encoding="utf-8")
     block = manifest["block"]
     if block not in text:
         raise ConfigError("Managed autostart block was edited; inspect it and the backup before restoring")
-    target.write_text(text.replace(block, manifest["original"], 1))
+    target.write_text(text.replace(block, manifest["original"], 1), encoding="utf-8")
 
 
 def fallback_panel(paths):

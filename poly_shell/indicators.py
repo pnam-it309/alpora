@@ -8,26 +8,31 @@ from .desktop import backlight_device
 from .state import ConfigError, ROOT, read_object
 
 
+VALID_INDICATORS = ('brightness', 'volume', 'microphone')
+
+
 def indicator(kind):
+    if kind not in VALID_INDICATORS:
+        raise ConfigError('Unknown indicator')
     if kind == 'brightness':
         device, value = backlight_device()
         if not device:
             raise ConfigError('No controllable display backlight found')
         return value / 100, False
-    if kind not in ('volume', 'microphone'):
-        raise ConfigError('Unknown indicator')
     node = '@DEFAULT_AUDIO_SINK@' if kind == 'volume' else '@DEFAULT_AUDIO_SOURCE@'
     response = subprocess.run(['wpctl', 'get-volume', node], capture_output=True, text=True, timeout=3)
     match = re.search(r'Volume:\s*([0-9.]+)', response.stdout)
     if response.returncode or not match:
         raise ConfigError('Audio device is unavailable')
-    return max(0, float(match[1])), '[MUTED]' in response.stdout
+    return max(0.0, float(match[1])), '[MUTED]' in response.stdout
 
 
 def show_indicator(kind):
+    if kind not in VALID_INDICATORS:
+        raise ConfigError('Unknown indicator')
     value, muted = indicator(kind)
     subprocess.run(['quickshell', 'ipc', '--path', str(ROOT / 'shell'), 'call', 'shell',
-                    'showOsd', kind, str(value), str(muted).lower()], check=True, timeout=3)
+                    'showOsd', kind, f"{value:.4f}", "true" if muted else "false"], check=True, timeout=3)
 
 
 def mako_style(snapshot):

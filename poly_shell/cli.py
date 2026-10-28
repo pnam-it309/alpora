@@ -28,8 +28,20 @@ from .shortcuts import shortcuts_control
 from .programs import inventory
 
 
+ALLOWED_SYSTEMCTL_SUBCOMMANDS = {
+    'start', 'stop', 'restart', 'status', 'is-active', 'is-failed',
+    'reset-failed', 'daemon-reload', 'import-environment'
+}
+
+
 def systemctl(*arguments, check=True, capture=False):
-    return subprocess.run(["systemctl", "--user", *arguments], check=check,
+    if not arguments or arguments[0] not in ALLOWED_SYSTEMCTL_SUBCOMMANDS:
+        raise ConfigError(f"Unauthorized systemctl action: {arguments[0] if arguments else None}")
+    clean_arguments = [str(arg) for arg in arguments]
+    for arg in clean_arguments:
+        if any(c in arg for c in ("\x00", "\n", "\r")):
+            raise ConfigError("Invalid character in systemctl argument")
+    return subprocess.run(["systemctl", "--user", *clean_arguments], check=check,
                           capture_output=capture, text=True)
 
 
@@ -259,6 +271,8 @@ def main(argv=None):
             result = install_assets(paths) if args.action == "install" else apply_assets(paths)
             print(json.dumps(result, ensure_ascii=False))
         elif args.command == "osd":
+            if args.kind not in ('brightness', 'volume', 'microphone'):
+                raise ConfigError(f"Invalid OSD indicator: {args.kind}")
             show_indicator(args.kind)
         elif args.command == "lock-date":
             print(lock_date())
@@ -290,8 +304,10 @@ def main(argv=None):
             elif args.action == "normalize-path":
                 print(normalize_windows_path(args.target))
         elif args.command == "dotfiles":
-            script = ROOT / "scripts/stow-dotfiles.sh"
-            return subprocess.run(["bash", str(script), args.action]).returncode
+            if args.action not in ("status", "check", "link", "stow", "apply", "unlink", "unstow", "delete", "restow"):
+                raise ConfigError(f"Invalid dotfiles action: {args.action}")
+            script = (ROOT / "scripts/stow-dotfiles.sh").resolve()
+            return subprocess.run(["bash", str(script), args.action], check=False).returncode
         elif args.command == "wallpaper":
             wallpaper(paths, args.image, reset=args.reset)
         elif args.command == "settings":
