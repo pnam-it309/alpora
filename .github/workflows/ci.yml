@@ -13,14 +13,14 @@ jobs:
   # ---------------------------------------------------------------------------
   syntax-and-lint:
     name: Syntax Check & Static Analysis
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -92,16 +92,16 @@ jobs:
   # ---------------------------------------------------------------------------
   unit-tests:
     name: Unit Tests & Regression Suite
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: syntax-and-lint
     timeout-minutes: 10
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -154,14 +154,14 @@ jobs:
   # ---------------------------------------------------------------------------
   arch-dry-run-install:
     name: Dry-Run Install on Clean Arch Linux
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container:
       image: archlinux:base-devel
     needs: syntax-and-lint
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Prepare Arch environment & non-root user
         run: |
@@ -204,12 +204,12 @@ jobs:
   # ---------------------------------------------------------------------------
   debian-dry-run-install:
     name: Dry-Run Install on Debian/Ubuntu Distro
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: syntax-and-lint
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Test UI-Only Standalone Dry-Run on Ubuntu
         run: |
