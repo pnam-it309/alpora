@@ -28,7 +28,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y shellcheck shfmt lua5.4 yamllint jq
-          pip install ruff
+          pip install --only-binary :all: ruff==0.9.9
 
       - name: 1. ShellCheck (Bash & Shell Scripts)
         run: |
@@ -112,8 +112,7 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install pillow
+          pip install --only-binary :all: pillow==11.1.0
 
       - name: Run I18n Key Parity Tests
         run: |
