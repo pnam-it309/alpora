@@ -64,13 +64,15 @@ def sequences(p):
 def terminal_ptys(proc=Path('/proc')):
     """Discover only PTY masters held by this user's supported emulators."""
     found = set()
+    current_uid = os.getuid() if hasattr(os, "getuid") else None
     for process in proc.iterdir():
         if not process.name.isdigit(): continue
         try:
-            if process.stat().st_uid != os.getuid(): continue
-            if (process / 'comm').read_text().strip() not in ('foot', 'foot-server', 'kitty'): continue
+            stat_info = process.stat()
+            if current_uid is not None and getattr(stat_info, "st_uid", None) != current_uid: continue
+            if (process / 'comm').read_text(encoding="utf-8").strip() not in ('foot', 'foot-server', 'kitty'): continue
             for info in (process / 'fdinfo').iterdir():
-                match = re.search(r'(?m)^tty-index:\s*(\d+)\s*$', info.read_text())
+                match = re.search(r'(?m)^tty-index:\s*(\d+)\s*$', info.read_text(encoding="utf-8"))
                 if match: found.add(Path('/dev/pts') / match[1])
         except (OSError, ValueError):
             continue  # Processes may exit during discovery.
@@ -80,12 +82,14 @@ def terminal_ptys(proc=Path('/proc')):
 def refresh(p):
     payload = sequences(p)
     failed = []
+    current_uid = os.getuid() if hasattr(os, "getuid") else None
     for terminal in terminal_ptys():
         try:
             fd = os.open(terminal, os.O_WRONLY | os.O_NOCTTY | os.O_NONBLOCK | os.O_NOFOLLOW)
             try:
                 info = os.fstat(fd)
-                if info.st_uid != os.getuid() or not stat.S_ISCHR(info.st_mode): continue
+                if current_uid is not None and getattr(info, "st_uid", None) != current_uid: continue
+                if not stat.S_ISCHR(info.st_mode): continue
                 if os.write(fd, payload) != len(payload): failed.append(str(terminal))
             finally:
                 os.close(fd)

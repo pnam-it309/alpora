@@ -126,11 +126,11 @@ def settings_files(paths):
     for version in ('3', '4'):
         target = paths.config.parent/('gtk-'+version+'.0')/'settings.ini'
         if target.is_symlink(): target = target.resolve()
-        result[target] = ini_settings(target.read_text() if target.exists() else '', values)
+        result[target] = ini_settings(target.read_text(encoding="utf-8") if target.exists() else '', values)
     hypr = paths.config.parent/'hypr/hyprland.lua'
     if not hypr.exists(): raise ConfigError('hyprland.lua not found; install a Lua Hyprland configuration first')
     if hypr.is_symlink(): hypr = hypr.resolve()
-    text = hypr.read_text()
+    text = hypr.read_text(encoding="utf-8")
     if BEGIN in text or END in text:
         if text.count(BEGIN)!=1 or text.count(END)!=1 or LUA.strip() not in text:
             raise ConfigError('Preserving manually edited ALPORA cursor block')
@@ -172,7 +172,7 @@ def apply(paths):
         except Exception:
             for path,content in old.items():
                 if content is None: path.unlink(missing_ok=True)
-                else: atomic_text(path,content.decode())
+                else: path.write_bytes(content)
             for key,value in previous.items():
                 subprocess.run(['gsettings','set',schema,key,value],capture_output=True,timeout=5)
             # Re-read the restored config to restore compositor environment/options.

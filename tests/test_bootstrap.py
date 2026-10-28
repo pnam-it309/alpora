@@ -41,6 +41,7 @@ class BootstrapTests(unittest.TestCase):
         self.assertEqual((backup/'hyprland.conf').read_text(),'personal legacy')
         self.assertFalse(legacy.exists());self.assertEqual(extra.read_text(),'keep')
 
+    @unittest.skipIf(os.name == 'nt', 'Symlink creation requires Linux / POSIX environment')
     def test_failed_hook_restores_external_symlink_and_all_original_files(self):
         external=self.root/'external.lua';external.write_text('-- external config')
         main=self.hypr/'hyprland.lua';main.symlink_to(external)
@@ -66,6 +67,7 @@ class BootstrapTests(unittest.TestCase):
         self.assertIn('moon-lake.png',read_object(self.paths.config/'wallpaper.json')['image'])
         self.assertTrue((self.paths.state/'hyprlock-theme.conf').exists())
 
+    @unittest.skipIf(os.name == 'nt', 'Bash installer requires Linux / POSIX environment')
     def test_install_dry_run_changes_nothing(self):
         env=dict(os.environ,HOME=str(self.root),XDG_CONFIG_HOME=str(self.root/'config'),XDG_STATE_HOME=str(self.root/'state'))
         for flags,marker in ((['--dry-run'],'no changes'),
@@ -78,6 +80,7 @@ class BootstrapTests(unittest.TestCase):
                 self.assertFalse((self.root/'state').exists())
                 self.assertFalse(list(self.hypr.iterdir()))
 
+    @unittest.skipIf(os.name == 'nt', 'Symlink creation requires Linux / POSIX environment')
     def test_setup_orchestration_runs_offline_and_preserves_running_signature(self):
         env={'HOME':str(self.root),'XDG_CONFIG_HOME':str(self.root/'config'),
              'XDG_STATE_HOME':str(self.root/'local-state'),'XDG_DATA_HOME':str(self.root/'data'),
@@ -132,6 +135,7 @@ class BootstrapTests(unittest.TestCase):
         self.assertFalse((self.paths.config/'organizer.json').exists())
         self.assertFalse((self.paths.config/'clipboard').exists())
 
+    @unittest.skipIf(os.name == 'nt', 'PTY wizard requires Linux / POSIX environment')
     def test_real_wizard_selection_is_preview_only(self):
         import pty
         import select

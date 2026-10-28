@@ -79,21 +79,21 @@ def configuration_plan(paths, replace=False):
         for path in (paths.state, ROOT):
             if any(c in str(path) for c in '\n\r\0$#'):
                 raise ConfigError('Unsupported special character in lockscreen path')
-        files[lock]=('# ALPORA managed lockscreen\nsource = '+str(paths.state/'hyprlock-theme.conf')+
-                     '\nsource = '+str(ROOT/'assets/lockscreen/layout.conf')+'\n')
+        files[lock]=('# ALPORA managed lockscreen\nsource = '+(paths.state/'hyprlock-theme.conf').as_posix()+
+                     '\nsource = '+(ROOT/'assets/lockscreen/layout.conf').as_posix()+'\n')
     main=root/'hyprland.lua';legacy=root/'hyprland.conf'
     for path in (main,legacy):
         if path.exists() and not replace:
-            text=path.read_text()
+            text=path.read_text(encoding="utf-8")
             if not text.startswith(MARKER):
                 raise ConfigError('Existing Hyprland config requires explicit consent: '+str(path))
     if not replace:
         for path,text in files.items():
-            if path.exists() and path.name not in ('hyprland.lua','hyprlock.conf') and path.read_text()!=text:
+            if path.exists() and path.name not in ('hyprland.lua','hyprlock.conf') and path.read_text(encoding="utf-8")!=text:
                 raise ConfigError('Preserving modified session file: '+str(path))
     # Do not silently discard manually added settings in an already installed main.
-    if main.exists() and main.read_text().startswith(MARKER) and not replace:
-        files[main]=main.read_text()
+    if main.exists() and main.read_text(encoding="utf-8").startswith(MARKER) and not replace:
+        files[main]=main.read_text(encoding="utf-8")
     return files
 
 

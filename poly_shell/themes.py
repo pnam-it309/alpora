@@ -323,7 +323,7 @@ def apply_timeline_palette(paths, minute, palette, selection):
     files[paths.config/'appearance.json'] = json.dumps(selection | {'palette': p}, ensure_ascii=False, indent=2)+'\n'
     files[paths.config/'timeline.json'] = json.dumps({'schemaVersion': 1, 'minute': minute})+'\n'
     files[paths.session] = json.dumps(snapshot, ensure_ascii=False, indent=2)+'\n'
-    originals = {path: path.read_text() if path.exists() else None for path in files}
+    originals = {path: path.read_text(encoding="utf-8") if path.exists() else None for path in files}
     border_changed = False
     try:
         for path, text in files.items():
@@ -335,7 +335,7 @@ def apply_timeline_palette(paths, minute, palette, selection):
         for path, old in originals.items():
             try:
                 if old is None: path.unlink(missing_ok=True)
-                elif not path.exists() or path.read_text() != old: atomic_text(path, old)
+                elif not path.exists() or path.read_text(encoding="utf-8") != old: atomic_text(path, old)
             except OSError as exc: errors.append(str(exc))
         if border_changed:
             try: runtime_border(old_palette)
@@ -348,7 +348,10 @@ def apply_timeline_palette(paths, minute, palette, selection):
 
 
 def timeline_frame(paths):
-    from PIL import Image
+    try:
+        from PIL import Image
+    except ImportError:
+        Image = None
     from .timeline import assets, saved_minute
     stops = assets()
     minute = saved_minute(paths)
@@ -357,6 +360,9 @@ def timeline_frame(paths):
         return path
     extended = stops + [dict(stops[0], minute=1440)]
     lower, upper = next((a, b) for a, b in zip(extended, extended[1:]) if a['minute'] <= minute < b['minute'])
+    if Image is None:
+        nearest = lower if (minute - lower['minute']) <= (upper['minute'] - minute) else upper
+        return Path(nearest['image'])
     t = (minute - lower['minute']) / (upper['minute'] - lower['minute'])
     t = t * t * (3 - 2 * t)
     path.parent.mkdir(parents=True, exist_ok=True)

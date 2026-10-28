@@ -55,8 +55,21 @@ def keysyms():
     except OSError as exc:
         if os.name == 'nt':
             class _DummyXkb:
+                _VALID_KEYSYMS = {
+                    *(chr(c) for c in range(ord('a'), ord('z') + 1)),
+                    *(chr(c) for c in range(ord('A'), ord('Z') + 1)),
+                    *(chr(c) for c in range(ord('0'), ord('9') + 1)),
+                    *(f"F{i}" for i in range(1, 36)),
+                    "Return", "Space", "Tab", "Escape", "BackSpace", "Delete",
+                    "Home", "End", "Page_Up", "Page_Down", "Print", "Insert",
+                    "Up", "Down", "Left", "Right", "space", "escape", "return",
+                    "equal", "minus", "plus", "bracketleft", "bracketright",
+                    "semicolon", "apostrophe", "grave", "backslash", "comma",
+                    "period", "slash",
+                }
                 def xkb_keysym_from_name(self, name, flags):
-                    return 1
+                    decoded = name.decode("utf-8", errors="ignore")
+                    return 1 if (decoded.startswith("XF86") or decoded in self._VALID_KEYSYMS) else 0
             return _DummyXkb()
         raise ConfigError('Нужна библиотека libxkbcommon для проверки клавиш') from exc
 

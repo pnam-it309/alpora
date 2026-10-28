@@ -166,7 +166,7 @@ def atomic_text(path, text):
     path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
     temporary = None
     try:
-        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=path.parent, delete=False) as stream:
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=path.parent, delete=False, newline="") as stream:
             temporary = Path(stream.name)
             stream.write(text)
             stream.flush()

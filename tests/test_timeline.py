@@ -19,7 +19,10 @@ class TimelineTests(unittest.TestCase):
         atomic_json(self.paths.config/'appearance.json', {'theme': 'timeline'})
 
     def test_six_readable_same_size_images_and_one_catalog_theme(self):
-        from PIL import Image
+        try:
+            from PIL import Image
+        except ImportError:
+            self.skipTest("PIL is required for image verification tests")
         assets = timeline.assets()
         self.assertEqual(len(assets), 6)
         sizes = []
