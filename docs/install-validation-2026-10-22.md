@@ -16,7 +16,8 @@ with `/home/new user`. Both accessed the source as `/mnt/ALPORA copy`, exercisin
 spaces in both source and home paths. No machine user accounts were created.
 System libraries and tools came from the existing Arch installation, not a fresh
 package root. The package list contains 48 names, available in the local Arch sync
-database at the time of validation.
+database at the time of validation. Automated execution of this validation suite
+is provided by [`scripts/validate-isolated-install.sh`](../scripts/validate-isolated-install.sh).
 
 ## Results
 
@@ -73,4 +74,4 @@ backend; an offscreen Qt platform has no PanelWindow backend. These are recorded
 as unsuccessful test environments, not successful desktop runs. The isolated
 headless Sway run supplied the real Wayland interface smoke check above.
 
-[Installer](arch-installer.md) · [Known limitations](known-issues.md) · [File map](repository-layout.md)
+[Installer](arch-installer.md) · [Known limitations](known-issues.md) · [File map](repository-layout.md) · [Validation script](../scripts/validate-isolated-install.sh)
