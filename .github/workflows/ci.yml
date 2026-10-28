@@ -89,6 +89,7 @@ jobs:
     name: Unit Tests & Regression Suite
     runs-on: ubuntu-latest
     needs: syntax-and-lint
+    timeout-minutes: 10
 
     steps:
       - name: Checkout repository
@@ -125,9 +126,13 @@ jobs:
         run: |
           python -m unittest tests/test_desktop.py tests/test_running_apps.py tests/test_widgets.py tests/test_appearance.py
 
-      - name: Run Full Test Suite
+      - name: Run Desktop Controls & Lockscreen Media Tests
         run: |
-          python -m unittest discover tests
+          python -m unittest tests/test_desktop_controls.py tests/test_lock_media.py tests/test_lockscreen.py
+
+      - name: Run Theme, Landscape & State Tests
+        run: |
+          python -m unittest tests/test_themes.py tests/test_landscapes.py tests/test_state.py tests/test_shortcuts.py
 
   # ---------------------------------------------------------------------------
   # 3. Dry-Run Installation Test (Clean Arch Linux Container)
