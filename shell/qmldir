@@ -5,10 +5,13 @@ singleton LandscapeState 1.0 LandscapeState.qml
 LivingLandscape 1.0 LivingLandscape.qml
 LandscapeButton 1.0 LandscapeButton.qml
 singleton DockState 1.0 DockState.qml
+singleton WindowTracker 1.0 WindowTracker.qml
 Dock 1.0 Dock.qml
 DockButton 1.0 DockButton.qml
 singleton OverviewState 1.0 OverviewState.qml
 WorkspaceOverview 1.0 WorkspaceOverview.qml
+singleton ScreenshotState 1.0 ScreenshotState.qml
+ScreenshotOverlay 1.0 ScreenshotOverlay.qml
 singleton AppearanceState 1.0 AppearanceState.qml
 AppearancePage 1.0 AppearancePage.qml
 AppearanceSlider 1.0 AppearanceSlider.qml

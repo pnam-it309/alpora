@@ -781,6 +781,10 @@
   "shortcuts.group_system": "Система и оболочка",
   "shortcuts.group_windows": "Окна и приложения",
   "shortcuts.group_workspaces": "Рабочие столы и навигация",
-  "shortcuts.overview_subtitle": "Горячие клавиши, руководство и настройка",
-  "shortcut.toggle_mode": "Переключить режим Work / Vibe"
+  "shortcut.toggle_mode": "Переключить режим Work / Vibe",
+  "quick.screenshot": "Снимок экрана",
+  "screenshot.drag_hint": "Выделите область мышью · Пробел для всего экрана · Esc для отмены",
+  "common.copy": "Копировать",
+  "common.save": "Сохранить",
+  "common.cancel": "Отмена"
 }

@@ -49,6 +49,12 @@ PanelWindow {
     onPointerInsideChanged: Qt.callLater(updatePointer)
     onAllowedChanged: if (!allowed) { requested = false; contextId = ""; hoverId = ""; hoverItem = null; }
     onContextGroupChanged: if (!contextGroup) contextId = ""
+    onOpenedChanged: {
+        if (opened) WindowTracker.subscribe();
+        else WindowTracker.unsubscribe();
+    }
+    Component.onCompleted: if (opened) WindowTracker.subscribe()
+    Component.onDestruction: if (opened) WindowTracker.unsubscribe()
     PanelMotion { id: motion; opened: dock.opened; openDuration: Motion.openMs; closeDuration: Motion.closeMs }
 
     // Only the thin summon strip receives input while hidden. Closing releases

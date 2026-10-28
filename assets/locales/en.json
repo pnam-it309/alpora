@@ -781,6 +781,10 @@
   "shortcuts.group_system": "System & Shell",
   "shortcuts.group_windows": "Windows & Apps",
   "shortcuts.group_workspaces": "Workspaces & Navigation",
-  "shortcuts.overview_subtitle": "Keyboard shortcuts, cheat sheet and custom bindings",
-  "shortcut.toggle_mode": "Toggle Work / Vibe Mode"
+  "shortcut.toggle_mode": "Toggle Work / Vibe Mode",
+  "quick.screenshot": "Screenshot",
+  "screenshot.drag_hint": "Drag to capture region · Space for full screen · Esc to cancel",
+  "common.copy": "Copy",
+  "common.save": "Save",
+  "common.cancel": "Cancel"
 }

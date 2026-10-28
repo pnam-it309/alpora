@@ -781,6 +781,10 @@
   "shortcuts.group_system": "Sistema y shell",
   "shortcuts.group_windows": "Ventanas y aplicaciones",
   "shortcuts.group_workspaces": "Espacios de trabajo y navegación",
-  "shortcuts.overview_subtitle": "Atajos de teclado, guía y personalización",
-  "shortcut.toggle_mode": "Alternar modo Work / Vibe"
+  "shortcut.toggle_mode": "Alternar modo Work / Vibe",
+  "quick.screenshot": "Captura de pantalla",
+  "screenshot.drag_hint": "Arrastre para capturar región · Espacio para pantalla completa · Esc para cancelar",
+  "common.copy": "Copiar",
+  "common.save": "Guardar",
+  "common.cancel": "Cancelar"
 }
