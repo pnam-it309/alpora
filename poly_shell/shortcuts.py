@@ -39,7 +39,7 @@ ACTIONS = [
 ]
 GLOBAL_ACTIONS = [('poly-shell:launcher', 'Applications'), ('poly-shell:quick-settings', 'Quick settings'),
                   ('poly-shell:notifications', 'Notifications'), ('poly-shell:overview', 'Overview'),
-                  ('poly-shell:clipboard', 'Clipboard')]
+                  ('poly-shell:clipboard', 'Clipboard'), ('poly-shell:toggle-mode', 'Toggle Work / Vibe Mode')]
 MODS = {'SUPER':64, 'CTRL':4, 'ALT':8, 'SHIFT':1}
 
 

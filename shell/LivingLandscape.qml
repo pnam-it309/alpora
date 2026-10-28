@@ -6,6 +6,7 @@ import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
+import Quickshell.Hyprland
 import "LandscapeGeometry.js" as Scene
 
 // The Bottom layer puts all interaction behind real application windows.
@@ -22,8 +23,12 @@ PanelWindow {
     color: "transparent"
     readonly property var scene: Scene.layout(Session.appearance.id || "alpine", TimelineState.shownMinute, width, height)
     readonly property real fit: scene.scale
-    readonly property bool allowed: LandscapeState.enabled && LandscapeState.loaded && Session.loaded && !ClockState.sleeping && !OverviewState.opened && !BarState.selection.name && !ThemeState.busy
-    visible: !!modelData && LandscapeState.enabled && LandscapeState.loaded && Session.loaded
+    readonly property var monitor: modelData ? Hyprland.monitorFor(modelData) : null
+    readonly property bool fullscreen: !!monitor && !!monitor.activeWorkspace && monitor.activeWorkspace.hasFullscreen
+    readonly property bool screenAwake: !monitor || (monitor.lastIpcObject && monitor.lastIpcObject.dpmsStatus !== false)
+    readonly property bool isWorkMode: Session.mode === "work"
+    readonly property bool allowed: LandscapeState.enabled && LandscapeState.loaded && Session.loaded && !ClockState.sleeping && screenAwake && !fullscreen && !isWorkMode && !OverviewState.opened && !BarState.selection.name && !ThemeState.busy
+    visible: !!modelData && allowed
     WlrLayershell.layer: WlrLayer.Bottom
     WlrLayershell.namespace: "poly-living-landscape"
     // Hover previews never own typing; the app search requests it after a click

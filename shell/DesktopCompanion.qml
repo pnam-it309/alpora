@@ -77,7 +77,7 @@ PanelWindow {
     readonly property bool screenAwake: !monitor || monitor.lastIpcObject.dpmsStatus !== false
     readonly property bool allowed: CompanionState.enabled && CompanionState.loaded && Session.loaded && !!modelData
         && modelData.name === targetScreen && fits && !ClockState.sleeping && screenAwake && !fullscreen
-        && !OverviewState.opened
+        && Session.mode !== "work" && !OverviewState.opened
     visible: allowed
     readonly property bool interactive: allowed
     onInteractiveChanged: if (!interactive) {cancelGesture();lastTick=0;}

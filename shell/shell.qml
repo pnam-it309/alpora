@@ -66,6 +66,11 @@ ShellRoot {
         onActivated: BarState.toggle("clipboard", root.focusedScreen())
     }
 
+    NativeShortcut {
+        appid: "poly-shell"; name: "toggle-mode"; description: I18n.tr("shortcut.toggle_mode")
+        onActivated: Session.setMode("toggle")
+    }
+
     FileView {
         id: readiness
         path: Quickshell.env("POLY_SHELL_READY") || ""

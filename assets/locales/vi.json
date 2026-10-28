@@ -781,5 +781,6 @@
   "shortcuts.group_system": "Hệ thống & Shell",
   "shortcuts.group_windows": "Cửa sổ & Ứng dụng",
   "shortcuts.group_workspaces": "Bàn làm việc & Điều hướng",
-  "shortcuts.overview_subtitle": "Bảng phím tắt, hướng dẫn thao tác & tùy chỉnh"
+  "shortcuts.overview_subtitle": "Bảng phím tắt, hướng dẫn thao tác & tùy chỉnh",
+  "shortcut.toggle_mode": "Chuyển chế độ Work / Vibe"
 }

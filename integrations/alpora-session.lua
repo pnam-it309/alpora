@@ -79,6 +79,7 @@ hl.bind("SUPER + I", hl.dsp.global("poly-shell:quick-settings"))
 hl.bind("SUPER + M", hl.dsp.global("poly-shell:notifications"))
 hl.bind("SUPER + V", hl.dsp.global("poly-shell:clipboard"))
 hl.bind("SUPER + Tab", hl.dsp.global("poly-shell:overview"))
+hl.bind("SUPER + W", hl.dsp.global("poly-shell:toggle-mode"))
 
 -- Window operations
 hl.bind("SUPER + Q", hl.dsp.window.close())

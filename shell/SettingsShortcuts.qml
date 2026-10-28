@@ -115,6 +115,7 @@ ColumnLayout {
             ShortcutItem { name: I18n.tr("shortcut.launcher"); keys: ["Super", "Space"] }
             ShortcutItem { name: I18n.tr("shortcut.overview"); keys: ["Super", "Tab"] }
             ShortcutItem { name: I18n.tr("shortcut.quick_settings"); keys: ["Super", "I"] }
+            ShortcutItem { name: I18n.tr("shortcut.toggle_mode"); keys: ["Super", "W"] }
             ShortcutItem { name: I18n.tr("shortcut.clipboard"); keys: ["Super", "V"] }
             ShortcutItem { name: I18n.tr("shortcut.notifications"); keys: ["Super", "N"] }
             ShortcutItem { name: I18n.tr("bar.lock_screen"); keys: ["Super", "L"] }

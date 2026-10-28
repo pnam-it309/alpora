@@ -781,5 +781,6 @@
   "shortcuts.group_system": "System & Shell",
   "shortcuts.group_windows": "Windows & Apps",
   "shortcuts.group_workspaces": "Workspaces & Navigation",
-  "shortcuts.overview_subtitle": "Keyboard shortcuts, cheat sheet and custom bindings"
+  "shortcuts.overview_subtitle": "Keyboard shortcuts, cheat sheet and custom bindings",
+  "shortcut.toggle_mode": "Toggle Work / Vibe Mode"
 }
