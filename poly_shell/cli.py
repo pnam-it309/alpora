@@ -212,6 +212,8 @@ def main(argv=None):
     windows_fs_parser = sub.add_parser("windows-drives", help="discover and mount Windows partitions")
     windows_fs_parser.add_argument("action", choices=("list", "mount", "unmount", "normalize-path"))
     windows_fs_parser.add_argument("target", nargs="?", default="")
+    dotfiles_parser = sub.add_parser("dotfiles", help="manage dotfile symlinks (Stow / Chezmoi compatible)")
+    dotfiles_parser.add_argument("action", choices=("link", "unlink", "status", "restow"), nargs="?", default="status")
     args = parser.parse_args(argv)
     paths = Paths.current()
     try:
@@ -282,6 +284,9 @@ def main(argv=None):
                 print(json.dumps({"success": unmount_drive(args.target)}, ensure_ascii=False))
             elif args.action == "normalize-path":
                 print(normalize_windows_path(args.target))
+        elif args.command == "dotfiles":
+            script = ROOT / "scripts/stow-dotfiles.sh"
+            return subprocess.run(["bash", str(script), args.action]).returncode
         elif args.command == "wallpaper":
             wallpaper(paths, args.image, reset=args.reset)
         elif args.command == "settings":
