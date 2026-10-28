@@ -411,6 +411,8 @@ def wallpaper(paths, image=None, *, reset=False):
 def validate_transition(value):
     if value is None:
         return None
+    if value == 'fade' or (isinstance(value, dict) and value.get('type') == 'fade'):
+        return {'type': 'fade'}
     if not isinstance(value, dict) or set(value) != {'x', 'y'}:
         raise ConfigError('Invalid wallpaper origin point')
     for coordinate in value.values():
@@ -428,13 +430,21 @@ def _animated_wallpaper(paths, image, saved, transition, seed=None):
     if not client or not daemon:
         raise ConfigError('awww (or swww) required for wallpaper animation')
     def send(image_path, origin=None):
-        args = [client, 'img', str(image_path), '--resize', 'crop',
-                '--transition-type', 'grow' if origin else 'none']
+        transition_type = 'none'
         if origin:
+            if isinstance(origin, dict) and origin.get('type') == 'fade':
+                transition_type = 'fade'
+            elif isinstance(origin, dict) and 'x' in origin:
+                transition_type = 'grow'
+        args = [client, 'img', str(image_path), '--resize', 'crop',
+                '--transition-type', transition_type]
+        if transition_type == 'grow':
             # Explicit decimals distinguish relative coordinates from pixel values.
             args += ['--transition-pos', f"{origin['x']:.6f},{origin['y']:.6f}", '--invert-y',
                      '--transition-duration', '1.4', '--transition-fps', '60',
                      '--transition-bezier', '0.22,0.8,0.22,1']
+        elif transition_type == 'fade':
+            args += ['--transition-duration', '0.25', '--transition-fps', '60']
         command(args)
     started = False
     if command([client, 'query'], check=False).returncode:

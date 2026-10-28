@@ -65,7 +65,10 @@ Rectangle {
                 Rectangle { x: tile.active ? 17 : 3; y: 3; width: 12; height: 12; radius: 6; color: tile.active ? Session.foreground : Session.muted; Behavior on x { NumberAnimation { duration: Motion.responseMs } } }
             }
         }
-        onClicked: tile.toggled()
+        onClicked: {
+            AudioFeedback.playTock();
+            tile.toggled();
+        }
     }
     Button {
         id: detailButton

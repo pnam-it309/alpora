@@ -6,6 +6,11 @@ Item {
     id: root
     required property var group
     property bool menuOpened: false
+    property real cursorX: -1000
+    property bool waveActive: false
+    readonly property real centerX: x + width / 2
+    readonly property real cursorDist: Math.abs(cursorX - centerX)
+    readonly property real waveFactor: (!waveActive || cursorDist >= 95) ? 0 : Math.cos((cursorDist / 95) * (Math.PI / 2))
     signal hoverChanged(bool hovered)
     signal menuRequested()
     implicitWidth: 56; implicitHeight: 64
@@ -22,15 +27,17 @@ Item {
     Image {
         id: icon
         anchors.horizontalCenter: parent.horizontalCenter
-        y: Motion.reduced ? 12 : root.hovered ? 7 : 12
+        readonly property real targetY: Motion.reduced ? 12 : root.waveActive ? (12 - 9 * root.waveFactor) : (root.hovered ? 7 : 12)
+        readonly property real targetScale: Motion.reduced ? 1 : mouse.pressed ? 0.93 : root.waveActive ? (1.0 + 0.30 * root.waveFactor) : (root.hovered ? 1.1 : 1)
+        y: targetY
         width: 40; height: 40
-        scale: Motion.reduced ? 1 : mouse.pressed ? 0.93 : root.hovered ? 1.1 : 1
+        scale: targetScale
         source: DockState.iconSource(root.group)
         sourceSize: Qt.size(96, 96); fillMode: Image.PreserveAspectFit
         // QIcon-backed providers must not create GUI pixmaps in an image worker.
         asynchronous: !source.toString().startsWith("image://")
-        Behavior on y { NumberAnimation { duration: Motion.responseMs; easing.type: Easing.OutCubic } }
-        Behavior on scale { NumberAnimation { duration: Motion.responseMs; easing.type: Easing.OutCubic } }
+        Behavior on y { NumberAnimation { duration: Motion.reduced ? 0 : 130; easing.type: Easing.OutQuad } }
+        Behavior on scale { NumberAnimation { duration: Motion.reduced ? 0 : 130; easing.type: Easing.OutQuad } }
     }
     Rectangle {
         visible: root.group.windows.length > 1

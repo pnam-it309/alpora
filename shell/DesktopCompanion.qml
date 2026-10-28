@@ -164,6 +164,7 @@ PanelWindow {
     }
     function cancelGesture(): void {suppressClick=true;releaseGesture(true);}
     function finishThrow(): void {
+        if (toss.mode === "landed") AudioFeedback.playTock();
         travel=toss.mode==="landed"?Travel.perchAt(travel,travelContext,toss.support,(toss.x-8)/freeWidth)
             :Travel.resumeAt(travel,travelContext,(toss.x-8)/freeWidth,toss.y/freeHeight);
         toss=Throw.create();

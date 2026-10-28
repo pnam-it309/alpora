@@ -84,13 +84,41 @@ ColumnLayout {
                 Text { Layout.fillWidth: true; text: I18n.tr("theme.preview"); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 15; font.weight: Font.DemiBold }
             }
             Item {
+                id: previewCanvas
                 Layout.fillWidth: true; Layout.fillHeight: true; Layout.minimumHeight: 210
-                SettingsImage { anchors.fill: parent; source: root.selected ? root.fileUrl(root.selected.image) : ""; sourceSize: Qt.size(660, 600) }
+                readonly property string targetSource: root.selected ? root.fileUrl(root.selected.image) : ""
+                property string activeSourceA: targetSource
+                property string activeSourceB: ""
+                property bool showingA: true
+                onTargetSourceChanged: {
+                    if (showingA) {
+                        activeSourceB = targetSource;
+                        showingA = false;
+                    } else {
+                        activeSourceA = targetSource;
+                        showingA = true;
+                    }
+                }
+                SettingsImage {
+                    anchors.fill: parent
+                    source: previewCanvas.activeSourceA
+                    sourceSize: Qt.size(660, 600)
+                    opacity: previewCanvas.showingA ? 1 : 0
+                    Behavior on opacity { NumberAnimation { duration: Motion.reduced ? 0 : 250; easing.type: Easing.InOutQuad } }
+                }
+                SettingsImage {
+                    anchors.fill: parent
+                    source: previewCanvas.activeSourceB
+                    sourceSize: Qt.size(660, 600)
+                    opacity: previewCanvas.showingA ? 0 : 1
+                    Behavior on opacity { NumberAnimation { duration: Motion.reduced ? 0 : 250; easing.type: Easing.InOutQuad } }
+                }
                 Rectangle {
                     x: 7; y: 10; width: parent.width - 14; height: 20; radius: 8
                     color: Qt.rgba(root.previewBackground.r,root.previewBackground.g,root.previewBackground.b,0.93)
-                    Row { x: 7; anchors.verticalCenter: parent.verticalCenter; spacing: 4; Repeater { model: 3; Rectangle { width: 4; height: 4; radius: 2; color: root.previewAccent } } }
-                    Text { anchors.centerIn: parent; text: "12:30"; color: root.previewPalette.text || Session.foreground; font.family: Session.fontFamily; font.pixelSize: 8 }
+                    Behavior on color { ColorAnimation { duration: Motion.reduced ? 0 : 250 } }
+                    Row { x: 7; anchors.verticalCenter: parent.verticalCenter; spacing: 4; Repeater { model: 3; Rectangle { width: 4; height: 4; radius: 2; color: root.previewAccent; Behavior on color { ColorAnimation { duration: Motion.reduced ? 0 : 250 } } } } }
+                    Text { anchors.centerIn: parent; text: "12:30"; color: root.previewPalette.text || Session.foreground; font.family: Session.fontFamily; font.pixelSize: 8; Behavior on color { ColorAnimation { duration: Motion.reduced ? 0 : 250 } } }
                     Icon { name: "wifi"; width: 10; height: 10; anchors.right: parent.right; anchors.rightMargin: 9; anchors.verticalCenter: parent.verticalCenter }
                 }
                 Rectangle {
@@ -98,9 +126,11 @@ ColumnLayout {
                     width: 134; height: 146; radius: 12
                     color: Qt.rgba(root.previewBackground.r,root.previewBackground.g,root.previewBackground.b,0.93)
                     border.width: 1; border.color: root.previewAccent
+                    Behavior on color { ColorAnimation { duration: Motion.reduced ? 0 : 250 } }
+                    Behavior on border.color { ColorAnimation { duration: Motion.reduced ? 0 : 250 } }
                     ColumnLayout {
                         anchors.fill: parent; anchors.margins: 11; spacing: 11
-                        Text { text: I18n.tr("theme.quick_settings"); color: root.previewPalette.text || Session.foreground; font.family: Session.fontFamily; font.pixelSize: 9 }
+                        Text { text: I18n.tr("theme.quick_settings"); color: root.previewPalette.text || Session.foreground; font.family: Session.fontFamily; font.pixelSize: 9; Behavior on color { ColorAnimation { duration: Motion.reduced ? 0 : 250 } } }
                         Repeater {
                             model: ["volume", "sun", "microphone"]
                             RowLayout {
@@ -108,13 +138,17 @@ ColumnLayout {
                                 required property string modelData
                                 Layout.fillWidth: true; spacing: 7
                                 Icon { name: previewControl.modelData; Layout.preferredWidth: 13; Layout.preferredHeight: 13 }
-                                Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 4; radius: 2; color: root.previewSurface; Rectangle { width: parent.width * 0.7; height: 4; radius: 2; color: root.previewAccent } }
+                                Rectangle {
+                                    Layout.fillWidth: true; Layout.preferredHeight: 4; radius: 2; color: root.previewSurface
+                                    Behavior on color { ColorAnimation { duration: Motion.reduced ? 0 : 250 } }
+                                    Rectangle { width: parent.width * 0.7; height: 4; radius: 2; color: root.previewAccent; Behavior on color { ColorAnimation { duration: Motion.reduced ? 0 : 250 } } }
+                                }
                             }
                         }
                         RowLayout {
                             Layout.fillWidth: true; spacing: 7
-                            Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 28; radius: 6; color: root.previewSurface; Icon { anchors.centerIn: parent; name: "wifi"; width: 15; height: 15 } }
-                            Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 28; radius: 6; color: root.previewSurface; Icon { anchors.centerIn: parent; name: "bluetooth"; width: 15; height: 15 } }
+                            Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 28; radius: 6; color: root.previewSurface; Behavior on color { ColorAnimation { duration: Motion.reduced ? 0 : 250 } }; Icon { anchors.centerIn: parent; name: "wifi"; width: 15; height: 15 } }
+                            Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 28; radius: 6; color: root.previewSurface; Behavior on color { ColorAnimation { duration: Motion.reduced ? 0 : 250 } }; Icon { anchors.centerIn: parent; name: "bluetooth"; width: 15; height: 15 } }
                         }
                     }
                 }
@@ -122,11 +156,13 @@ ColumnLayout {
                     x: 12; y: parent.height - 108; width: 151; height: 88; radius: 9
                     color: Qt.rgba(root.previewSurface.r,root.previewSurface.g,root.previewSurface.b,0.95)
                     border.width: 1; border.color: Qt.rgba(root.previewAccent.r,root.previewAccent.g,root.previewAccent.b,0.4)
+                    Behavior on color { ColorAnimation { duration: Motion.reduced ? 0 : 250 } }
+                    Behavior on border.color { ColorAnimation { duration: Motion.reduced ? 0 : 250 } }
                     Column { anchors.fill: parent; anchors.margins: 10; spacing: 9
-                        Text { text: I18n.tr("theme.app_window"); color: root.previewPalette.text || Session.foreground; font.family: Session.fontFamily; font.pixelSize: 9 }
-                        Rectangle { width: 100; height: 4; radius: 2; color: root.previewAccent }
-                        Rectangle { width: 73; height: 4; radius: 2; color: root.previewPalette.muted || Session.muted; opacity: 0.5 }
-                        Rectangle { width: 90; height: 4; radius: 2; color: root.previewPalette.muted || Session.muted; opacity: 0.5 }
+                        Text { text: I18n.tr("theme.app_window"); color: root.previewPalette.text || Session.foreground; font.family: Session.fontFamily; font.pixelSize: 9; Behavior on color { ColorAnimation { duration: Motion.reduced ? 0 : 250 } } }
+                        Rectangle { width: 100; height: 4; radius: 2; color: root.previewAccent; Behavior on color { ColorAnimation { duration: Motion.reduced ? 0 : 250 } } }
+                        Rectangle { width: 73; height: 4; radius: 2; color: root.previewPalette.muted || Session.muted; opacity: 0.5; Behavior on color { ColorAnimation { duration: Motion.reduced ? 0 : 250 } } }
+                        Rectangle { width: 90; height: 4; radius: 2; color: root.previewPalette.muted || Session.muted; opacity: 0.5; Behavior on color { ColorAnimation { duration: Motion.reduced ? 0 : 250 } } }
                     }
                 }
             }

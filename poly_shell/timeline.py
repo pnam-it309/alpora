@@ -69,7 +69,8 @@ def assets():
 def release_fallback():
     """Remove only this theme's static renderer once every output is ready."""
     expected = str(ROOT / 'assets/wallpapers/timeline/sunset.png')
-    result = subprocess.run(['pgrep', '-u', str(os.getuid()), '-x', 'swaybg'],
+    uid_str = str(os.getuid()) if hasattr(os, 'getuid') else '1000'
+    result = subprocess.run(['pgrep', '-u', uid_str, '-x', 'swaybg'],
                             capture_output=True, text=True, timeout=3, check=False)
     for token in result.stdout.split():
         if not token.isdecimal(): continue

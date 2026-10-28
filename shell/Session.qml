@@ -58,6 +58,7 @@ Singleton {
     readonly property var battery: UPower.displayDevice
     readonly property bool batteryPresent: isLaptop && hardware.batteryAvailable !== false && !!battery && battery.ready && battery.isLaptopBattery
     readonly property bool batteryCharging: batteryPresent && battery.state === UPowerDeviceState.Charging
+    onBatteryChargingChanged: if (batteryCharging) AudioFeedback.playTock()
     readonly property bool onBattery: UPower.onBattery
     readonly property string batteryStatus: !batteryPresent ? I18n.tr("power.ac")
         : batteryCharging ? I18n.tr("power.charging")

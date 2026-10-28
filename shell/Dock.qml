@@ -115,11 +115,16 @@ PanelWindow {
             Row {
                 id: icons
                 height: 64; y: 4; spacing: 0
+                readonly property real waveCursorX: iconsHover.hovered ? iconsHover.point.position.x : -1000
+                readonly property bool waveActive: !Motion.reduced && dock.opened && iconsHover.hovered
+                HoverHandler { id: iconsHover; enabled: !Motion.reduced && dock.opened }
                 Button {
                     id: applications
                     width: 56; height: 64; padding: 0
                     hoverEnabled: true; focusPolicy: Qt.NoFocus
                     Accessible.name: I18n.tr("dock.all_apps")
+                    readonly property real appDist: Math.abs(icons.waveCursorX - 28)
+                    readonly property real appWave: (icons.waveActive && appDist < 95) ? Math.cos((appDist / 95) * (Math.PI / 2)) : 0
                     onHoveredChanged: {
                         if (hovered) { dock.hoverItem = applications; dock.hoverId = ""; }
                         else if (dock.hoverItem === applications) dock.hoverItem = null;
@@ -130,7 +135,14 @@ PanelWindow {
                         color: PolyTheme.Theme.withAlpha(Session.accent, applications.hovered || dock.launcherActive ? 0.15 : 0.04)
                     }
                     contentItem: Item {
-                        FacetedMark { anchors.centerIn: parent; anchors.verticalCenterOffset: -2; width: 34; height: 34 }
+                        FacetedMark {
+                            anchors.centerIn: parent
+                            anchors.verticalCenterOffset: Motion.reduced ? -2 : -2 - 8 * applications.appWave
+                            scale: Motion.reduced ? 1 : 1.0 + 0.28 * applications.appWave
+                            width: 34; height: 34
+                            Behavior on scale { NumberAnimation { duration: Motion.reduced ? 0 : 130; easing.type: Easing.OutQuad } }
+                            Behavior on anchors.verticalCenterOffset { NumberAnimation { duration: Motion.reduced ? 0 : 130; easing.type: Easing.OutQuad } }
+                        }
                     }
                     onClicked: {
                         dock.contextId = "";
@@ -152,6 +164,8 @@ PanelWindow {
                         required property var modelData
                         required property int index
                         group: modelData; width: 56; height: 64
+                        cursorX: icons.waveCursorX
+                        waveActive: icons.waveActive
                         menuOpened: dock.contextId === group.id
                         onHoverChanged: hovered => {
                             if (hovered) { dock.hoverItem = button; dock.hoverId = group.id; }

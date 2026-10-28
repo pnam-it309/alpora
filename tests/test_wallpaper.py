@@ -122,6 +122,13 @@ class WallpaperTests(unittest.TestCase):
         self.assertNotIn('--transition-pos', args)
         self.assertEqual(args[-1], 'none')
 
+    def test_fade_crossfade_transition_uses_fast_duration(self):
+        with patch('poly_shell.desktop.shutil.which', side_effect=lambda name: '/bin/' + name):
+            self.desktop._wallpaper(self.paths, str(self.image), transition='fade')
+        args = next(c for c in self.calls if c[1:2] == ['img'])
+        self.assertEqual(args[args.index('--transition-type') + 1], 'fade')
+        self.assertEqual(args[args.index('--transition-duration') + 1], '0.25')
+
 
 if __name__ == '__main__':
     unittest.main()

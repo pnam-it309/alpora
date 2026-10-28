@@ -15,6 +15,7 @@ PanelWindow {
     property point origin: Qt.point(0, 0)
     property size decodeSize: Qt.size(1920, 1080)
     property bool frontA: true
+    property bool crossfadeMode: false
     readonly property var front: frontA ? textureA : textureB
     readonly property var staging: frontA ? textureB : textureA
     function prepare(path: string): void {
@@ -22,8 +23,19 @@ PanelWindow {
     }
     function startAt(x: real, y: real): void {
         handoff.stop(); reveal.stop();
+        crossfadeMode = false;
         frontA = !frontA;
         origin = Qt.point(x, y); progress = 0; showing = true;
+        pendingStart = true;
+        begin();
+    }
+    function crossfade(path: string): void {
+        prepare(path);
+        handoff.stop(); reveal.stop();
+        crossfadeMode = true;
+        frontA = !frontA;
+        origin = Qt.point(width / 2, height / 2);
+        progress = 0; showing = true;
         pendingStart = true;
         begin();
     }
@@ -35,7 +47,7 @@ PanelWindow {
     }
     function clear(): void {
         handoff.stop(); reveal.stop();
-        showing = false; pendingStart = false; front.source = "";
+        showing = false; pendingStart = false; crossfadeMode = false; front.source = "";
     }
     anchors { top: true; bottom: true; left: true; right: true }
     exclusionMode: ExclusionMode.Ignore; exclusiveZone: 0
@@ -71,9 +83,10 @@ PanelWindow {
     NumberAnimation {
         id: reveal
         target: root; property: "progress"; from: 0; to: 1
-        duration: 1400; easing.type: Easing.OutCubic
+        duration: root.crossfadeMode ? (Motion.reduced ? 0 : 250) : 1400
+        easing.type: root.crossfadeMode ? Easing.InOutQuad : Easing.OutCubic
     }
-    Timer { id: handoff; interval: 1600; onTriggered: root.clear() }
+    Timer { id: handoff; interval: root.crossfadeMode ? 350 : 1600; onTriggered: root.clear() }
     Connections {
         target: ThemeState
         function onMessageChanged(): void {

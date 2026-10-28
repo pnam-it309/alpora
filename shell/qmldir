@@ -1,4 +1,5 @@
 singleton Session 1.0 Session.qml
+singleton AudioFeedback 1.0 AudioFeedback.qml
 singleton I18n 1.0 I18n.qml
 CompanionTween 1.0 CompanionTween.qml
 singleton LandscapeState 1.0 LandscapeState.qml
