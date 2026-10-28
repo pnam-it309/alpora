@@ -163,14 +163,10 @@ Singleton {
         }
     }
     function screenshot(): void {
+        const target = root.popupScreen || "";
         close();
         Session.closeQuickSettings();
-        screenshotDelay.restart();
-    }
-    Timer {
-        id: screenshotDelay
-        interval: 250
-        onTriggered: Quickshell.execDetached(["bash", Quickshell.env("HOME") + "/.config/hypr/screenshot.sh"])
+        ScreenshotState.open(target);
     }
 
     Connections {

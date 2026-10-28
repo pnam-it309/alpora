@@ -12,6 +12,8 @@ singleton OverviewState 1.0 OverviewState.qml
 WorkspaceOverview 1.0 WorkspaceOverview.qml
 singleton ScreenshotState 1.0 ScreenshotState.qml
 ScreenshotOverlay 1.0 ScreenshotOverlay.qml
+singleton PowerState 1.0 PowerState.qml
+PowerMenu 1.0 PowerMenu.qml
 singleton AppearanceState 1.0 AppearanceState.qml
 AppearancePage 1.0 AppearancePage.qml
 AppearanceSlider 1.0 AppearanceSlider.qml

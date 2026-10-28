@@ -34,9 +34,14 @@ ShellRoot {
     Variants { model: Quickshell.screens; WorkspaceOverview {} }
     Variants { model: Quickshell.screens; Dock {} }
     Variants { model: Quickshell.screens; ScreenshotOverlay {} }
+    Variants { model: Quickshell.screens; PowerMenu {} }
 
     // Native Wayland shortcuts avoid spawning an IPC client before input can
     // reach the launcher. Keep registration once per shell, not per monitor.
+    NativeShortcut {
+        appid: "poly-shell"; name: "power-menu"; description: I18n.tr("power.title")
+        onActivated: PowerState.toggle(root.focusedScreen())
+    }
     NativeShortcut {
         appid: "poly-shell"; name: "screenshot"; description: I18n.tr("quick.screenshot")
         onActivated: ScreenshotState.open(root.focusedScreen())
@@ -138,6 +143,7 @@ ShellRoot {
         function startFrameProbe(): void { FrameMetrics.start(); }
         function stopFrameProbe(): string { return FrameMetrics.finish(); }
         function screenshot(): void { ScreenshotState.open(root.focusedScreen()); }
+        function powerMenu(): void { PowerState.toggle(root.focusedScreen()); }
     }
 
 

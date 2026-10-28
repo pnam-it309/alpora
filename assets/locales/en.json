@@ -786,5 +786,16 @@
   "screenshot.drag_hint": "Drag to capture region · Space for full screen · Esc to cancel",
   "common.copy": "Copy",
   "common.save": "Save",
-  "common.cancel": "Cancel"
+  "common.cancel": "Cancel",
+  "common.off": "Off",
+  "common.on": "On",
+  "osd.volume": "Volume",
+  "osd.brightness": "Brightness",
+  "osd.microphone": "Microphone",
+  "power.title": "Power & Session",
+  "power.lock": "Lock",
+  "power.suspend": "Sleep",
+  "power.reboot": "Restart",
+  "power.poweroff": "Shut Down",
+  "power.logout": "Log Out"
 }

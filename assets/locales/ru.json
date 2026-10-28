@@ -786,5 +786,16 @@
   "screenshot.drag_hint": "Выделите область мышью · Пробел для всего экрана · Esc для отмены",
   "common.copy": "Копировать",
   "common.save": "Сохранить",
-  "common.cancel": "Отмена"
+  "common.cancel": "Отмена",
+  "common.off": "Выкл",
+  "common.on": "Вкл",
+  "osd.volume": "Громкость",
+  "osd.brightness": "Яркость",
+  "osd.microphone": "Микрофон",
+  "power.title": "Питание и сеанс",
+  "power.lock": "Блокировка",
+  "power.suspend": "Сон",
+  "power.reboot": "Перезагрузка",
+  "power.poweroff": "Выключение",
+  "power.logout": "Выход"
 }

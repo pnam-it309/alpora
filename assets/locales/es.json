@@ -786,5 +786,16 @@
   "screenshot.drag_hint": "Arrastre para capturar región · Espacio para pantalla completa · Esc para cancelar",
   "common.copy": "Copiar",
   "common.save": "Guardar",
-  "common.cancel": "Cancelar"
+  "common.cancel": "Cancelar",
+  "common.off": "Desactivado",
+  "common.on": "Activado",
+  "osd.volume": "Volumen",
+  "osd.brightness": "Brillo",
+  "osd.microphone": "Micrófono",
+  "power.title": "Energía y sesión",
+  "power.lock": "Bloquear",
+  "power.suspend": "Suspender",
+  "power.reboot": "Reiniciar",
+  "power.poweroff": "Apagar",
+  "power.logout": "Cerrar sesión"
 }

@@ -786,5 +786,16 @@
   "screenshot.drag_hint": "Kéo chuột để chọn vùng · Phím Cách để chụp toàn màn hình · Esc để hủy",
   "common.copy": "Sao chép",
   "common.save": "Lưu",
-  "common.cancel": "Hủy"
+  "common.cancel": "Hủy",
+  "common.off": "Tắt",
+  "common.on": "Bật",
+  "osd.volume": "Âm lượng",
+  "osd.brightness": "Độ sáng",
+  "osd.microphone": "Micro",
+  "power.title": "Nguồn & Phiên làm việc",
+  "power.lock": "Khóa",
+  "power.suspend": "Ngủ",
+  "power.reboot": "Khởi động lại",
+  "power.poweroff": "Tắt máy",
+  "power.logout": "Đăng xuất"
 }
