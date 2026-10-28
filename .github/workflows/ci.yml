@@ -1,15 +1,95 @@
-name: CI
+name: CI/CD Pipeline
 
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
-  test:
-    name: Unit Tests & I18n Verification
+  # ---------------------------------------------------------------------------
+  # 1. Syntax Check, Static Linters & Formatting Verification
+  # ---------------------------------------------------------------------------
+  syntax-and-lint:
+    name: Syntax Check & Static Analysis
     runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install static analysis tools & linters
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck shfmt lua5.4 yamllint jq
+          pip install ruff
+
+      - name: 1. ShellCheck (Bash & Shell Scripts)
+        run: |
+          echo "Running ShellCheck on installation and helper scripts..."
+          shellcheck -x -S warning install.sh uninstall.sh integrations/*.sh scripts/*
+
+      - name: 2. Shell Script Formatting Check (shfmt)
+        run: |
+          echo "Verifying shell script indentation & format with shfmt..."
+          shfmt -d -i 4 -ci install.sh uninstall.sh integrations/*.sh scripts/*
+
+      - name: 3. Python Code Style & Syntax Check (Ruff)
+        run: |
+          echo "Verifying Python code style and static formatting..."
+          ruff check poly_shell/ tests/ scripts/
+          ruff format --check poly_shell/ tests/ scripts/
+
+      - name: 4. Python Bytecode Compilation Check
+        run: |
+          echo "Validating Python compilation..."
+          python -m compileall -q poly_shell tests
+
+      - name: 5. JSON Syntax & Encoding Verification
+        run: |
+          echo "Validating syntax of all JSON localization, theme and profile files..."
+          python - <<'EOF'
+          import glob, json, sys
+          failed = False
+          for f in glob.glob("**/*.json", recursive=True):
+              if ".git" in f:
+                  continue
+              try:
+                  with open(f, "r", encoding="utf-8") as fp:
+                      json.load(fp)
+              except Exception as e:
+                  print(f"::error file={f}::JSON syntax error: {e}")
+                  failed = True
+          if failed:
+              sys.exit(1)
+          print("All JSON files are syntactically valid!")
+          EOF
+
+      - name: 6. YAML Syntax Check (yamllint)
+        run: |
+          echo "Validating workflow and YAML configurations..."
+          yamllint -d relaxed .github/workflows/*.yml
+
+      - name: 7. Lua Configuration & Dispatcher Syntax Check
+        run: |
+          echo "Compiling Lua integration scripts with luac..."
+          luac -p integrations/alpora-session.lua
+          luac -p integrations/alpora-overview.lua
+
+  # ---------------------------------------------------------------------------
+  # 2. Automated Test Suite & Multi-Monitor / I18n Verification
+  # ---------------------------------------------------------------------------
+  unit-tests:
+    name: Unit Tests & Regression Suite
+    runs-on: ubuntu-latest
+    needs: syntax-and-lint
 
     steps:
       - name: Checkout repository
@@ -35,14 +115,83 @@ jobs:
         run: |
           python -m unittest tests/test_i18n.py
 
+      - name: Run Windows Folder & Drive Support Tests
+        run: |
+          python -m unittest tests/test_windows_fs.py
+
       - name: Run Multi-Monitor & Fractional Scaling Tests
         run: |
           python -m unittest tests/test_multimonitor.py
 
       - name: Run Desktop & Running Apps Tests
         run: |
-          python -m unittest tests/test_desktop.py tests/test_running_apps.py tests/test_widgets.py
+          python -m unittest tests/test_desktop.py tests/test_running_apps.py tests/test_widgets.py tests/test_appearance.py
 
       - name: Run Full Test Suite
         run: |
           python -m unittest discover tests
+
+  # ---------------------------------------------------------------------------
+  # 3. Dry-Run Installation Test (Clean Arch Linux Container)
+  # ---------------------------------------------------------------------------
+  arch-dry-run-install:
+    name: Dry-Run Install on Clean Arch Linux
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:base-devel
+    needs: syntax-and-lint
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare Arch environment & non-root user
+        run: |
+          pacman -Syu --noconfirm git python sudo which
+          useradd -m -s /bin/bash archuser
+          echo "archuser ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+          chown -R archuser:archuser "$GITHUB_WORKSPACE"
+
+      - name: Test 1 - Standard Dry-Run Installation
+        run: |
+          sudo -u archuser ./install.sh --dry-run
+
+      - name: Test 2 - UI-Only Standalone Dry-Run
+        run: |
+          sudo -u archuser ./install.sh --ui-only --dry-run
+
+      - name: Test 3 - Core-Only Minimal Dry-Run
+        run: |
+          sudo -u archuser ./install.sh --core-only --dry-run
+
+      - name: Test 4 - Custom Theme Preset Dry-Run
+        run: |
+          sudo -u archuser ./install.sh --dry-run --theme=forest-mist
+
+      - name: Test 5 - Terminal Welcome Banner & Preview Mode
+        run: |
+          sudo -u archuser ./install.sh --preview
+
+      - name: Test 6 - Dry-Run Uninstall Script
+        run: |
+          sudo -u archuser ./uninstall.sh --dry-run || true
+
+  # ---------------------------------------------------------------------------
+  # 4. Dry-Run Installation Test (Debian / Ubuntu Non-Arch Distro)
+  # ---------------------------------------------------------------------------
+  debian-dry-run-install:
+    name: Dry-Run Install on Debian/Ubuntu Distro
+    runs-on: ubuntu-latest
+    needs: syntax-and-lint
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Test UI-Only Standalone Dry-Run on Ubuntu
+        run: |
+          ./install.sh --ui-only --dry-run
+
+      - name: Test Skip-Packages Dry-Run on Ubuntu
+        run: |
+          ./install.sh --skip-packages --dry-run

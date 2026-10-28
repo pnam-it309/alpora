@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Source-only terminal presentation. No downloads or system changes here.
 alpora_colour() {
     alpora_reset='' alpora_bold='' alpora_dim='' alpora_accent='' alpora_warm=''
