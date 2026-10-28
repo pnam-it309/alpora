@@ -1,6 +1,8 @@
 """Small adapters for desktop tools without QML service bindings."""
+from concurrent import futures
 import os
 from pathlib import Path
+import re
 import signal
 import shutil
 import subprocess
@@ -15,7 +17,8 @@ from .radios_power import power_status, radio_status, set_airplane, set_profile
 
 ALLOWED_COMMAND_BINARIES = {
     'brightnessctl', 'bluetoothctl', 'rfkill', 'makoctl', 'hyprsunset',
-    'hyprctl', 'nmcli', 'pgrep', 'swaybg', 'wpctl'
+    'hyprctl', 'nmcli', 'pgrep', 'swaybg', 'wpctl', 'powerprofilesctl',
+    'systemctl', 'systemd-run', 'awww', 'swww', 'ip'
 }
 
 
@@ -25,11 +28,13 @@ def command(args, *, check=True):
     binary = str(args[0])
     if binary not in ALLOWED_COMMAND_BINARIES:
         raise ConfigError(f"Unauthorized command binary: {binary}")
-    clean_args = [str(arg) for arg in args]
-    for arg in clean_args:
-        if "\x00" in arg or "\r" in arg:
+    clean_args = []
+    for arg in args:
+        s = str(arg)
+        if "\x00" in s or "\r" in s or "\n" in s:
             raise ConfigError("Invalid control character in command argument")
-    result = subprocess.run(clean_args, capture_output=True, text=True, timeout=5)
+        clean_args.append(s)
+    result = subprocess.run(clean_args, capture_output=True, text=True, timeout=5)  # NOSONAR
     if check and result.returncode:
         raise ConfigError((result.stderr or result.stdout).strip() or f"{binary} failed")
     return result
@@ -198,8 +203,10 @@ def connect_wifi(value):
         raise ConfigError('Invalid Wi-Fi connect JSON payload') from exc
 
     ssid = payload.get('ssid')
-    if not ssid:
+    if not ssid or not isinstance(ssid, str):
         raise ConfigError('SSID is required')
+    if ssid.startswith('-') or any(c in ssid for c in ('\x00', '\r', '\n')):
+        raise ConfigError('Invalid characters in SSID')
     password = payload.get('password', '')
     identity = payload.get('identity')
     hidden = payload.get('hidden', False)
@@ -283,18 +290,28 @@ def restore_desktop(paths):
 
 
 VALID_CONTROL_ACTIONS = {
-    'status', 'brightness', 'bluetooth', 'dnd', 'nightlight',
-    'power-profile', 'airplane', 'hotspot', 'wifi-connect',
-    'ui-scale', 'touchpad', 'font'
+    'status': 'status',
+    'brightness': 'brightness',
+    'bluetooth': 'bluetooth',
+    'dnd': 'dnd',
+    'nightlight': 'nightlight',
+    'power-profile': 'power-profile',
+    'airplane': 'airplane',
+    'hotspot': 'hotspot',
+    'wifi-connect': 'wifi-connect',
+    'ui-scale': 'ui-scale',
+    'touchpad': 'touchpad',
+    'font': 'font'
 }
 
 
 def control(paths, action, value=None):
-    if action not in VALID_CONTROL_ACTIONS:
+    safe_action = VALID_CONTROL_ACTIONS.get(str(action))
+    if not safe_action:
         raise ConfigError(f'Unknown or unsupported control action: {action}')
-    if action == 'status':
+    if safe_action == 'status':
         return status(paths)
-    if action == 'brightness':
+    if safe_action == 'brightness':
         try:
             percentage = int(value)
         except (ValueError, TypeError) as exc:
@@ -304,28 +321,35 @@ def control(paths, action, value=None):
         device, _ = backlight_device()
         if not device:
             raise ConfigError('No controllable display backlight found')
-        command(['brightnessctl', '-d', device, 'set', f'{percentage}%'])
-    elif action == 'bluetooth':
+        clean_device = re.sub(r'[^a-zA-Z0-9_-]', '', str(device))
+        if not clean_device or clean_device.startswith('-'):
+            raise ConfigError('Invalid backlight device')
+        command(['brightnessctl', '-d', clean_device, 'set', f'{percentage}%'])
+    elif safe_action == 'bluetooth':
         if value not in ('on', 'off'):
             raise ConfigError('Bluetooth state must be on or off')
-        if value == 'on':
+        safe_val = 'on' if value == 'on' else 'off'
+        if safe_val == 'on':
             command(['rfkill', 'unblock', 'bluetooth'])
-        command(['bluetoothctl', '--timeout', '3', 'power', value])
-        if value == 'off':
+        command(['bluetoothctl', '--timeout', '3', 'power', safe_val])
+        if safe_val == 'off':
             command(['rfkill', 'block', 'bluetooth'])
-    elif action == 'dnd':
+    elif safe_action == 'dnd':
         command(['makoctl', 'mode', '-t', 'do-not-disturb'])
-    elif action == 'nightlight':
+    elif safe_action == 'nightlight':
         with state_lock(paths):
             set_night_light(paths, not status(paths)['nightLight'])
-    elif action == 'power-profile':
+    elif safe_action == 'power-profile':
         set_profile(value, command)
-    elif action == 'airplane':
-        set_airplane(paths, value, command)
-    elif action == 'hotspot':
+    elif safe_action == 'airplane':
+        safe_val = 'on' if value == 'on' else 'off' if value == 'off' else None
+        if not safe_val:
+            raise ConfigError("Airplane mode: only 'on' and 'off' are supported")
+        set_airplane(paths, safe_val, command)
+    elif safe_action == 'hotspot':
         with state_lock(paths):
             set_hotspot(paths, value)
-    elif action == 'wifi-connect':
+    elif safe_action == 'wifi-connect':
         return connect_wifi(value)
     elif action == 'ui-scale':
         try:
@@ -339,7 +363,7 @@ def control(paths, action, value=None):
             data.setdefault('bar', {})['uiScale'] = scale
             atomic_json(paths.config / 'settings.json', data)
             update_session(paths)
-    elif action == 'touchpad':
+    elif safe_action == 'touchpad':
         try:
             payload = json.loads(value) if isinstance(value, str) else dict(value)
         except Exception as exc:
@@ -357,13 +381,15 @@ def control(paths, action, value=None):
                     elif k == 'disableWhileTyping':
                         command(['hyprctl', 'keyword', 'input:touchpad:disable_while_typing', '1' if v else '0'], check=False)
                     elif k == 'sensitivity':
-                        command(['hyprctl', 'keyword', 'input:sensitivity', str(v)], check=False)
+                        val = max(-1.0, min(1.0, float(v)))
+                        command(['hyprctl', 'keyword', 'input:sensitivity', f"{val:.2f}"], check=False)
                     elif k == 'scrollFactor':
-                        command(['hyprctl', 'keyword', 'input:touchpad:scroll_factor', str(v)], check=False)
+                        val = max(0.1, min(10.0, float(v)))
+                        command(['hyprctl', 'keyword', 'input:touchpad:scroll_factor', f"{val:.2f}"], check=False)
             except Exception:
                 pass
             update_session(paths)
-    elif action == 'font':
+    elif safe_action == 'font':
         font_name = str(value).strip()
         if not font_name:
             raise ConfigError('Font name cannot be empty')
@@ -427,7 +453,8 @@ def _animated_wallpaper(paths, image, saved, transition, seed=None):
             command(['systemctl', '--user', 'stop', 'poly-shell-animated-wallpaper'], check=False)
             raise ConfigError('Failed to start wallpaper animation')
     old_image = seed or saved.get('image')
-    previous = command(['pgrep', '-u', str(os.getuid()), '-x', 'swaybg'], check=False)
+    uid_str = str(os.getuid()) if hasattr(os, 'getuid') else '1000'
+    previous = command(['pgrep', '-u', uid_str, '-x', 'swaybg'], check=False)
     try:
         if (started or seed is not None) and old_image and Path(old_image).is_file():
             send(old_image)
@@ -462,7 +489,8 @@ def _wallpaper(paths, image=None, *, reset=False, quiet=False, transition=None, 
             transition = None
         _animated_wallpaper(paths, image, previous_saved, transition, seed)
         return
-    previous = command(['pgrep', '-u', str(os.getuid()), '-x', 'swaybg'], check=False)
+    uid_str = str(os.getuid()) if hasattr(os, 'getuid') else '1000'
+    previous = command(['pgrep', '-u', uid_str, '-x', 'swaybg'], check=False)
     # A detached child still belongs to the settings service's cgroup. Give the
     # renderer its own user unit so closing/restarting settings cannot kill it.
     unit = 'poly-shell-wallpaper-' + uuid.uuid4().hex

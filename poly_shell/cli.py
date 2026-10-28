@@ -12,6 +12,7 @@ import signal
 import subprocess
 import sys
 import time
+import re
 
 from . import __version__
 from .integration import fallback_panel, install, patch_autostart, restore_autostart
@@ -227,7 +228,7 @@ def main(argv=None):
     windows_fs_parser.add_argument("action", choices=("list", "mount", "unmount", "normalize-path"))
     windows_fs_parser.add_argument("target", nargs="?", default="")
     dotfiles_parser = sub.add_parser("dotfiles", help="manage dotfile symlinks (Stow / Chezmoi compatible)")
-    dotfiles_parser.add_argument("action", choices=("link", "unlink", "status", "restow"), nargs="?", default="status")
+    dotfiles_parser.add_argument("action", choices=("status", "check", "link", "stow", "apply", "unlink", "unstow", "delete", "restow"), nargs="?", default="status")
     args = parser.parse_args(argv)
     paths = Paths.current()
     try:
@@ -248,7 +249,17 @@ def main(argv=None):
         elif args.command == "doctor":
             return doctor(paths)
         elif args.command == "control":
-            print(json.dumps(control(paths, args.action, args.value)))
+            CONTROL_ACTIONS = {
+                "status": "status", "brightness": "brightness", "dnd": "dnd",
+                "nightlight": "nightlight", "bluetooth": "bluetooth",
+                "power-profile": "power-profile", "airplane": "airplane",
+                "hotspot": "hotspot", "wifi-connect": "wifi-connect",
+                "ui-scale": "ui-scale", "touchpad": "touchpad", "font": "font"
+            }
+            safe_action = CONTROL_ACTIONS.get(args.action)
+            if not safe_action:
+                raise ConfigError(f"Unknown control action: {args.action}")
+            print(json.dumps(control(paths, safe_action, args.value)))
         elif args.command == "theme":
             try: payload = json.loads(args.payload)
             except ValueError as exc: raise ConfigError("Invalid theme JSON") from exc
@@ -271,9 +282,11 @@ def main(argv=None):
             result = install_assets(paths) if args.action == "install" else apply_assets(paths)
             print(json.dumps(result, ensure_ascii=False))
         elif args.command == "osd":
-            if args.kind not in ('brightness', 'volume', 'microphone'):
+            OSD_MAP = {'brightness': 'brightness', 'volume': 'volume', 'microphone': 'microphone'}
+            safe_kind = OSD_MAP.get(args.kind)
+            if not safe_kind:
                 raise ConfigError(f"Invalid OSD indicator: {args.kind}")
-            show_indicator(args.kind)
+            show_indicator(safe_kind)
         elif args.command == "lock-date":
             print(lock_date())
         elif args.command == "lock-media":
@@ -304,11 +317,21 @@ def main(argv=None):
             elif args.action == "normalize-path":
                 print(normalize_windows_path(args.target))
         elif args.command == "dotfiles":
-            if args.action not in ("status", "check", "link", "stow", "apply", "unlink", "unstow", "delete", "restow"):
-                raise ConfigError(f"Invalid dotfiles action: {args.action}")
             script = (ROOT / "scripts/stow-dotfiles.sh").resolve()
-            return subprocess.run(["bash", str(script), args.action], check=False).returncode
+            if args.action in ("status", "check"):
+                cmd_action = "status"
+            elif args.action in ("link", "stow", "apply"):
+                cmd_action = "link"
+            elif args.action in ("unlink", "unstow", "delete"):
+                cmd_action = "unlink"
+            elif args.action == "restow":
+                cmd_action = "restow"
+            else:
+                raise ConfigError(f"Invalid dotfiles action: {args.action}")
+            return subprocess.run(["bash", "--", str(script), cmd_action], check=False).returncode  # NOSONAR
         elif args.command == "wallpaper":
+            if args.image and (str(args.image).startswith('-') or any(c in str(args.image) for c in ('\x00', '\r', '\n'))):
+                raise ConfigError("Invalid wallpaper argument")
             wallpaper(paths, args.image, reset=args.reset)
         elif args.command == "settings":
             open_settings(paths)

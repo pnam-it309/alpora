@@ -124,7 +124,7 @@ def source_rows(paths):
     if not path.is_file(): raise ConfigError('Редактор поддерживает Hyprland с hyprland.lua; файл не найден')
     text = path.read_text(encoding='utf-8')
     names = {'root':str(path.parent)+'/', 'indicator':''}
-    found = re.search(r'^local indicator\s*=\s*(.+)$', text, re.M)
+    found = re.search(r'^local indicator\s*=\s*([^\r\n]+)', text, re.M)
     if found:
         try: names['indicator'] = literal(found[1], names)
         except (ValueError, SyntaxError): pass

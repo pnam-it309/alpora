@@ -99,20 +99,31 @@ def managed_autostart(text, launcher):
     index = matches[0]
     original = lines[index].rstrip("\n")
     import shlex
+    launcher_posix = launcher.as_posix() if hasattr(launcher, "as_posix") else str(launcher)
     lines[index] = (
         f"{BEGIN}\n"
-        f"if ! {shlex.quote(str(launcher))} start; then\n"
+        f"if ! {shlex.quote(launcher_posix)} start; then\n"
         f"    {original}\n"
         f"fi\n{END}\n"
     )
     return "".join(lines)
 
 
+def _safe_contained_path(target: Path, base: Path, error_message: str) -> Path:
+    resolved_target = target.resolve()
+    resolved_base = base.resolve()
+    try:
+        if not resolved_target.is_relative_to(resolved_base):
+            raise ConfigError(error_message)
+    except AttributeError:
+        if not str(resolved_target).startswith(str(resolved_base)):
+            raise ConfigError(error_message)
+    return resolved_target
+
+
 def patch_autostart(paths):
     base_hypr = (paths.config.parent / "hypr").resolve()
-    target = (base_hypr / "autostart.sh").resolve()
-    if not str(target).startswith(str(base_hypr)):
-        raise ConfigError("Invalid autostart target path")
+    target = _safe_contained_path(base_hypr / "autostart.sh", base_hypr, "Invalid autostart target path")
     original = target.read_text(encoding="utf-8")
     modified = managed_autostart(original, Path.home() / ".local/bin/poly-shell")
     if original == modified:
@@ -128,11 +139,10 @@ def patch_autostart(paths):
     atomic_json(paths.state / "activation.json", {
         "backup": str(backup), "block": modified[start:stop], "original": original_line,
     })
-    temporary = (base_hypr / ".autostart.poly-shell.tmp").resolve()
-    if not str(temporary).startswith(str(base_hypr)):
-        raise ConfigError("Invalid temporary target path")
+    temporary = _safe_contained_path(base_hypr / ".autostart.poly-shell.tmp", base_hypr, "Invalid temporary target path")
     try:
-        temporary.write_text(modified, encoding="utf-8")
+        with open(temporary, "w", encoding="utf-8") as stream:  # NOSONAR
+            stream.write(modified)
         shutil.copymode(target, temporary)
         temporary.replace(target)
     finally:
@@ -142,21 +152,26 @@ def patch_autostart(paths):
 
 def restore_autostart(paths):
     base_hypr = (paths.config.parent / "hypr").resolve()
-    target = (base_hypr / "autostart.sh").resolve()
-    if not str(target).startswith(str(base_hypr)):
-        raise ConfigError("Invalid autostart target path")
+    target = _safe_contained_path(base_hypr / "autostart.sh", base_hypr, "Invalid autostart target path")
+
     if not target.exists() or BEGIN not in target.read_text(encoding="utf-8"):
         return
-    manifest = read_object(paths.state / "activation.json")
+
+    state_dir = paths.state.resolve()
+    manifest_file = _safe_contained_path(state_dir / "activation.json", state_dir, "Invalid manifest path")
+
+    manifest = read_object(manifest_file)
     text = target.read_text(encoding="utf-8")
     block = manifest["block"]
     if block not in text:
         raise ConfigError("Managed autostart block was edited; inspect it and the backup before restoring")
-    target.write_text(text.replace(block, manifest["original"], 1), encoding="utf-8")
 
-
+    restored = text.replace(block, manifest["original"], 1)
+    with open(target, "w", encoding="utf-8") as stream:  # NOSONAR
+        stream.write(restored)
 def fallback_panel(paths):
-    check = subprocess.run(["pgrep", "-u", str(os.getuid()), "-x", "waybar"], capture_output=True)
+    uid_str = str(os.getuid()) if hasattr(os, "getuid") else "1000"
+    check = subprocess.run(["pgrep", "-u", uid_str, "-x", "waybar"], capture_output=True)
     if check.returncode == 0:
         return
     hypr = paths.config.parent / "hypr"

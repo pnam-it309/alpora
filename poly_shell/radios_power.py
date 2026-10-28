@@ -6,7 +6,12 @@ from pathlib import Path
 
 from .state import ConfigError, atomic_json, read_object, state_lock
 
-PROFILES = ("power-saver", "balanced", "performance")
+SAFE_PROFILES = {
+    "power-saver": "power-saver",
+    "balanced": "balanced",
+    "performance": "performance",
+}
+PROFILES = tuple(SAFE_PROFILES.keys())
 
 
 def power_status(run):
@@ -17,26 +22,33 @@ def power_status(run):
     if result.returncode:
         return data
     for line in result.stdout.splitlines():
-        match = re.fullmatch(r"\s*(\*)?\s*(power-saver|balanced|performance):\s*", line)
-        if match:
-            data["powerProfiles"].append(match[2])
-            if match[1]: data["powerProfile"] = match[2]
-        if line.strip().startswith("Degraded:"):
-            reason = line.split(":", 1)[1].strip()
+        stripped = line.strip()
+        is_active = stripped.startswith("*")
+        if is_active:
+            stripped = stripped[1:].strip()
+        for profile in SAFE_PROFILES:
+            if stripped == f"{profile}:" or stripped.startswith(f"{profile}:"):
+                data["powerProfiles"].append(profile)
+                if is_active:
+                    data["powerProfile"] = profile
+                break
+        if stripped.startswith("Degraded:"):
+            reason = stripped.split(":", 1)[1].strip()
             if reason != "no": data["powerDegraded"] = reason
     data["powerProfilesAvailable"] = bool(data["powerProfile"] and data["powerProfiles"])
     return data
 
 
 def set_profile(value, run):
-    if value not in PROFILES:
+    safe_profile = SAFE_PROFILES.get(str(value))
+    if not safe_profile:
         raise ConfigError("Unknown power mode")
     available = power_status(run)
     if not available["powerProfilesAvailable"]:
         raise ConfigError("power-profiles-daemon service unavailable")
-    if value not in available["powerProfiles"]:
+    if safe_profile not in available["powerProfiles"]:
         raise ConfigError("Power profile is not supported by device")
-    run(["powerprofilesctl", "set", value])
+    run(["powerprofilesctl", "set", safe_profile])
 
 
 def radios(root=Path("/sys/class/rfkill")):

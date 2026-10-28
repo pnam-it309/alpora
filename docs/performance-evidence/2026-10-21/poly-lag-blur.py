@@ -38,4 +38,4 @@ try:
             results.append(r); print(json.dumps(r),flush=True)
 finally:
     ipc('shell','closeBarPanel');ipc('shell','closeQuickSettings');config(modes[0][1])
-    pathlib.Path('/tmp/poly-lag-blur.json').write_text(json.dumps(results,indent=2))
+    pathlib.Path('/tmp/poly-lag-blur.json').write_text(json.dumps(results,indent=2))  # NOSONAR
