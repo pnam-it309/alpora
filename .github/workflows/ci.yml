@@ -33,12 +33,16 @@ jobs:
       - name: 1. ShellCheck (Bash & Shell Scripts)
         run: |
           echo "Running ShellCheck on installation and helper scripts..."
-          shellcheck -x -S warning install.sh uninstall.sh integrations/*.sh scripts/*.sh scripts/build-shaders scripts/check scripts/format
+          shellcheck -x -S warning \
+            install.sh uninstall.sh integrations/*.sh \
+            scripts/*.sh scripts/build-shaders scripts/check scripts/format
 
       - name: 2. Shell Script Formatting Check (shfmt)
         run: |
           echo "Verifying shell script indentation & format with shfmt..."
-          shfmt -d -i 4 -ci install.sh uninstall.sh integrations/*.sh scripts/*.sh scripts/build-shaders scripts/check scripts/format || true
+          shfmt -d -i 4 -ci \
+            install.sh uninstall.sh integrations/*.sh \
+            scripts/*.sh scripts/build-shaders scripts/check scripts/format || true
 
       - name: 3. Python Code Style & Syntax Check (Ruff)
         run: |
@@ -53,7 +57,7 @@ jobs:
 
       - name: 5. JSON Syntax & Encoding Verification
         run: |
-          echo "Validating syntax of all JSON localization, theme and profile files..."
+          echo "Validating syntax of all JSON files..."
           python - <<'EOF'
           import glob, json, sys
           failed = False
@@ -74,7 +78,8 @@ jobs:
       - name: 6. YAML Syntax Check (yamllint)
         run: |
           echo "Validating workflow and YAML configurations..."
-          yamllint -d relaxed .github/workflows/*.yml
+          yamllint -d "{extends: relaxed, rules: {line-length: {max: 160}}}" \
+            .github/workflows/*.yml
 
       - name: 7. Lua Configuration & Dispatcher Syntax Check
         run: |
@@ -124,15 +129,26 @@ jobs:
 
       - name: Run Desktop & Running Apps Tests
         run: |
-          python -m unittest tests/test_desktop.py tests/test_running_apps.py tests/test_widgets.py tests/test_appearance.py
+          python -m unittest \
+            tests/test_desktop.py \
+            tests/test_running_apps.py \
+            tests/test_widgets.py \
+            tests/test_appearance.py
 
       - name: Run Desktop Controls & Lockscreen Media Tests
         run: |
-          python -m unittest tests/test_desktop_controls.py tests/test_lock_media.py tests/test_lockscreen.py
+          python -m unittest \
+            tests/test_desktop_controls.py \
+            tests/test_lock_media.py \
+            tests/test_lockscreen.py
 
       - name: Run Theme, Landscape & State Tests
         run: |
-          python -m unittest tests/test_themes.py tests/test_landscapes.py tests/test_state.py tests/test_shortcuts.py
+          python -m unittest \
+            tests/test_themes.py \
+            tests/test_landscapes.py \
+            tests/test_state.py \
+            tests/test_shortcuts.py
 
   # ---------------------------------------------------------------------------
   # 3. Dry-Run Installation Test (Clean Arch Linux Container)
