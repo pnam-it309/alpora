@@ -95,6 +95,8 @@ jobs:
     runs-on: ubuntu-24.04
     needs: syntax-and-lint
     timeout-minutes: 10
+    env:
+      PYTHONUNBUFFERED: "1"
 
     steps:
       - name: Checkout repository
@@ -116,19 +118,19 @@ jobs:
 
       - name: Run I18n Key Parity Tests
         run: |
-          python -m unittest tests/test_i18n.py
+          python -u -m unittest -v tests/test_i18n.py
 
       - name: Run Windows Folder & Drive Support Tests
         run: |
-          python -m unittest tests/test_windows_fs.py
+          python -u -m unittest -v tests/test_windows_fs.py
 
       - name: Run Multi-Monitor & Fractional Scaling Tests
         run: |
-          python -m unittest tests/test_multimonitor.py
+          python -u -m unittest -v tests/test_multimonitor.py
 
       - name: Run Desktop & Running Apps Tests
         run: |
-          python -m unittest \
+          python -u -m unittest -v \
             tests/test_desktop.py \
             tests/test_running_apps.py \
             tests/test_widgets.py \
@@ -136,14 +138,14 @@ jobs:
 
       - name: Run Desktop Controls & Lockscreen Media Tests
         run: |
-          python -m unittest \
+          python -u -m unittest -v \
             tests/test_desktop_controls.py \
             tests/test_lock_media.py \
             tests/test_lockscreen.py
 
       - name: Run Theme, Landscape & State Tests
         run: |
-          python -m unittest \
+          python -u -m unittest -v \
             tests/test_themes.py \
             tests/test_landscapes.py \
             tests/test_state.py \

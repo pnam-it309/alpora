@@ -362,7 +362,7 @@ def control(paths, action, value=None):
             data = settings_for(paths)
             data.setdefault('bar', {})['uiScale'] = scale
             atomic_json(paths.config / 'settings.json', data)
-            update_session(paths)
+        update_session(paths)
     elif safe_action == 'touchpad':
         try:
             payload = json.loads(value) if isinstance(value, str) else dict(value)
@@ -372,23 +372,23 @@ def control(paths, action, value=None):
             data = settings_for(paths)
             data.setdefault('input', {}).setdefault('touchpad', {}).update(payload)
             atomic_json(paths.config / 'settings.json', data)
-            try:
-                for k, v in payload.items():
-                    if k == 'tapToClick':
-                        command(['hyprctl', 'keyword', 'input:touchpad:tap-to-click', '1' if v else '0'], check=False)
-                    elif k == 'naturalScroll':
-                        command(['hyprctl', 'keyword', 'input:touchpad:natural_scroll', '1' if v else '0'], check=False)
-                    elif k == 'disableWhileTyping':
-                        command(['hyprctl', 'keyword', 'input:touchpad:disable_while_typing', '1' if v else '0'], check=False)
-                    elif k == 'sensitivity':
-                        val = max(-1.0, min(1.0, float(v)))
-                        command(['hyprctl', 'keyword', 'input:sensitivity', f"{val:.2f}"], check=False)
-                    elif k == 'scrollFactor':
-                        val = max(0.1, min(10.0, float(v)))
-                        command(['hyprctl', 'keyword', 'input:touchpad:scroll_factor', f"{val:.2f}"], check=False)
-            except Exception:
-                pass
-            update_session(paths)
+        try:
+            for k, v in payload.items():
+                if k == 'tapToClick':
+                    command(['hyprctl', 'keyword', 'input:touchpad:tap-to-click', '1' if v else '0'], check=False)
+                elif k == 'naturalScroll':
+                    command(['hyprctl', 'keyword', 'input:touchpad:natural_scroll', '1' if v else '0'], check=False)
+                elif k == 'disableWhileTyping':
+                    command(['hyprctl', 'keyword', 'input:touchpad:disable_while_typing', '1' if v else '0'], check=False)
+                elif k == 'sensitivity':
+                    val = max(-1.0, min(1.0, float(v)))
+                    command(['hyprctl', 'keyword', 'input:sensitivity', f"{val:.2f}"], check=False)
+                elif k == 'scrollFactor':
+                    val = max(0.1, min(10.0, float(v)))
+                    command(['hyprctl', 'keyword', 'input:touchpad:scroll_factor', f"{val:.2f}"], check=False)
+        except Exception:
+            pass
+        update_session(paths)
     elif safe_action == 'font':
         font_name = str(value).strip()
         if not font_name:
@@ -397,7 +397,7 @@ def control(paths, action, value=None):
             data = settings_for(paths)
             data.setdefault('bar', {})['fontFamily'] = font_name
             atomic_json(paths.config / 'settings.json', data)
-            update_session(paths)
+        update_session(paths)
     else:
         raise ConfigError('Unsupported desktop action')
     return status(paths)

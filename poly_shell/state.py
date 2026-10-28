@@ -12,6 +12,7 @@ from pathlib import Path
 import re
 import shutil
 import tempfile
+import threading
 
 ROOT = Path(__file__).resolve().parents[1]
 MODES = ("work", "vibe")
@@ -192,13 +193,28 @@ def profile_for(paths, mode):
     return data
 
 
+_STATE_LOCK_LOCAL = threading.local()
+
+
 @contextmanager
 def state_lock(paths):
+    depth = getattr(_STATE_LOCK_LOCAL, "depth", 0)
+    _STATE_LOCK_LOCAL.depth = depth + 1
+    if depth > 0:
+        try:
+            yield
+        finally:
+            _STATE_LOCK_LOCAL.depth -= 1
+        return
+
     paths.state.mkdir(mode=0o700, parents=True, exist_ok=True)
     with (paths.state / "state.lock").open("a") as stream:
         if fcntl is not None:
             fcntl.flock(stream, fcntl.LOCK_EX)
-        yield
+        try:
+            yield
+        finally:
+            _STATE_LOCK_LOCAL.depth -= 1
 
 
 def current_mode(paths):
