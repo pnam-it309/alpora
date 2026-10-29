@@ -65,6 +65,7 @@ package() {
     cp -r shell "$pkgdir/usr/share/alpora/"
     cp -r assets "$pkgdir/usr/share/alpora/"
     cp -r dotfiles "$pkgdir/usr/share/alpora/"
+    cp -r config "$pkgdir/usr/share/alpora/" 2>/dev/null || true
     cp -r scripts "$pkgdir/usr/share/alpora/"
 
     # Install Executable Binaries
@@ -74,5 +75,5 @@ package() {
 
     # Install License
     install -dm755 "$pkgdir/usr/share/licenses/$pkgname"
-    install -m644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+    install -m644 LICENSE.md "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }

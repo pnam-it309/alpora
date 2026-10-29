@@ -11,3 +11,4 @@ def handle_organizer(paths, args) -> int:
         raise ConfigError("Invalid organizer JSON") from exc
     print(json.dumps(organizer(paths, args.action, payload), ensure_ascii=False))
     return 0
+

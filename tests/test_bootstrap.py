@@ -73,7 +73,7 @@ class BootstrapTests(unittest.TestCase):
         for flags,marker in ((['--dry-run'],'no changes'),
                              (['--preview','--theme=northern-lights'],'PREVIEW / No installation')):
             with self.subTest(flags=flags):
-                result=subprocess.run([str(ROOT/'install.sh'),*flags],env=env,capture_output=True,text=True,timeout=5)
+                result=subprocess.run([str(ROOT/'install/install.sh'),*flags],env=env,capture_output=True,text=True,timeout=5)
                 self.assertEqual(result.returncode,0,result.stderr)
                 self.assertIn(marker,result.stdout)
                 self.assertNotIn('\x1b[',result.stdout)
@@ -142,7 +142,7 @@ class BootstrapTests(unittest.TestCase):
         import time
         master,slave=pty.openpty()
         env=dict(os.environ,HOME=str(self.root),XDG_CONFIG_HOME=str(self.root/'config'),XDG_STATE_HOME=str(self.root/'state'),TERM='xterm-256color',NO_COLOR='1')
-        process=subprocess.Popen([str(ROOT/'install.sh'),'--dry-run','--wizard'],stdin=slave,stdout=slave,stderr=slave,env=env)
+        process=subprocess.Popen([str(ROOT/'install/install.sh'),'--dry-run','--wizard'],stdin=slave,stdout=slave,stderr=slave,env=env)
         os.close(slave)
         output=b''
         try:

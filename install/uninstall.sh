@@ -14,7 +14,7 @@ for argument in "$@"; do
         -h|--help)
             cat <<'HELP'
 ALPORA uninstaller
-Usage: ./uninstall.sh [OPTIONS]
+Usage: ./install/uninstall.sh [OPTIONS]
 
   --dry-run          Print actions that would be performed without removing files.
   --restore-config   Restore latest Hyprland configuration backup if available.
@@ -32,7 +32,7 @@ HELP
 done
 
 if [[ "$EUID" -eq 0 ]]; then
-    echo 'Run ./uninstall.sh as your normal user, without sudo.' >&2
+    echo 'Run ./install/uninstall.sh as your normal user, without sudo.' >&2
     exit 1
 fi
 
@@ -49,28 +49,28 @@ if [[ "$uninstall_dry_run" == true ]]; then
 else
     echo "Stopping poly-shell service..."
     systemctl --user stop poly-shell.service 2>/dev/null || true
+    systemctl --user stop poly-shell-settings.service 2>/dev/null || true
     systemctl --user disable poly-shell.service 2>/dev/null || true
-    if command -v poly-shell >/dev/null 2>&1; then
-        poly-shell stop 2>/dev/null || true
-    fi
+    pkill -u "$UID" -f "quickshell.*shell.qml" 2>/dev/null || true
 fi
 
-# 2. Files and symlinks to remove
+# 2. Remove symlinks and desktop entries
 targets=(
     "$bin_dir/poly-shell"
     "$bin_dir/alpora-fetch"
     "$config_home/quickshell/poly-shell"
     "$config_home/systemd/user/poly-shell.service"
     "$data_home/applications/poly-shell-settings.desktop"
+    "$data_home/applications/poly-shell-task-manager.desktop"
 )
 
 for target in "${targets[@]}"; do
-    if [[ -e "$target" || -L "$target" ]]; then
+    if [[ -L "$target" || -f "$target" ]]; then
         if [[ "$uninstall_dry_run" == true ]]; then
             echo "[dry-run] Would remove: $target"
         else
             echo "Removing: $target"
-            rm -rf "$target"
+            rm -f "$target"
         fi
     fi
 done
@@ -79,56 +79,48 @@ if [[ "$uninstall_dry_run" != true ]]; then
     systemctl --user daemon-reload 2>/dev/null || true
 fi
 
-# 3. Check for Hyprland configuration backups
-backup_dir="$state_home/poly-shell/backups"
-latest_backup=""
-if [[ -d "$backup_dir" ]]; then
-    latest_backup=$(ls -dt "$backup_dir"/arch-install-* 2>/dev/null | head -n 1 || true)
-fi
-
-if [[ -n "$latest_backup" && -d "$latest_backup/hypr" ]]; then
-    hypr_dir="$config_home/hypr"
-    if [[ "$uninstall_restore_config" == true ]]; then
-        if [[ "$uninstall_dry_run" == true ]]; then
-            echo "[dry-run] Would restore Hyprland configuration from: $latest_backup/hypr -> $hypr_dir"
+# 3. Restore Hyprland configuration backup if requested
+if [[ "$uninstall_restore_config" == true ]]; then
+    backup_root="$state_home/poly-shell/backups"
+    if [[ -d "$backup_root" ]]; then
+        latest_backup=$(find "$backup_root" -mindepth 1 -maxdepth 1 -type d | sort -r | head -n 1)
+        if [[ -n "$latest_backup" && -d "$latest_backup" ]]; then
+            hypr_dir="$config_home/hypr"
+            if [[ "$uninstall_dry_run" == true ]]; then
+                echo "[dry-run] Would restore Hyprland config from: $latest_backup"
+            else
+                echo "Restoring Hyprland configuration from $latest_backup..."
+                mkdir -p "$hypr_dir"
+                cp -a "$latest_backup/." "$hypr_dir/"
+                echo "Hyprland configuration restored."
+            fi
         else
-            echo "Restoring Hyprland configuration from $latest_backup/hypr..."
-            rm -rf "$hypr_dir"
-            cp -a "$latest_backup/hypr" "$hypr_dir"
-            echo "Restored Hyprland configuration to $hypr_dir"
+            echo "Notice: No backup directory found in $backup_root"
         fi
     else
-        echo ""
-        echo "Found existing Hyprland backup at:"
-        echo "  $latest_backup/hypr"
-        echo "To restore it to $hypr_dir, run:"
-        echo "  ./uninstall.sh --restore-config"
+        echo "Notice: No backup root found ($backup_root)"
     fi
 fi
 
-# 4. Purge configs if requested
+# 4. Purge state and configuration if requested
 if [[ "$uninstall_purge" == true ]]; then
-    purge_targets=(
+    purge_dirs=(
         "$config_home/poly-shell"
         "$state_home/poly-shell"
-        "$data_home/alpora"
-        "$HOME/.cache/alpora"
     )
-    for p_target in "${purge_targets[@]}"; do
-        if [[ -d "$p_target" ]]; then
+    for pdir in "${purge_dirs[@]}"; do
+        if [[ -d "$pdir" ]]; then
             if [[ "$uninstall_dry_run" == true ]]; then
-                echo "[dry-run] Would purge directory: $p_target"
+                echo "[dry-run] Would purge directory: $pdir"
             else
-                echo "Purging directory: $p_target"
-                rm -rf "$p_target"
+                echo "Purging directory: $pdir"
+                rm -rf "$pdir"
             fi
         fi
     done
 fi
 
-echo ""
-if [[ "$uninstall_dry_run" == true ]]; then
-    echo "Dry-run complete. No files were modified."
-else
-    echo "ALPORA has been successfully uninstalled."
+echo "=== ALPORA Uninstallation Complete ==="
+if [[ "$uninstall_restore_config" != true ]]; then
+    echo "Tip: Use ./install/uninstall.sh --restore-config if you need to recover pre-install Hyprland configs."
 fi

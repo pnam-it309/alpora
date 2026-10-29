@@ -82,3 +82,4 @@ def handle_tasks(paths, args) -> int:
             data = {}
         print(json.dumps(data, ensure_ascii=False))
     return 0
+

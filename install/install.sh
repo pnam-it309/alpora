@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ALPORA bootstrap for Arch Linux and Arch-based distributions. Run as your normal desktop user.
 set -euo pipefail
-project_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+project_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 install_dry_run=false
 install_skip_packages=false
 install_replace_config=false
@@ -21,7 +21,7 @@ for argument in "$@"; do
         --core-only|--minimal) install_core_only=true ;;
         --ignore-distro-check|--force-distro) install_ignore_distro=true ;;
         --uninstall)
-            exec "$project_dir/uninstall.sh" "${@:2}"
+            exec "$project_dir/install/uninstall.sh" "${@:2}"
             ;;
         --theme=*) install_theme=${argument#--theme=} ;;
         --wizard) install_wizard=true ;;
@@ -29,7 +29,7 @@ for argument in "$@"; do
         -h|--help)
             cat <<'HELP'
 ALPORA installer for Arch Linux and Arch-based distributions
-Usage: ./install.sh [OPTIONS]
+Usage: ./install/install.sh [OPTIONS]
 
   --ui-only               Install standalone ALPORA UI shell only. Does NOT install system
                           packages and does NOT alter existing Hyprland configuration.
@@ -58,95 +58,51 @@ case "$install_theme" in
     *) printf 'Unknown theme: %s\n' "$install_theme" >&2; exit 2 ;;
 esac
 if [[ "$install_preview" == true ]]; then
-    if [[ "$install_wizard" == true && -t 0 && -t 1 && -z "$install_theme" ]]; then
-        alpora_choose_theme
-    fi
-    if command -v python3 >/dev/null; then
-        preview_arguments=()
-        if [[ -n "$install_theme" ]]; then preview_arguments+=(--theme "$install_theme"); fi
-        "$project_dir/bin/alpora-fetch" "${preview_arguments[@]}"
-    else
-        alpora_colour
-        alpora_banner
-        alpora_summary
-    fi
-    printf '\n  PREVIEW / No installation or system changes.\n\n'
+    alpora_banner
+    alpora_welcome
     exit 0
 fi
-if [[ "$EUID" -eq 0 && "$install_dry_run" != true ]]; then
-    echo 'Run ./install.sh as your normal user, without sudo.' >&2
+if [[ "$EUID" -eq 0 ]]; then
+    echo 'Run ./install/install.sh as your normal user, without sudo. Pacman prompts when necessary.' >&2
     exit 1
 fi
-
-alpora_detect_pkg_manager() {
-    if command -v pacman >/dev/null 2>&1; then
-        echo "pacman"
-    elif command -v dnf >/dev/null 2>&1; then
-        echo "dnf"
-    elif command -v apt-get >/dev/null 2>&1; then
-        echo "apt"
-    elif command -v zypper >/dev/null 2>&1; then
-        echo "zypper"
-    else
-        echo "unknown"
-    fi
-}
-
-detected_pkg_mgr=$(alpora_detect_pkg_manager)
-
-is_arch_based=false
-if [[ -f /etc/os-release ]]; then
-    source /etc/os-release
-    if [[ "${ID:-}" == "arch" || "${ID_LIKE:-}" =~ (^|[[:space:]])arch([[:space:]]|$) || "${ID:-}" =~ ^(endeavouros|cachyos|manjaro|garuda|artix|arcolinux|archcraft)$ ]]; then
-        is_arch_based=true
-    fi
+detected_pkg_mgr='unknown'
+if command -v pacman >/dev/null; then
+    detected_pkg_mgr='pacman'
+elif command -v dnf >/dev/null; then
+    detected_pkg_mgr='dnf'
+elif command -v apt-get >/dev/null; then
+    detected_pkg_mgr='apt'
 fi
 
 if [[ "$install_ui_only" != true && "$install_ignore_distro" != true ]]; then
-    if [[ "$is_arch_based" != true && "$detected_pkg_mgr" == "unknown" ]]; then
-        printf 'This full installer is optimized for Arch Linux and distributions with pacman, dnf, or apt.\n' >&2
-        printf 'Detected: %s (%s) with unsupported package manager.\n' "${NAME:-Unknown}" "${ID:-unknown}" >&2
-        printf 'Tip: Use ./install.sh --ui-only to install the standalone ALPORA UI on any distro or custom kernel setup.\n' >&2
-        printf '     Use ./install.sh --skip-packages if you have manually installed dependencies.\n' >&2
+    if [[ "$detected_pkg_mgr" == 'unknown' ]]; then
+        echo 'ALPORA automated package installation currently supports pacman, dnf, and apt.' >&2
+        echo 'Use ./install/install.sh --ui-only to install shell UI without package management,' >&2
+        echo 'or --ignore-distro-check to force system package manager installation.' >&2
         exit 1
-    elif [[ "$is_arch_based" != true ]]; then
-        printf 'Note: Non-Arch distribution detected: %s (%s) using package manager: %s\n' "${NAME:-Unknown}" "${ID:-unknown}" "$detected_pkg_mgr"
     fi
 fi
-
-core_packages=(
-    hyprland quickshell qt6-svg qt6-imageformats qt6-multimedia
-    python python-pillow python-gobject gtk3 glib2
-    pipewire pipewire-pulse wireplumber upower networkmanager nm-connection-editor
-    bluez bluez-utils brightnessctl power-profiles-daemon
-    hyprlock hypridle hyprsunset hyprpolkitagent
-    xdg-desktop-portal xdg-desktop-portal-hyprland xdg-desktop-portal-gtk
-    swaybg wl-clipboard grim slurp libnotify playerctl xdg-utils xdg-user-dirs
-    noto-fonts noto-fonts-emoji adwaita-icon-theme git curl
-    fcitx5 fcitx5-bamboo fcitx5-configtool fcitx5-gtk fcitx5-qt
-    ntfs-3g dosfstools exfatprogs udisks2 gvfs gvfs-smb gvfs-mtp cifs-utils
-)
-
-bundled_apps=(
-    mako foot kitty nautilus firefox fuzzel pavucontrol hyprshutdown
-)
+if [[ "$install_wizard" == true ]]; then
+    interactive_theme="$(alpora_theme_wizard "${install_theme:-alpine}")"
+    if [[ -n "$interactive_theme" ]]; then
+        install_theme="$interactive_theme"
+    fi
+fi
+alpora_banner
+printf 'Selected theme: %s\n' "${install_theme:-alpine (default)}"
+mapfile -t required_packages < <(python3 "$project_dir/scripts/setup-arch-desktop" --print-packages)
+mapfile -t optional_packages < <(python3 "$project_dir/scripts/setup-arch-desktop" --print-packages --optional)
 
 if [[ "$install_core_only" == true ]]; then
-    packages=("${core_packages[@]}")
+    packages=("${required_packages[@]}")
 else
-    packages=("${core_packages[@]}" "${bundled_apps[@]}")
+    packages=("${required_packages[@]}" "${optional_packages[@]}")
 fi
 
-alpora_colour
-alpora_banner
-if [[ -t 0 && -t 1 && -z "$install_theme" && ( "$install_dry_run" != true || "$install_wizard" == true ) ]]; then
-    alpora_choose_theme
-fi
-alpora_summary
 if [[ "$install_dry_run" == true ]]; then
-    printf 'ALPORA installation plan (no changes)\nProject: %s\n' "$project_dir"
+    echo 'DRY-RUN / no changes will be made'
     if [[ "$install_ui_only" == true ]]; then
-        echo 'Mode: Standalone UI only (no system packages, no Hyprland config changes)'
         echo '1. Link poly-shell, alpora-fetch, and quickshell QML UI.'
         echo '2. Seed user preferences and themes.'
         echo '3. Install systemd user service poly-shell.service.'

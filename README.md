@@ -93,12 +93,12 @@ Download or clone this repository into a permanent directory, then open a termin
 inside it. The installer creates links into the checkout, so keep that directory.
 
 ```sh
-git clone https://github.com/IhTiYaR0/alpora.git
+git clone https://github.com/pnam-it309/alpora.git
 cd alpora
 
-./install.sh --preview          # Live system card without installing; q to exit
-./install.sh --dry-run --wizard  # Explore the chooser and installation plan
-./install.sh                    # Install ALPORA and choose your first landscape
+./install/install.sh --preview          # Live system card without installing; q to exit
+./install/install.sh --dry-run --wizard  # Explore the chooser and installation plan
+./install/install.sh                    # Install ALPORA and choose your first landscape
 ```
 
 For the neofetch-style system card with ALPORA's faceted mountain and your active
@@ -132,11 +132,11 @@ will be your own.
 
 | Want to… | Use |
 | :--- | :--- |
-| Choose a theme directly | `./install.sh --theme=northern-lights` |
-| Install standalone UI shell only | `./install.sh --ui-only` |
-| Install core shell (skip bundled apps) | `./install.sh --core-only` |
-| Read the full installation plan | `./install.sh --dry-run` |
-| Cleanly uninstall ALPORA | `./uninstall.sh` (or `./uninstall.sh --restore-config`) |
+| Choose a theme directly | `./install/install.sh --theme=northern-lights` |
+| Install standalone UI shell only | `./install/install.sh --ui-only` |
+| Install core shell (skip bundled apps) | `./install/install.sh --core-only` |
+| Read the full installation plan | `./install/install.sh --dry-run` |
+| Cleanly uninstall ALPORA | `./install/uninstall.sh` (or `./install/uninstall.sh --restore-config`) |
 | Understand backups and recovery | [Installer guide](docs/guides/arch-installer.md) |
 | Add only the desktop components | [Component installation](docs/guides/installation.md) |
 | See every application and dependency | [Programs & services](docs/guides/programs.md) |
@@ -149,7 +149,7 @@ and Qt **6.12.0**. The installer supports Arch Linux and Arch-based derivatives
 (EndeavourOS, CachyOS, Manjaro, Garuda, Artix, ArcoLinux, Archcraft) as well as custom
 kernels. For users wishing to preserve existing personal Hyprland setups or use other
 distributions, `--ui-only` installs only the standalone ALPORA shell panel and widgets.
-An official `./uninstall.sh` script is provided to cleanly revert symlinks, systemd user
+An official `./install/uninstall.sh` script is provided to cleanly revert symlinks, systemd user
 services, and restore prior Hyprland configuration backups. Full first login on a clean
 Arch system remains pending. The reference composition targets 1920×1080 at scale 1;
 other displays use the existing adaptive layout and need further validation.

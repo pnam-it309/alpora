@@ -144,7 +144,7 @@ def format_preflight_report(report: dict[str, Any]) -> str:
     lines.append("\n" + "=" * 60)
     if report["ready"]:
         lines.append("STATUS: READY FOR INSTALLATION / SHELL EXECUTION")
-        lines.append("Gợi ý: Bạn có thể chạy './install.sh --ui-only' để kiểm thử an toàn.")
+        lines.append("Gợi ý: Bạn có thể chạy './install/install.sh --ui-only' để kiểm thử an toàn.")
     else:
         lines.append("STATUS: INCOMPLETE PREREQUISITES")
         lines.append("Gợi ý: Cài đặt các gói cốt lõi bị [FAIL] trước khi khởi chạy shell.")

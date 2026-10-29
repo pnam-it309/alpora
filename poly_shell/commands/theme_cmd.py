@@ -65,3 +65,4 @@ def handle_toolkit_refresh(paths, args) -> int:
         schedule_toolkit(paths)
     print(json.dumps(result))
     return 0
+

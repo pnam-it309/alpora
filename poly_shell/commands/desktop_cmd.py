@@ -100,3 +100,4 @@ def handle_lock_media(paths, args) -> int:
     from ..lock_media import handle_cli
     handle_cli(args.field)
     return 0
+

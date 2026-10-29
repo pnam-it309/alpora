@@ -98,8 +98,8 @@ if [[ "$(pwd)" != "$source_mount" ]]; then
 fi
 
 # 2. Run production installation (skip-packages, since host root is read-only)
-printf "  -> Running ./install.sh --skip-packages --theme=alpine\n"
-./install.sh --skip-packages --theme=alpine --replace-config
+printf "  -> Running ./install/install.sh --skip-packages --theme=alpine\n"
+./install/install.sh --skip-packages --theme=alpine --replace-config
 
 # 3. Check installed user binaries and symlinks
 printf "  -> Verifying deployed binaries and symlinks...\n"
@@ -155,7 +155,7 @@ mkdir -p "$HOME/.config/hypr"
 echo "-- personal user notes" > "$HOME/.config/hypr/personal-notes.txt"
 
 # Run repeat installation
-./install.sh --skip-packages
+./install/install.sh --skip-packages
 
 # Verify personal file was preserved
 if [[ ! -f "$HOME/.config/hypr/personal-notes.txt" ]]; then

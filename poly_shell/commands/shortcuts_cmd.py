@@ -11,3 +11,4 @@ def handle_shortcuts(paths, args) -> int:
         raise ConfigError("Invalid shortcuts JSON") from exc
     print(json.dumps(shortcuts_control(paths, args.action, payload), ensure_ascii=False))
     return 0
+
