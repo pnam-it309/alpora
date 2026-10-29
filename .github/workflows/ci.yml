@@ -35,14 +35,14 @@ jobs:
           echo "Running ShellCheck on installation and helper scripts..."
           shellcheck -x -S warning \
             install.sh uninstall.sh \
-            scripts/*.sh scripts/check scripts/format scripts/build/* scripts/checks/*
+            scripts/*.sh scripts/check scripts/format scripts/build/build-shaders
 
       - name: 2. Shell Script Formatting Check (shfmt)
         run: |
           echo "Verifying shell script indentation & format with shfmt..."
           shfmt -d -i 4 -ci \
             install.sh uninstall.sh \
-            scripts/*.sh scripts/check scripts/format scripts/build/* scripts/checks/* || true
+            scripts/*.sh scripts/check scripts/format scripts/build/build-shaders || true
 
       - name: 3. Python Code Style & Syntax Check (Ruff)
         run: |

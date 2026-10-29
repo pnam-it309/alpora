@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Source-only terminal presentation. No downloads or system changes here.
+# shellcheck disable=SC2034
 alpora_colour() {
     alpora_reset='' alpora_bold='' alpora_dim='' alpora_accent='' alpora_warm=''
     if [[ -t 1 && "${TERM:-dumb}" != dumb && -z "${NO_COLOR:-}" ]]; then

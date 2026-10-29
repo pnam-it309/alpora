@@ -114,20 +114,28 @@ case "$MODE" in
             exit 0
         fi
 
-        AUDIO_FLAG=""
+        WITH_AUDIO=false
         if [ "${2:-}" = "--with-audio" ]; then
-            AUDIO_FLAG="--audio"
+            WITH_AUDIO=true
         fi
 
         REGION="$(slurp 2>/dev/null)" || exit 0
 
         if command -v gpu-screen-recorder >/dev/null 2>&1; then
-            gpu-screen-recorder -w "$REGION" -f 60 -a default_output -o "$OUTPUT" &
-            echo $! > "$PID_FILE"
+            if [ "$WITH_AUDIO" = true ]; then
+                gpu-screen-recorder -w "$REGION" -f 60 -a default_output -o "$OUTPUT" &
+            else
+                gpu-screen-recorder -w "$REGION" -f 60 -o "$OUTPUT" &
+            fi
+            echo "$!" > "$PID_FILE"
             notify "Screen Recording" "Started recording region..."
         elif command -v wf-recorder >/dev/null 2>&1; then
-            wf-recorder -g "$REGION" -f "$OUTPUT" &
-            echo $! > "$PID_FILE"
+            if [ "$WITH_AUDIO" = true ]; then
+                wf-recorder --audio -g "$REGION" -f "$OUTPUT" &
+            else
+                wf-recorder -g "$REGION" -f "$OUTPUT" &
+            fi
+            echo "$!" > "$PID_FILE"
             notify "Screen Recording" "Started recording with wf-recorder..."
         else
             notify "Recorder Error" "Neither gpu-screen-recorder nor wf-recorder is installed."
@@ -159,4 +167,3 @@ case "$MODE" in
         exit 1
         ;;
 esac
-
