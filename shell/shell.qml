@@ -36,6 +36,7 @@ ShellRoot {
     Variants { model: Quickshell.screens; ScreenshotOverlay {} }
     Variants { model: Quickshell.screens; PowerMenu {} }
     Variants { model: Quickshell.screens; DisplayProjectMenu {} }
+    Variants { model: Quickshell.screens; BrightnessOverlay {} }
 
     // Native Wayland shortcuts avoid spawning an IPC client before input can
     // reach the launcher. Keep registration once per shell, not per monitor.
@@ -141,6 +142,7 @@ ShellRoot {
         function setCenterPage(page: int): void { if (page >= 0 && page <= 1) BarState.centerPage = page; }
         function desktopAction(action: string, value: string): void { Desktop.request(action, value); }
         function showOsd(kind: string, value: real, muted: bool): void { OsdState.show(kind, value, muted); }
+        function showToggleOsd(kind: string, state: bool): void { OsdState.showToggle(kind, state); }
         function osdStatus(): string { return JSON.stringify({ opened: OsdState.opened, kind: OsdState.kind, value: OsdState.value, muted: OsdState.muted, screen: OsdState.screenName }); }
         function notificationsStatus(): string { return JSON.stringify({ active: BarState.notifications.map(item => item.id), history: BarState.visibleHistory.map(item => item.id), dnd: BarState.dnd, busy: BarState.notificationBusy, error: BarState.notificationError }); }
         function dismissNotification(id: int): void { BarState.dismissNotification(id); }

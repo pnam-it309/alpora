@@ -34,15 +34,15 @@ jobs:
         run: |
           echo "Running ShellCheck on installation and helper scripts..."
           shellcheck -x -S warning \
-            install.sh uninstall.sh integrations/*.sh \
-            scripts/*.sh scripts/build-shaders scripts/check scripts/format
+            install.sh uninstall.sh \
+            scripts/*.sh scripts/check scripts/format scripts/build/* scripts/checks/*
 
       - name: 2. Shell Script Formatting Check (shfmt)
         run: |
           echo "Verifying shell script indentation & format with shfmt..."
           shfmt -d -i 4 -ci \
-            install.sh uninstall.sh integrations/*.sh \
-            scripts/*.sh scripts/build-shaders scripts/check scripts/format || true
+            install.sh uninstall.sh \
+            scripts/*.sh scripts/check scripts/format scripts/build/* scripts/checks/* || true
 
       - name: 3. Python Code Style & Syntax Check (Ruff)
         run: |
@@ -84,8 +84,8 @@ jobs:
       - name: 7. Lua Configuration & Dispatcher Syntax Check
         run: |
           echo "Compiling Lua integration scripts with luac..."
-          luac -p integrations/alpora-session.lua
-          luac -p integrations/hyprland-overview.lua
+          luac -p dotfiles/hypr/.config/hypr/alpora-session.lua
+          luac -p dotfiles/hypr/.config/hypr/hyprland-overview.lua
 
   # ---------------------------------------------------------------------------
   # 2. Automated Test Suite & Multi-Monitor / I18n Verification

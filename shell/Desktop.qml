@@ -10,7 +10,7 @@ Singleton {
     property var pending: []
     readonly property bool changingSettings: (worker.running && worker.command.length > 2 && worker.command[2] !== "status") || pending.some(item => item[2] !== "status")
 
-    readonly property var validActions: ["status", "brightness", "dnd", "nightlight", "bluetooth", "power-profile", "airplane", "hotspot", "wifi-connect", "ui-scale", "touchpad", "font"]
+    readonly property var validActions: ["status", "brightness", "dnd", "nightlight", "bluetooth", "power-profile", "airplane", "hotspot", "wifi-connect", "ui-scale", "touchpad", "font", "caffeine"]
 
     function request(action: string, value: string): void {
         if (!validActions.includes(action)) {

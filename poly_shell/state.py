@@ -177,7 +177,7 @@ def settings_for(paths):
 def profile_for(paths, mode):
     if mode not in MODES:
         raise ConfigError(f"Unknown mode: {mode}")
-    data = read_object(ROOT / "profiles" / f"{mode}.json")
+    data = read_object(ROOT / "assets" / "profiles" / f"{mode}.json")
     override = paths.config / "profiles" / f"{mode}.json"
     if override.exists():
         data = merge(data, read_object(override))

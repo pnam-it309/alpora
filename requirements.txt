@@ -1,2 +1,0 @@
-# Core and testing dependencies for Alpora Python modules
-pillow==11.1.0

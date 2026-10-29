@@ -1,4 +1,5 @@
 singleton Session 1.0 Session.qml
+AudioVisualizer 1.0 AudioVisualizer.qml
 singleton AudioFeedback 1.0 AudioFeedback.qml
 singleton I18n 1.0 I18n.qml
 CompanionTween 1.0 CompanionTween.qml
@@ -146,3 +147,4 @@ DesktopCompanion 1.0 DesktopCompanion.qml
 
 singleton ShortcutsState 1.0 ShortcutsState.qml
 SettingsShortcuts 1.0 SettingsShortcuts.qml
+BrightnessOverlay 1.0 BrightnessOverlay.qml

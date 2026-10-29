@@ -11,6 +11,7 @@ import uuid
 import json
 import math
 
+from .adapters.base import SafeRunner
 from .state import ConfigError, ROOT, atomic_json, read_object, state_lock, settings_for, update_session
 from .radios_power import power_status, radio_status, set_airplane, set_profile
 
@@ -34,7 +35,7 @@ def command(args, *, check=True):
         if "\x00" in s or "\r" in s or "\n" in s:
             raise ConfigError("Invalid control character in command argument")
         clean_args.append(s)
-    result = subprocess.run(clean_args, capture_output=True, text=True, timeout=5)  # NOSONAR
+    result = SafeRunner.run(clean_args, timeout=5.0)
     if check and result.returncode:
         raise ConfigError((result.stderr or result.stdout).strip() or f"{binary} failed")
     return result
@@ -242,12 +243,16 @@ def connect_wifi(value):
 
 
 def status(paths):
-    device, brightness = backlight_device()
+    device, hw_brightness = backlight_device()
     dnd = command(['makoctl', 'mode'], check=False) if shutil.which('makoctl') else None
     preference = paths.state / 'desktop.json'
     saved = read_object(preference) if preference.exists() else {}
+    has_hw = bool(device and shutil.which('brightnessctl'))
+    sw_brightness = saved.get('softwareBrightness', saved.get('brightness', 100))
+    brightness = hw_brightness if has_hw else sw_brightness
     return {
-        'brightnessAvailable': bool(device and shutil.which('brightnessctl')),
+        'brightnessAvailable': True,
+        'brightnessType': 'hardware' if has_hw else 'software',
         'brightness': brightness,
         'dndAvailable': bool(dnd and dnd.returncode == 0),
         'dnd': bool(dnd and 'do-not-disturb' in dnd.stdout.split()),
@@ -257,6 +262,8 @@ def status(paths):
         **radio_status(),
         **hotspot_status(paths),
         'airplaneManaged': (paths.state / 'airplane-restore.json').exists(),
+        'caffeineAvailable': True,
+        'caffeine': (paths.state / 'caffeine.active').exists(),
     }
 
 
@@ -281,6 +288,40 @@ def set_night_light(paths, enabled):
     atomic_json(paths.state / 'desktop.json', {'nightLight': enabled})
 
 
+
+def set_caffeine(paths, enabled):
+    active_marker = paths.state / 'caffeine.active'
+    pid_file = paths.state / 'caffeine.pid'
+    paths.state.mkdir(parents=True, exist_ok=True)
+    if enabled:
+        if not active_marker.exists():
+            active_marker.touch()
+        if shutil.which('systemd-inhibit'):
+            try:
+                proc = subprocess.Popen(
+                    ['systemd-inhibit', '--what=idle:sleep', '--who=ALPORA', '--why=Caffeine active', 'sleep', 'infinity'],
+                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True
+                )
+                pid_file.write_text(str(proc.pid))
+            except Exception:
+                pass
+    else:
+        if active_marker.exists():
+            try:
+                active_marker.unlink()
+            except OSError:
+                pass
+        if pid_file.exists():
+            try:
+                pid = int(pid_file.read_text().strip())
+                os.kill(pid, 15)
+            except Exception:
+                pass
+            try:
+                pid_file.unlink()
+            except OSError:
+                pass
+
 def restore_desktop(paths):
     """Reapply our saved Night Light preference when the shell starts."""
     preference = paths.state / 'desktop.json'
@@ -301,7 +342,8 @@ VALID_CONTROL_ACTIONS = {
     'wifi-connect': 'wifi-connect',
     'ui-scale': 'ui-scale',
     'touchpad': 'touchpad',
-    'font': 'font'
+    'font': 'font',
+    'caffeine': 'caffeine'
 }
 
 
@@ -325,6 +367,17 @@ def control(paths, action, value=None):
         if not clean_device or clean_device.startswith('-'):
             raise ConfigError('Invalid backlight device')
         command(['brightnessctl', '-d', clean_device, 'set', f'{percentage}%'])
+        preference = paths.state / 'desktop.json'
+        saved = read_object(preference) if preference.exists() else {}
+        saved['softwareBrightness'] = percentage
+        saved['brightness'] = percentage
+        atomic_json(preference, saved)
+        try:
+            from .indicators import show_indicator
+            show_indicator('brightness')
+        except Exception:
+            pass
+        return {'success': True, 'brightness': percentage}
     elif safe_action == 'bluetooth':
         if value not in ('on', 'off'):
             raise ConfigError('Bluetooth state must be on or off')
@@ -336,6 +389,12 @@ def control(paths, action, value=None):
             command(['rfkill', 'block', 'bluetooth'])
     elif safe_action == 'dnd':
         command(['makoctl', 'mode', '-t', 'do-not-disturb'])
+    elif safe_action == 'caffeine':
+        with state_lock(paths):
+            current = (paths.state / 'caffeine.active').exists()
+            target = not current if value in (None, '', 'toggle') else (value in (True, 'true', 'on', '1'))
+            set_caffeine(paths, target)
+            return {'caffeine': target}
     elif safe_action == 'nightlight':
         with state_lock(paths):
             set_night_light(paths, not status(paths)['nightLight'])

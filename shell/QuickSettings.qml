@@ -352,6 +352,12 @@ PanelWindow {
                                 ToolTip.visible: hovered; ToolTip.text: I18n.tr("quick.screenshot")
                                 onClicked: BarState.screenshot()
                             }
+                            QuickActionButton {
+                                Layout.preferredWidth: 40; Layout.minimumWidth: 40
+                                symbol: "coffee"; Accessible.name: "Caffeine"
+                                ToolTip.visible: hovered; ToolTip.text: (Desktop.data.caffeine ? "Caffeine: Active" : "Caffeine: Inactive")
+                                onClicked: Desktop.request("caffeine", Desktop.data.caffeine ? "off" : "on")
+                            }
                         }
                     }
                 }

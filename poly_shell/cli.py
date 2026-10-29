@@ -125,7 +125,12 @@ def start(paths):
     raise ConfigError("Shell did not become ready; existing panel kept. See poly-shell logs")
 
 
-def doctor(paths):
+def doctor(paths, bundle=False, output_dir=None):
+    if bundle:
+        from .diagnostics import collect_diagnostic_bundle
+        archive = collect_diagnostic_bundle(paths, output_dir)
+        print(f"Diagnostic bundle written to: {archive}")
+        return 0
     ok = True
     print(f"Poly Shell {__version__}\nProject: {ROOT}")
     for item in inventory():
@@ -183,12 +188,62 @@ def open_settings(paths):
         raise ConfigError("Settings window failed to start. See journalctl --user -u poly-shell-settings")
 
 
+def open_task_manager(paths):
+    runtime_check()
+    if not os.environ.get("WAYLAND_DISPLAY"):
+        raise ConfigError("Open task manager inside Wayland session")
+    entry = ROOT / "shell/task_manager.qml"
+    ipc = ["quickshell", "ipc", "--path", str(entry), "call", "task-manager-app", "raiseWindow"]
+    paths.runtime.mkdir(parents=True, exist_ok=True, mode=0o700)
+    from .adapters.base import SafeRunner
+    if SafeRunner.run(ipc, timeout=2.0).returncode == 0:
+        return
+    update_session(paths)
+    environment = {name: os.environ[name] for name in (
+        "WAYLAND_DISPLAY", "DISPLAY", "HYPRLAND_INSTANCE_SIGNATURE",
+        "XDG_CURRENT_DESKTOP", "XDG_SESSION_TYPE", "XDG_CONFIG_HOME", "XDG_STATE_HOME",
+        "XDG_DATA_HOME") if os.environ.get(name)}
+    environment.update(
+        POLY_SHELL_STATE=str(paths.session),
+        POLY_SHELL_CTL=str(ROOT / "bin/poly-shell"),
+        POLY_SHELL_ASSETS=str(ROOT / "assets")
+    )
+    if SafeRunner.is_available("systemd-run"):
+        cmd = ["systemd-run", "--user", "--quiet", "--collect",
+               "--unit=poly-shell-task-manager", "--service-type=exec",
+               "--description=ALPORA Task Manager"]
+        cmd += ["--setenv=" + name + "=" + value for name, value in environment.items()]
+        SafeRunner.run(cmd + ["quickshell", "--path", str(entry), "--no-duplicate"], timeout=8.0)
+    else:
+        env_copy = os.environ.copy()
+        env_copy.update(environment)
+        subprocess.Popen(["quickshell", "--path", str(entry), "--no-duplicate"], env=env_copy, start_new_session=True)
+
+    for _ in range(50):
+        if SafeRunner.run(ipc, timeout=1.5).returncode == 0:
+            return
+        time.sleep(.1)
+    raise ConfigError("Task manager window failed to start.")
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Poly Shell foundation preview")
     parser.add_argument("--version", action="version", version=__version__)
     sub = parser.add_subparsers(dest="command", required=True)
-    for command in ("init", "refresh", "doctor", "install", "run", "start", "stop", "restart", "status", "logs", "activate", "deactivate", "settings"):
+    for command in ("init", "refresh", "install", "run", "start", "stop", "restart", "status", "logs", "activate", "deactivate", "settings"):
         sub.add_parser(command)
+    doctor_parser = sub.add_parser("doctor", help="check runtime dependencies and system health")
+    doctor_parser.add_argument("--bundle", action="store_true", help="export diagnostic bundle archive for tester triage")
+    doctor_parser.add_argument("--output", help="output directory for the diagnostic bundle archive")
+    preflight_parser = sub.add_parser("preflight", help="inspect environment readiness before installation")
+    preflight_parser.add_argument("--json", action="store_true", help="output preflight report as JSON")
+    sub.add_parser("task-manager", help="open or raise ALPORA Mini Task Manager")
+    tasks_parser = sub.add_parser("tasks", help="task manager data queries and control")
+    tasks_parser.add_argument("--tab", choices=("processes", "performance", "startup", "users", "details", "services"), default="processes")
+    tasks_parser.add_argument("--kill", type=int, help="kill process by PID")
+    tasks_parser.add_argument("--sig", type=int, default=15, help="signal number to send with kill (default 15)")
+    tasks_parser.add_argument("--service", nargs=2, metavar=("NAME", "ACTION"), help="control systemd service (e.g. name restart)")
+    tasks_parser.add_argument("--startup-toggle", nargs=2, metavar=("NAME", "STATE"), help="toggle startup item (name on/off)")
     wallpaper_parser = sub.add_parser("wallpaper", help="apply and remember a static wallpaper")
     wallpaper_parser.add_argument("image", nargs="?")
     wallpaper_parser.add_argument("--reset", action="store_true")
@@ -196,7 +251,7 @@ def main(argv=None):
     mode_parser.add_argument("mode", nargs="?", choices=(*MODES, "toggle"))
     mode_parser.add_argument("--json", action="store_true")
     control_parser = sub.add_parser("control", help="desktop adapters for the quick settings panel")
-    control_parser.add_argument("action", choices=("status", "brightness", "dnd", "nightlight", "bluetooth", "power-profile", "airplane", "hotspot", "wifi-connect", "ui-scale", "touchpad", "font"))
+    control_parser.add_argument("action", choices=("status", "brightness", "dnd", "nightlight", "bluetooth", "power-profile", "airplane", "hotspot", "wifi-connect", "ui-scale", "touchpad", "font", "caffeine"))
     control_parser.add_argument("value", nargs="?")
     theme_parser = sub.add_parser("theme", help="wallpaper-derived color themes")
     theme_parser.add_argument("action", choices=("list", "apply", "import"))
@@ -213,11 +268,18 @@ def main(argv=None):
     assets_parser = sub.add_parser("assets", help="install pinned ALPORA icon and cursor themes")
     assets_parser.add_argument("action", choices=("install", "apply"))
     osd_parser = sub.add_parser("osd", help="show the current system value without changing it")
-    osd_parser.add_argument("kind", choices=("volume", "microphone", "brightness"))
+    osd_parser.add_argument("kind", choices=("volume", "microphone", "brightness", "capslock", "numlock", "airplane"))
+    osd_parser.add_argument("--state", choices=("on", "off"), default="on", help="toggle state for indicator")
     sub.add_parser("lock-date", help="localized lockscreen date, without system locale dependencies")
     lock_media_parser = sub.add_parser("lock-media", help="hyprlock media player album art, metadata, and controls")
     lock_media_parser.add_argument("field", choices=("art", "title", "artist", "controls", "status", "summary"), nargs="?", default="summary")
     sub.add_parser("toolkit-refresh", help="refresh a cached file-manager palette after a theme change")
+    screen_parser = sub.add_parser("screen", help="screen capture, recording, OCR and QR tools")
+    screen_parser.add_argument("action", choices=("region", "full", "window", "satty", "ocr", "qr", "record", "stop-record"), default="region", nargs="?")
+    screen_parser.add_argument("--with-audio", action="store_true", help="record screen with audio")
+    wellbeing_parser = sub.add_parser("wellbeing", help="display digital wellbeing and application usage statistics")
+    wellbeing_parser.add_argument("--date", help="specific date YYYY-MM-DD")
+    wellbeing_parser.add_argument("--json", action="store_true", help="output JSON")
     appearance_parser = sub.add_parser("appearance", help="validated desktop appearance controls")
     appearance_parser.add_argument("action", choices=("get", "apply", "reset", "install"))
     appearance_parser.add_argument("payload", nargs="?", default="{}")
@@ -231,6 +293,8 @@ def main(argv=None):
     dotfiles_parser.add_argument("action", choices=("status", "check", "link", "stow", "apply", "unlink", "unstow", "delete", "restow"), nargs="?", default="status")
     project_parser = sub.add_parser("project", help="multi-monitor projection modes (internal, mirror, extend, external)")
     project_parser.add_argument("mode", choices=("toggle", "open", "close", "internal", "mirror", "extend", "external"), nargs="?", default="toggle")
+    palette_parser = sub.add_parser("palette-extract", help="extract dominant palette from any image")
+    palette_parser.add_argument("image", help="path to image file")
     args = parser.parse_args(argv)
     paths = Paths.current()
     try:
@@ -249,7 +313,62 @@ def main(argv=None):
             else:
                 print(current_mode(paths))
         elif args.command == "doctor":
-            return doctor(paths)
+            return doctor(paths, bundle=args.bundle, output_dir=args.output)
+        elif args.command == "preflight":
+            from .preflight import run_preflight, format_preflight_report
+            report = run_preflight(paths)
+            if getattr(args, "json", False):
+                print(json.dumps(report, indent=2, ensure_ascii=False))
+            else:
+                print(format_preflight_report(report))
+            return 0 if report["ready"] else 1
+        elif args.command == "task-manager":
+            open_task_manager(paths)
+        elif args.command == "wellbeing":
+            from .wellbeing import WellbeingTracker
+            tracker = WellbeingTracker(paths)
+            summary = tracker.get_summary(args.date or "")
+            if args.json:
+                print(json.dumps(summary, indent=2, ensure_ascii=False))
+            else:
+                mins = summary.get("total_minutes", 0)
+                hrs = int(mins // 60)
+                rem_mins = int(mins % 60)
+                print(f"ALPORA Digital Wellbeing [{summary.get('date')}]: {hrs}h {rem_mins}m total screen time")
+                for app in summary.get("apps", []):
+                    app_mins = app.get("minutes", 0)
+                    print(f"  • {app['name']}: {app_mins:.1f}m")
+        elif args.command == "tasks":
+            from . import task_manager
+            if args.kill:
+                task_manager.kill_process(args.kill, sig=args.sig)
+                print(json.dumps({"success": True, "killed": args.kill}))
+            elif args.service:
+                name, act = args.service
+                task_manager.control_service(name, act)
+                print(json.dumps({"success": True, "service": name, "action": act}))
+            elif args.startup_toggle:
+                name, state = args.startup_toggle
+                enabled = state.lower() in ("on", "true", "1", "yes")
+                task_manager.toggle_startup_item(name, enabled)
+                print(json.dumps({"success": True, "item": name, "enabled": enabled}))
+            else:
+                tab = args.tab
+                if tab == "processes":
+                    data = task_manager.get_processes()
+                elif tab == "performance":
+                    data = task_manager.get_performance_data()
+                elif tab == "startup":
+                    data = task_manager.get_startup_items()
+                elif tab == "users":
+                    data = task_manager.get_user_sessions()
+                elif tab == "details":
+                    data = task_manager.get_process_details()
+                elif tab == "services":
+                    data = task_manager.get_services()
+                else:
+                    data = {}
+                print(json.dumps(data, ensure_ascii=False))
         elif args.command == "control":
             CONTROL_ACTIONS = {
                 "status": "status", "brightness": "brightness", "dnd": "dnd",
@@ -284,11 +403,15 @@ def main(argv=None):
             result = install_assets(paths) if args.action == "install" else apply_assets(paths)
             print(json.dumps(result, ensure_ascii=False))
         elif args.command == "osd":
-            OSD_MAP = {'brightness': 'brightness', 'volume': 'volume', 'microphone': 'microphone'}
-            safe_kind = OSD_MAP.get(args.kind)
-            if not safe_kind:
-                raise ConfigError(f"Invalid OSD indicator: {args.kind}")
-            show_indicator(safe_kind)
+            if args.kind in ("capslock", "numlock", "airplane"):
+                state_val = getattr(args, 'state', 'on') == 'on'
+                SafeRunner.run(['quickshell', 'ipc', '--path', str(ROOT / 'shell'), 'call', 'shell', 'showToggleOsd', args.kind, "true" if state_val else "false"], timeout=3.0)
+            else:
+                OSD_MAP = {'brightness': 'brightness', 'volume': 'volume', 'microphone': 'microphone'}
+                safe_kind = OSD_MAP.get(args.kind)
+                if not safe_kind:
+                    raise ConfigError(f"Invalid OSD indicator: {args.kind}")
+                show_indicator(safe_kind)
         elif args.command == "lock-date":
             print(lock_date())
         elif args.command == "lock-media":
@@ -304,6 +427,22 @@ def main(argv=None):
             try: payload = json.loads(args.payload)
             except ValueError as exc: raise ConfigError("Invalid organizer JSON") from exc
             print(json.dumps(organizer(paths, args.action, payload), ensure_ascii=False))
+        elif args.command == "screen":
+            action_map = {
+                "region": "screenshot-region",
+                "full": "screenshot-full",
+                "window": "screenshot-window",
+                "satty": "screenshot-satty",
+                "ocr": "ocr",
+                "qr": "qr",
+                "record": "record-start",
+                "stop-record": "record-stop"
+            }
+            cmd = [str(ROOT / "scripts" / "screen-tools.sh"), action_map.get(args.action, "screenshot-region")]
+            if getattr(args, "with_audio", False):
+                cmd.append("--with-audio")
+            res = SafeRunner.run(cmd, timeout=30.0)
+            return res.returncode
         elif args.command == "appearance":
             try: payload = json.loads(args.payload)
             except ValueError as exc: raise ConfigError("Invalid appearance JSON") from exc
@@ -348,6 +487,10 @@ def main(argv=None):
                 print(f"Display projection: {safe_mode}")
             else:
                 raise ConfigError("Cannot connect to running Poly Shell for display projection")
+        elif args.command == "palette-extract":
+            from .themes import extract_palette_from_image
+            palette = extract_palette_from_image(args.image)
+            print(json.dumps(palette, indent=2))
         elif args.command == "wallpaper":
             if args.image and (str(args.image).startswith('-') or any(c in str(args.image) for c in ('\x00', '\r', '\n'))):
                 raise ConfigError("Invalid wallpaper argument")

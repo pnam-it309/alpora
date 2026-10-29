@@ -7,7 +7,7 @@
   <a href="#landscapes">Landscapes</a> &nbsp; / &nbsp;
   <a href="#install">Install</a> &nbsp; / &nbsp;
   <a href="docs/README.md">Docs</a> &nbsp; / &nbsp;
-  <a href="README.ru.md">Русский</a>
+  <a href="docs/README.ru.md">Русский</a>
 </p>
 
 <p align="center">
@@ -60,7 +60,7 @@ window borders and supported applications. Work/Vibe behaviour stays independent
 
 **A seventh option: Timeline.** Explore landscapes for different times of day.
 You can also import your own wallpaper and extract its palette.
-[Theme controls →](docs/wallpaper-themes.md)
+[Theme controls →](docs/features/wallpaper-themes.md)
 
 ## 03 &nbsp; The small things belong together
 
@@ -128,7 +128,7 @@ With `~/.local/bin` on your `PATH`, use the short commands `poly-shell` and
 `alpora-fetch`. The card opens on request. The sample folders and Nautilus/Foot
 window arrangement are a demonstration composition; files and system readings
 will be your own.
-[System card](docs/system-card.md) · [Installed files and source layout](docs/repository-layout.md)
+[System card](docs/features/system-card.md) · [Installed files and source layout](docs/architecture/repository-layout.md)
 
 | Want to… | Use |
 | :--- | :--- |
@@ -137,9 +137,9 @@ will be your own.
 | Install core shell (skip bundled apps) | `./install.sh --core-only` |
 | Read the full installation plan | `./install.sh --dry-run` |
 | Cleanly uninstall ALPORA | `./uninstall.sh` (or `./uninstall.sh --restore-config`) |
-| Understand backups and recovery | [Installer guide](docs/arch-installer.md) |
-| Add only the desktop components | [Component installation](docs/installation.md) |
-| See every application and dependency | [Programs & services](docs/programs.md) |
+| Understand backups and recovery | [Installer guide](docs/guides/arch-installer.md) |
+| Add only the desktop components | [Component installation](docs/guides/installation.md) |
+| See every application and dependency | [Programs & services](docs/guides/programs.md) |
 
 <details>
 <summary><b>Compatibility & current preview limits</b></summary>
@@ -164,8 +164,8 @@ Suspend/resume, monitor hotplug and more device combinations remain to be checke
 Bluetooth pairing uses a terminal helper; monitor layout editing is pending.
 
 The last local check passed **197 tests and strict QML lint**. These are local
-results, not a hosted CI claim. Read the [known issues](docs/known-issues.md),
-[new-user validation](docs/install-validation-2026-10-22.md) and [code audit](docs/code-audit-2026-10-22.md).
+results, not a hosted CI claim. Read the [known issues](docs/guides/known-issues.md),
+[new-user validation](docs/audits/install-validation-2026-10-22.md) and [code audit](docs/audits/code-audit-2026-10-22.md).
 
 </details>
 
@@ -185,9 +185,9 @@ These are the bundled session defaults. Change supported bindings in Settings �
 **Горячие клавиши**. The technical command and configuration namespace remain
 `poly-shell` to preserve compatibility.
 
-[Documentation](docs/README.md) &nbsp; / &nbsp; [Hotkeys](docs/shortcuts.md) &nbsp; / &nbsp;
-[Themes](docs/wallpaper-themes.md) &nbsp; / &nbsp; [Robot](docs/desktop-companion.md) &nbsp; / &nbsp;
-[Contributing](CONTRIBUTING.md) &nbsp; / &nbsp; [Changelog](CHANGELOG.md)
+[Documentation](docs/README.md) &nbsp; / &nbsp; [Hotkeys](docs/guides/shortcuts.md) &nbsp; / &nbsp;
+[Themes](docs/features/wallpaper-themes.md) &nbsp; / &nbsp; [Robot](docs/features/desktop-companion.md) &nbsp; / &nbsp;
+[Contributing](.github/CONTRIBUTING.md) &nbsp; / &nbsp; [Changelog](docs/CHANGELOG.md)
 
 ---
 
@@ -196,5 +196,5 @@ These are the bundled session defaults. Change supported bindings in Settings �
 
 Original code and authored vectors: [MIT](LICENSE). Papirus, Bibata and the
 historical Adwaita assets retain their upstream licenses. Landscapes were made
-with OpenAI's image generation tool. [Credits & third-party notices](THIRD_PARTY_NOTICES.md) ·
+with OpenAI's image generation tool. [Credits & third-party notices](licenses/THIRD_PARTY_NOTICES.md) ·
 [Capture provenance & presentation references](docs/media/README.md).

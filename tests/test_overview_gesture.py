@@ -55,4 +55,4 @@ local down = factory("down")
 down.start({delta={y=90},time_ms=60})
 assert(sent[5]:match(',start,%-1,%-90%.000,60,0$'))
 '''
-        subprocess.run(['lua', '-', str(ROOT / 'integrations/hyprland-overview.lua')], input=script, text=True, check=True)
+        subprocess.run(['lua', '-', str(ROOT / 'dotfiles/hypr/.config/hypr/hyprland-overview.lua')], input=script, text=True, check=True)

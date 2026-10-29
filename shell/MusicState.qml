@@ -6,9 +6,9 @@ import Quickshell.Services.Mpris
 Singleton {
     id: root
     readonly property var playerModel: Mpris.players
-    readonly property var players: playerModel.values.filter(item => !!item)
+    readonly property var players: (playerModel && playerModel.values) ? playerModel.values.filter(item => !!item) : []
     property string selectedName: ""
-    readonly property var player: players.find(item => item.dbusName === selectedName) || players.find(item => item.isPlaying) || players[0] || null
+    readonly property var player: players.length ? (players.find(item => item && item.dbusName === selectedName) || players.find(item => item && item.isPlaying) || players[0]) : null
     function select(name: string): void { selectedName = name; }
     function formatTime(seconds: real): string {
         const value = Math.max(0, Math.floor(seconds || 0));

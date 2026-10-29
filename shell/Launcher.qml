@@ -115,9 +115,73 @@ PanelWindow {
     readonly property string trimmedQuery: query.trim()
     readonly property bool isCommand: trimmedQuery.startsWith(">") || trimmedQuery.startsWith("$")
     readonly property string commandText: isCommand ? trimmedQuery.replace(/^[>\$]\s*/, "") : ""
-    readonly property var webMatch: trimmedQuery.match(/^(g|gh|yt|w)\s+(.+)$/i)
+    readonly property var directWebMatch: trimmedQuery.match(/^\?\s*(.+)$/)
+    readonly property var keywordWebMatch: trimmedQuery.match(/^(g|gh|yt|w)\s+(.+)$/i)
+    readonly property var webMatch: directWebMatch ? ["? " + directWebMatch[1], "g", directWebMatch[1]] : keywordWebMatch
     readonly property string webEngine: webMatch ? webMatch[1].toLowerCase() : ""
     readonly property string webTerm: webMatch ? webMatch[2] : ""
+
+    function evaluateConversion(expr: string): string {
+        if (!expr) return "";
+        const m = expr.trim().match(/^([0-9]+(?:\.[0-9]+)?)\s*([a-zA-Z\$€£¥]+)\s*(?:in|to|=|as)\s*([a-zA-Z\$€£¥]+)$/i);
+        if (!m) return "";
+        const val = parseFloat(m[1]);
+        const fromU = m[2].toLowerCase();
+        const toU = m[3].toLowerCase();
+        if (isNaN(val)) return "";
+
+        // Currency rates (USD base)
+        const curRates = {
+            usd: 1.0, "$": 1.0,
+            eur: 0.92, "€": 0.92,
+            gbp: 0.79, "£": 0.79,
+            jpy: 152.0, "¥": 152.0,
+            vnd: 25400.0,
+            cny: 7.23,
+            cad: 1.39,
+            aud: 1.52
+        };
+        if (curRates[fromU] !== undefined && curRates[toU] !== undefined) {
+            const inUsd = val / curRates[fromU];
+            const converted = inUsd * curRates[toU];
+            const formatted = converted >= 100 ? converted.toFixed(2) : converted.toFixed(4).replace(/\.?0+$/, "");
+            return formatted + " " + toU.toUpperCase();
+        }
+
+        // Length
+        const lenMeters = {
+            km: 1000, m: 1, cm: 0.01, mm: 0.001,
+            mi: 1609.344, miles: 1609.344,
+            ft: 0.3048, feet: 0.3048,
+            in: 0.0254, inch: 0.0254, inches: 0.0254
+        };
+        if (lenMeters[fromU] !== undefined && lenMeters[toU] !== undefined) {
+            const inMeters = val * lenMeters[fromU];
+            const converted = inMeters / lenMeters[toU];
+            return (Math.abs(converted - Math.round(converted)) < 1e-6 ? Math.round(converted) : converted.toFixed(3).replace(/\.?0+$/, "")) + " " + toU;
+        }
+
+        // Mass
+        const massKg = {
+            kg: 1, g: 0.001, mg: 0.000001,
+            lb: 0.45359237, lbs: 0.45359237,
+            oz: 0.0283495
+        };
+        if (massKg[fromU] !== undefined && massKg[toU] !== undefined) {
+            const inKg = val * massKg[fromU];
+            const converted = inKg / massKg[toU];
+            return (Math.abs(converted - Math.round(converted)) < 1e-6 ? Math.round(converted) : converted.toFixed(3).replace(/\.?0+$/, "")) + " " + toU;
+        }
+
+        // Temperature
+        if ((fromU === "c" || fromU === "celsius") && (toU === "f" || toU === "fahrenheit")) {
+            return ((val * 9 / 5) + 32).toFixed(1).replace(/\.0$/, "") + " °F";
+        }
+        if ((fromU === "f" || fromU === "fahrenheit") && (toU === "c" || toU === "celsius")) {
+            return (((val - 32) * 5 / 9)).toFixed(1).replace(/\.0$/, "") + " °C";
+        }
+        return "";
+    }
 
     function evaluateMath(expr: string): string {
         if (!expr || expr.length < 2) return "";
@@ -135,7 +199,8 @@ PanelWindow {
         } catch (_) {}
         return "";
     }
-    readonly property string mathResult: isCommand || webMatch ? "" : evaluateMath(trimmedQuery)
+    readonly property string conversionResult: isCommand || webMatch ? "" : evaluateConversion(trimmedQuery)
+    readonly property string mathResult: isCommand || webMatch ? "" : (conversionResult.length > 0 ? conversionResult : evaluateMath(trimmedQuery))
 
     function activateAction(): void {
         if (mathResult.length > 0) {
@@ -284,7 +349,7 @@ PanelWindow {
                 font.family: Session.fontFamily; font.pixelSize: 14
                 leftPadding: 42; rightPadding: 12
                 Accessible.name: I18n.tr("launcher.search")
-                background: Rectangle { radius: 13; color: Glass.tint(PolyTheme.Theme.color("#293130"), 0.5); border.width: search.activeFocus ? 2 : 1; border.color: search.activeFocus ? PolyTheme.Theme.color("#a9b99a") : PolyTheme.Theme.color("#46564d") }
+                background: Rectangle { radius: 13; color: Glass.tint(Session.surface, 0.6); border.width: search.activeFocus ? 2 : 1; border.color: search.activeFocus ? Session.accent : Glass.tint(Session.muted, 0.3) }
                 Icon { x: 14; anchors.verticalCenter: parent.verticalCenter; width: 20; height: 20; name: "search" }
                 Keys.onDownPressed: launcher.moveSelection(launcher.columnCount)
                 Keys.onUpPressed: launcher.moveSelection(-launcher.columnCount)
@@ -427,7 +492,7 @@ PanelWindow {
             Item {
                 Layout.fillWidth: true; Layout.preferredHeight: 22
                 MountainRidge { anchors.right: parent.right; width: 240; height: 30; opacity: 0.65 }
-                Rectangle { anchors.bottom: parent.bottom; width: parent.width; height: 1; color: PolyTheme.Theme.color("#3b4540") }
+                Rectangle { anchors.bottom: parent.bottom; width: parent.width; height: 1; color: Glass.tint(Session.surface, 0.8) }
             }
             RowLayout {
                 id: sectionHeading
@@ -443,8 +508,8 @@ PanelWindow {
                     visible: launcher.browsing
                     text: I18n.tr("common.back")
                     onClicked: { search.clear(); launcher.category = ""; launcher.allApps = false; search.forceActiveFocus(); }
-                    contentItem: Text { text: back.text; color: PolyTheme.Theme.color("#b9c9a7"); font.family: Session.fontFamily; font.pixelSize: 11 }
-                    background: Rectangle { radius: 6; color: PolyTheme.Theme.color("#303c34") }
+                    contentItem: Text { text: back.text; color: Session.accent; font.family: Session.fontFamily; font.pixelSize: 11 }
+                    background: Rectangle { radius: 6; color: Glass.tint(Session.surface, 0.75) }
                 }
             }
             ScrollView {
@@ -541,7 +606,7 @@ PanelWindow {
                 horizontalAlignment: Text.AlignHCenter
             }
             }
-            Text { visible: AppCatalog.error.length > 0; text: AppCatalog.error; color: PolyTheme.Theme.color("#e2af95"); font.family: Session.fontFamily; font.pixelSize: 10; Layout.fillWidth: true; wrapMode: Text.Wrap }
+            Text { visible: AppCatalog.error.length > 0; text: AppCatalog.error; color: Session.palette.urgent || Session.accent; font.family: Session.fontFamily; font.pixelSize: 10; Layout.fillWidth: true; wrapMode: Text.Wrap }
         }
     }
 }

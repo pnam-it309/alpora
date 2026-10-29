@@ -35,9 +35,9 @@ Singleton {
     readonly property var source: Pipewire.defaultAudioSource
     readonly property var microphone: source && source.ready ? source.audio : null
     readonly property var pipewireNodes: Pipewire.nodes
-    readonly property var outputs: pipewireNodes.values.filter(node => !node.isStream && node.audio && node.isSink)
-    readonly property var inputs: pipewireNodes.values.filter(node => !node.isStream && node.audio && !node.isSink)
-    readonly property var audioStreams: pipewireNodes.values.filter(node => node && node.isStream && node.audio && node.isSink)
+    readonly property var outputs: (pipewireNodes && pipewireNodes.values) ? pipewireNodes.values.filter(node => node && !node.isStream && node.audio && node.isSink) : []
+    readonly property var inputs: (pipewireNodes && pipewireNodes.values) ? pipewireNodes.values.filter(node => node && !node.isStream && node.audio && !node.isSink) : []
+    readonly property var audioStreams: (pipewireNodes && pipewireNodes.values) ? pipewireNodes.values.filter(node => node && node.isStream && node.audio && node.isSink) : []
     readonly property var sink: Pipewire.defaultAudioSink
     property string lastSinkName: ""
     onSinkChanged: {
@@ -70,12 +70,14 @@ Singleton {
     readonly property bool quickSettingsOpen: BarState.selection.name === "quick-settings"
     readonly property string quickSettingsScreen: quickSettingsOpen ? BarState.selection.screen : ""
     readonly property var networkDevices: Networking.devices
-    readonly property var wifiDevice: networkDevices.values.find(device => device.type === DeviceType.Wifi && device.connected)
-        || networkDevices.values.find(device => device.type === DeviceType.Wifi && device.state === ConnectionState.Connecting)
-        || networkDevices.values.find(device => device.type === DeviceType.Wifi) || null
-    readonly property var wifiNetwork: wifiDevice ? wifiDevice.networks.values.find(network => network.connected) || null : null
+    readonly property var wifiDevice: (networkDevices && networkDevices.values) ? (
+        networkDevices.values.find(device => device && device.type === DeviceType.Wifi && device.connected)
+        || networkDevices.values.find(device => device && device.type === DeviceType.Wifi && device.state === ConnectionState.Connecting)
+        || networkDevices.values.find(device => device && device.type === DeviceType.Wifi) || null
+    ) : null
+    readonly property var wifiNetwork: (wifiDevice && wifiDevice.networks && wifiDevice.networks.values) ? (wifiDevice.networks.values.find(network => network && network.connected) || null) : null
     readonly property bool wifiEnabled: Networking.wifiEnabled
-    readonly property var wiredDevice: networkDevices.values.find(device => device.type === DeviceType.Wired && device.connected) || null
+    readonly property var wiredDevice: (networkDevices && networkDevices.values) ? (networkDevices.values.find(device => device && device.type === DeviceType.Wired && device.connected) || null) : null
     readonly property var wifiObservation: ({
         wifiAvailable: !!wifiDevice, hardwareEnabled: Networking.wifiHardwareEnabled,
         wifiEnabled: wifiEnabled, connected: !!wifiDevice && wifiDevice.connected,
@@ -88,9 +90,9 @@ Singleton {
     readonly property var networkStatus: StatusLogic.network(wifiObservation)
     readonly property var audioStatus: StatusLogic.audio(!!audio, audio ? audio.muted : false, audio ? audio.volume : 0)
     readonly property var bluetoothService: Bluetooth
-    readonly property var bluetoothAdapter: bluetoothService.defaultAdapter
+    readonly property var bluetoothAdapter: bluetoothService ? bluetoothService.defaultAdapter : null
     readonly property bool bluetoothEnabled: bluetoothAdapter ? bluetoothAdapter.enabled : false
-    readonly property var connectedBluetooth: bluetoothEnabled ? bluetoothAdapter.devices.values.filter(device => device.connected) : []
+    readonly property var connectedBluetooth: (bluetoothEnabled && bluetoothAdapter && bluetoothAdapter.devices && bluetoothAdapter.devices.values) ? bluetoothAdapter.devices.values.filter(device => device && device.connected) : []
     readonly property string bluetoothDescription: !bluetoothAdapter ? I18n.tr("bluetooth.unavailable")
         : !bluetoothEnabled ? I18n.tr("bluetooth.off")
         : connectedBluetooth.length ? connectedBluetooth.map(device => device.name).join(", ")

@@ -41,7 +41,7 @@ GLOBAL_ACTIONS = [('poly-shell:launcher', 'Applications'), ('poly-shell:quick-se
                   ('poly-shell:notifications', 'Notifications'), ('poly-shell:overview', 'Overview'),
                   ('poly-shell:clipboard', 'Clipboard'), ('poly-shell:toggle-mode', 'Toggle Work / Vibe Mode'),
                   ('poly-shell:screenshot', 'Interactive Screenshot'),
-                  ('poly-shell:power-menu', 'Power Menu')]
+                  ('poly-shell:power-menu', 'Power Menu'), ('poly-shell:task-manager', 'Task Manager')]
 MODS = {'SUPER':64, 'CTRL':4, 'ALT':8, 'SHIFT':1}
 
 
@@ -208,8 +208,8 @@ def effective(paths):
 
 
 def hypr(*args):
-    try: result = subprocess.run(['hyprctl',*args],capture_output=True,text=True,timeout=8)
-    except (OSError,subprocess.SubprocessError) as exc: raise ConfigError('Hyprland is not responding / Hyprland не отвечает: '+str(exc)) from exc
+    from .adapters.base import SafeRunner
+    result = SafeRunner.run(['hyprctl', *args], timeout=8.0)
     if result.returncode: raise ConfigError((result.stderr or result.stdout).strip() or 'Hyprland error / Ошибка Hyprland')
     return result.stdout
 

@@ -118,6 +118,47 @@ def catalog(paths):
             'colorsFromWallpaper': saved.get('colorsFromWallpaper', True)}
 
 
+
+def extract_palette_from_image(source_path):
+    """Extract deterministic semantic palette from an image file using Pillow."""
+    source = Path(source_path).resolve()
+    if not source.is_file():
+        raise ConfigError('Select an image file')
+    try:
+        from PIL import Image, ImageOps
+    except ImportError:
+        raise ConfigError('Pillow (python-pillow) is required for palette extraction')
+    try:
+        with Image.open(source) as original:
+            if original.format not in ('PNG', 'JPEG', 'WEBP'):
+                raise ConfigError('Supported formats: PNG, JPEG, and WebP')
+            original.load()
+            sample = ImageOps.exif_transpose(original).convert('RGB')
+            sample.thumbnail((96, 96))
+            quantized = sample.quantize(colors=12)
+            table = quantized.getpalette()
+            counts = sorted(quantized.getcolors(), reverse=True)
+    except (OSError, ValueError) as exc:
+        raise ConfigError('Failed to read image') from exc
+    candidates = []
+    for count, index in counts:
+        color = tuple(c / 255 for c in table[index*3:index*3+3])
+        h, sat, val = colorsys.rgb_to_hsv(*color)
+        candidates.append((count * (0.2 + sat) * (0.3 + val), h, sat, val, color))
+    _, hue, sat, val, _ = max(candidates)
+    def hsv(h, s, v):
+        return '#' + ''.join(f'{round(x*255):02x}' for x in colorsys.hsv_to_rgb(h % 1, s, v))
+    return {
+        'background': hsv(hue, min(.48, max(.15, sat)), .15),
+        'surface': hsv(hue, min(.40, max(.12, sat*.65)), .24),
+        'text': hsv(hue, .035, .96),
+        'muted': hsv(hue, .13, .77),
+        'accent': hsv(hue, min(.42, max(.18, sat*.65)), .88),
+        'secondary': hsv(hue+.12, .29, .88),
+        'cool': hsv(hue-.10, .28, .80),
+        'border': hsv(hue, .18, .40),
+    }
+
 def import_wallpaper(paths, value):
     if not isinstance(value, str) or not Path(value).is_file():
         raise ConfigError('Select an image for wallpaper')

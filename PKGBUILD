@@ -60,12 +60,12 @@ package() {
     install -dm755 "$pkgdir/usr/lib/python${python_version}/site-packages/poly_shell"
     cp -r poly_shell/* "$pkgdir/usr/lib/python${python_version}/site-packages/poly_shell/"
 
-    # Install Shared Assets & Shell QML
+    # Install Shared Assets, Shell QML & Dotfiles
     install -dm755 "$pkgdir/usr/share/alpora"
     cp -r shell "$pkgdir/usr/share/alpora/"
     cp -r assets "$pkgdir/usr/share/alpora/"
-    cp -r integrations "$pkgdir/usr/share/alpora/"
-    cp -r profiles "$pkgdir/usr/share/alpora/"
+    cp -r dotfiles "$pkgdir/usr/share/alpora/"
+    cp -r scripts "$pkgdir/usr/share/alpora/"
 
     # Install Executable Binaries
     install -dm755 "$pkgdir/usr/bin"

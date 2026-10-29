@@ -25,7 +25,7 @@ def seed_reference_preferences(paths):
     from .state import read_object
     from .visual import validate as validate_visual
     from .widgets import validate as validate_widgets
-    preset=read_object(ROOT/'profiles/desktop.json')
+    preset=read_object(ROOT/'assets/profiles/desktop.json')
     if preset.get('version')!=1: raise ConfigError('Unsupported desktop preset')
     validate_visual(preset['visual']['values'])
     validate_widgets(preset['widgets']['values'])
@@ -68,10 +68,10 @@ def configuration_plan(paths, replace=False):
     root=paths.config.parent/'hypr'
     if root.is_symlink(): raise ConfigError('Preserving symlinked Hyprland directory; install in a regular configuration directory')
     files={root/'hyprland.lua':MAIN,
-           root/'alpora-session.lua':(ROOT/'integrations/alpora-session.lua').read_text(),
-           root/'alpora-hypridle.conf':(ROOT/'integrations/alpora-hypridle.conf').read_text(),
-           root/'alpora-overview.lua':(ROOT/'integrations/hyprland-overview.lua').read_text(),
-           root/'screenshot.sh':(ROOT/'integrations/screenshot.sh').read_text()}
+           root/'alpora-session.lua':(ROOT/'dotfiles/hypr/.config/hypr/alpora-session.lua').read_text(),
+           root/'alpora-hypridle.conf':(ROOT/'dotfiles/hypr/.config/hypr/alpora-hypridle.conf').read_text(),
+           root/'alpora-overview.lua':(ROOT/'dotfiles/hypr/.config/hypr/hyprland-overview.lua').read_text(),
+           root/'screenshot.sh':(ROOT/'scripts/screenshot.sh').read_text()}
     lock=root/'hyprlock.conf'
     # The palette sync creates this generated file before the next login.
     # Keep an existing personal lock config unless replacing the whole session.

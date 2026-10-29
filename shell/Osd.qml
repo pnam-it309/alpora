@@ -40,9 +40,16 @@ PanelWindow {
                     RowLayout {
                         Layout.fillWidth: true
                         Text { text: OsdState.title; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12; Layout.fillWidth: true }
-                        Text { text: OsdState.muted ? I18n.tr("common.off") : Math.round(OsdState.value * 100) + "%"; color: Session.accent; font.family: Session.fontFamily; font.pixelSize: 12; font.weight: Font.DemiBold }
+                        Text {
+                            text: OsdState.isToggle ? (OsdState.muted ? "OFF" : "ON") : (OsdState.muted ? I18n.tr("common.off") : Math.round(OsdState.value * 100) + "%")
+                            color: OsdState.muted ? Session.muted : Session.accent
+                            font.family: Session.fontFamily
+                            font.pixelSize: 12
+                            font.weight: Font.DemiBold
+                        }
                     }
                     Rectangle {
+                        visible: !OsdState.isToggle
                         Layout.fillWidth: true; Layout.preferredHeight: 5; radius: 3
                         color: Glass.tint(Session.foreground, 0.13)
                         Rectangle {

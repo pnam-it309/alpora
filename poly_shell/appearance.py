@@ -184,7 +184,8 @@ def atomic_text(path, text):
 
 
 def hypr(*args):
-    result = subprocess.run(["hyprctl", *args], capture_output=True, text=True, timeout=5)
+    from .adapters.base import SafeRunner
+    result = SafeRunner.run(["hyprctl", *args], timeout=5.0)
     if result.returncode:
         raise ConfigError((result.stderr or result.stdout).strip() or "Hyprland unavailable / Hyprland недоступен")
     return result.stdout
