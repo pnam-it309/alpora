@@ -115,6 +115,14 @@ ColumnLayout {
                     Layout.fillWidth: true
                     Text { text: root.player && root.player.positionSupported ? MusicState.formatTime(seek.pressed ? seek.pendingPosition : root.position) : "—:—"; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 10 }
                     Item { Layout.fillWidth: true }
+                    AudioVisualizer {
+                        visible: root.expansion > 0.4
+                        barsCount: 12
+                        barWidth: 2.5
+                        barSpacing: 2
+                        implicitHeight: 14
+                    }
+                    Item { Layout.fillWidth: true }
                     Text { text: root.length > 0 ? MusicState.formatTime(root.length) : "—:—"; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 10 }
                 }
                 RowLayout {
