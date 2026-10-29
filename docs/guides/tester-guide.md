@@ -113,3 +113,41 @@ Nếu muốn xóa toàn bộ dữ liệu tạm và cache:
 | **Không có thanh trượt độ sáng màn hình** | Đang dùng máy tính để bàn (PC) hoặc thiếu `brightnessctl` | Đây là tính năng tự suy thoái mềm: máy bàn không có cổng backlight sẽ tự ẩn thanh độ sáng |
 | **Widget phát nhạc không nhận bài hát** | Trình phát chưa hỗ trợ giao thức MPRIS | Đảm bảo trình phát (Spotify, Chromium, Firefox, MPV) đã bật cờ MPRIS |
 | **Quickshell báo lỗi version mismatch** | Phiên bản Qt và Quickshell bị lệch | Chạy `pacman -Q quickshell qt6-base` để kiểm tra phiên bản khớp nhau |
+
+---
+
+## 7. Các bước Bàn giao & Tối ưu Vận hành Thực tế (Production Handover Checklist)
+
+Sau khi cài đặt hoặc cập nhật phiên bản mới, thực hiện 3 bước sau để đưa ALPORA vào trạng thái Daily Driver ổn định nhất:
+
+### 1. Khởi chạy và Giám sát Daemon tự động (Systemd User Service)
+Đảm bảo daemon ALPORA được quản lý bởi systemd với cơ chế `Restart=always` (tự khởi động lại trong 1 giây nếu gặp sự cố):
+```bash
+systemctl --user daemon-reload
+systemctl --user enable --now poly-shell.service
+```
+Kiểm tra trạng thái đang hoạt động:
+```bash
+systemctl --user status poly-shell.service
+```
+
+### 2. Cấu hình Phím tắt Khẩn cấp / Cứu hộ (Safe Mode Fallback)
+Khai báo một phím tắt độc lập trong `~/.config/hypr/hyprland.conf` để luôn luôn có thể mở ngay một Terminal độc lập cứu hộ khi cần debug mà không phụ thuộc vào UI panel:
+```ini
+# ALPORA Emergency Terminal Fallback (Always accessible)
+bind = SUPER SHIFT, Return, exec, kitty || foot
+```
+
+### 3. Thiết lập Alias Chẩn đoán Nhanh (1-Command Healthcheck)
+Thêm alias chẩn đoán vào shell profile (`~/.bashrc` hoặc `~/.zshrc`):
+```bash
+echo 'alias alpora-doctor="poly-shell doctor"' >> ~/.bashrc
+# hoặc nếu dùng zsh:
+echo 'alias alpora-doctor="poly-shell doctor"' >> ~/.zshrc
+```
+Bất cứ khi nào cài thêm phần mềm mới hoặc nghi ngờ có xung đột, chỉ cần gõ:
+```bash
+alpora-doctor
+```
+Hệ thống sẽ quét toàn bộ danh sách công cụ, quyền thư mục và dịch vụ nền trong chưa đầy 1 giây.
+
