@@ -175,7 +175,7 @@ ColumnLayout {
                 spacing: 8
 
                 Item { width: parent.width; height: 12 }
-                Rectangle { width: parent.width; height: 1; color: Glass.tint(Session.accent, 0.22) }
+                GlowSectionDivider { width: parent.width }
                 Text {
                     text: I18n.tr("audio.app_streams")
                     color: Session.foreground
@@ -187,52 +187,24 @@ ColumnLayout {
 
                 Repeater {
                     model: Session.audioStreams
-                    Rectangle {
-                        id: appRow
+                    HoverControl {
                         required property var modelData
                         width: parent.width
-                        height: 54
-                        radius: 10
-                        color: Glass.tint(Session.surface, 0.6)
-                        border.color: Glass.tint(Session.accent, 0.3)
-                        border.width: 1
-
-                        RowLayout {
-                            anchors.fill: parent
-                            anchors.margins: 8
-                            spacing: 10
-
-                            Icon {
-                                name: (modelData.properties && modelData.properties["application.icon-name"]) || "volume"
-                                Layout.preferredWidth: 22
-                                Layout.preferredHeight: 22
+                        label: (modelData.properties && (modelData.properties["application.name"] || modelData.properties["node.description"])) || modelData.name || "App"
+                        symbol: (modelData.properties && modelData.properties["application.icon-name"]) || "volume"
+                        detail: (modelData.properties && modelData.properties["media.name"]) || ""
+                        value: modelData.audio ? modelData.audio.volume : 0
+                        muted: modelData.audio ? modelData.audio.muted : false
+                        hasMute: true
+                        onAdjusted: v => {
+                            if (modelData.audio) {
+                                modelData.audio.volume = v;
+                                if (v > 0) modelData.audio.muted = false;
                             }
-
-                            ColumnLayout {
-                                Layout.fillWidth: true
-                                spacing: 2
-                                Text {
-                                    text: (modelData.properties && (modelData.properties["application.name"] || modelData.properties["node.description"])) || modelData.name || "App"
-                                    color: Session.foreground
-                                    font.family: Session.fontFamily
-                                    font.pixelSize: 12
-                                    font.weight: Font.DemiBold
-                                    elide: Text.ElideRight
-                                    Layout.fillWidth: true
-                                }
-                                ControlSlider {
-                                    Layout.fillWidth: true
-                                    Layout.preferredHeight: 18
-                                    value: modelData.audio ? modelData.audio.volume : 0
-                                    onMoved: { if (modelData.audio) { modelData.audio.volume = value; if (value > 0) modelData.audio.muted = false; } }
-                                }
-                            }
-
-                            IconButton {
-                                symbol: modelData.audio && modelData.audio.muted ? "muted" : "volume"
-                                Layout.preferredWidth: 28
-                                Layout.preferredHeight: 28
-                                onClicked: if (modelData.audio) modelData.audio.muted = !modelData.audio.muted
+                        }
+                        onMuteRequested: {
+                            if (modelData.audio) {
+                                modelData.audio.muted = !modelData.audio.muted;
                             }
                         }
                     }
@@ -501,10 +473,8 @@ ColumnLayout {
             enabled: Desktop.data.hotspotAvailable && !Desktop.changingSettings && !Desktop.data.airplane
             onClicked: Desktop.request("hotspot", Desktop.data.hotspot ? "off" : "on")
         }
-        Rectangle {
+        GlowSectionDivider {
             Layout.fillWidth: true
-            height: 1
-            color: Glass.tint(Session.accent, 0.2)
         }
         Text {
             text: I18n.tr("wifi.hotspot_name")
@@ -600,6 +570,59 @@ ColumnLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
         spacing: 10
+
+        GridLayout {
+            Layout.fillWidth: true
+            columns: 2
+            rowSpacing: 8
+            columnSpacing: 8
+
+            HoverStatusTile {
+                Layout.fillWidth: true
+                title: "Wi-Fi"
+                symbol: "wifi"
+                detail: Desktop.data.wifiSsid || I18n.tr("common.disconnected")
+                active: Desktop.data.wifiEnabled
+                connected: !!Desktop.data.wifiSsid
+                statusKind: "wifi"
+                statusLevel: Desktop.data.wifiStrength || 0
+                onClicked: root.popup.page = "wifi"
+            }
+
+            HoverStatusTile {
+                Layout.fillWidth: true
+                title: "Bluetooth"
+                symbol: "bluetooth"
+                detail: Desktop.data.bluetoothConnectedDevice || (Desktop.data.bluetoothEnabled ? I18n.tr("bluetooth.on") : I18n.tr("common.off"))
+                active: Desktop.data.bluetoothEnabled
+                connected: !!Desktop.data.bluetoothConnectedDevice
+                statusKind: "bluetooth"
+                onClicked: root.popup.page = "bluetooth"
+            }
+
+            HoverStatusTile {
+                Layout.fillWidth: true
+                title: "Audio Out"
+                symbol: "volume"
+                detail: Desktop.data.audioOutputDescription || "Default Output"
+                active: !Desktop.data.audioMuted
+                connected: true
+                onClicked: root.popup.page = "output"
+            }
+
+            HoverStatusTile {
+                Layout.fillWidth: true
+                title: "Power Profile"
+                symbol: "performance"
+                detail: Desktop.data.powerProfile || "balanced"
+                active: Desktop.data.powerProfile === "performance"
+                connected: Desktop.data.powerProfilesAvailable
+                onClicked: root.popup.page = "profiles"
+            }
+        }
+
+        GlowSectionDivider { Layout.fillWidth: true }
+
         SettingsRow { Layout.fillWidth: true; text: "Sound output"; symbol: "volume"; onClicked: root.popup.page = "output" }
         SettingsRow { Layout.fillWidth: true; text: "Microphone"; symbol: "microphone"; onClicked: root.popup.page = "input" }
         SettingsRow { Layout.fillWidth: true; text: "Wi-Fi"; symbol: "wifi"; onClicked: root.popup.page = "wifi" }
@@ -628,13 +651,13 @@ ColumnLayout {
         }
         Repeater {
             model: [{key: "power-saver", label: I18n.tr("quick.power_saver"), detail: I18n.tr("quick.power_saver_desc"), icon: "leaf"}, {key: "balanced", label: I18n.tr("quick.balanced"), detail: I18n.tr("quick.balanced_desc"), icon: "balance"}, {key: "performance", label: I18n.tr("quick.performance"), detail: I18n.tr("quick.performance_desc"), icon: "performance"}]
-            SettingsRow {
+            QuickTile {
                 required property var modelData
                 Layout.fillWidth: true
-                text: modelData.label
+                title: modelData.label
                 subtitle: modelData.detail
                 symbol: modelData.icon
-                selected: Desktop.data.powerProfile === modelData.key
+                active: Desktop.data.powerProfile === modelData.key
                 enabled: Desktop.data.powerProfilesAvailable && (Desktop.data.powerProfiles || []).includes(modelData.key) && !Desktop.changingSettings
                 onClicked: Desktop.request("power-profile", modelData.key)
             }

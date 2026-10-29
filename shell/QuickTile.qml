@@ -1,5 +1,4 @@
 import QtQuick
-import "theme" as PolyTheme
 import QtQuick.Controls
 import QtQuick.Shapes
 
@@ -26,10 +25,12 @@ Button {
     HoverHandler { id: tileHover; enabled: control.enabled }
     background: FacetSurface {
         accented: control.active
-        baseColor: control.active ? (control.down ? PolyTheme.Theme.color("#65765f") : (tileHover.hovered ? PolyTheme.Theme.color("#5c6c53") : PolyTheme.Theme.color("#505f47"))) : (control.down ? PolyTheme.Theme.color("#424c47") : (tileHover.hovered ? PolyTheme.Theme.color("#38413f") : PolyTheme.Theme.color("#292f32")))
+        baseColor: control.active
+            ? (control.down ? Glass.tint(Session.accent, 0.40) : (tileHover.hovered ? Glass.tint(Session.accent, 0.30) : Glass.tint(Session.accent, 0.22)))
+            : (control.down ? Glass.tint(Session.surface, 0.85) : (tileHover.hovered ? Glass.tint(Session.surface, 0.70) : Glass.tint(Session.surface, 0.50)))
         Behavior on baseColor { ColorAnimation { duration: Motion.responseMs } }
         border.width: control.visualFocus ? 1.5 : 0.7
-        border.color: control.visualFocus ? Session.foreground : (control.active ? PolyTheme.Theme.color("#839478") : PolyTheme.Theme.color("#424b47"))
+        border.color: control.visualFocus ? Session.foreground : (control.active ? Session.accent : Glass.tint(Session.accent, 0.30))
     }
     contentItem: Item {
         opacity: control.enabled ? 1 : 0.4
@@ -51,7 +52,7 @@ Button {
             Text {
                 width: parent.width
                 text: control.subtitle
-                color: control.active ? PolyTheme.Theme.color("#d1d9c8") : Session.muted
+                color: control.active ? Session.accent : Session.muted
                 font.family: Session.settings.bar ? Session.settings.bar.fontFamily : "Noto Sans"
                 font.pixelSize: 10
                 elide: Text.ElideRight
@@ -73,13 +74,13 @@ Button {
         Accessible.name: control.title + " — " + I18n.tr("common.details")
         background: Item {
             Shape {
-        preferredRendererType: Shape.CurveRenderer
+                preferredRendererType: Shape.CurveRenderer
                 id: detailHighlight
                 anchors.fill: parent
                 opacity: detailsButton.down ? 0.16 : (detailsButton.hovered || detailsButton.visualFocus ? 0.09 : 0)
                 Behavior on opacity { NumberAnimation { duration: Motion.responseMs } }
                 ShapePath {
-                    strokeWidth: 0; fillColor: "white"
+                    strokeWidth: 0; fillColor: Session.foreground
                     startX: 0; startY: 0
                     PathLine { x: detailHighlight.width - 13; y: 0 }
                     PathArc { x: detailHighlight.width; y: 13; radiusX: 13; radiusY: 13 }
@@ -92,7 +93,7 @@ Button {
             Rectangle {
                 anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter
                 width: 1; height: parent.height - 22
-                color: detailsButton.visualFocus ? Session.foreground : PolyTheme.Theme.color("#30c6d3c5")
+                color: detailsButton.visualFocus ? Session.foreground : Glass.tint(Session.accent, 0.25)
             }
         }
         contentItem: Item {

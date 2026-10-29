@@ -188,6 +188,11 @@ PanelWindow {
         width: popup.panelWidth; height: popup.panelHeight
         x: popup.clipboardModal ? popup.panelLeft : 16 + (popup.windowWidth - popup.panelWidth) / 2; y: popup.topPadding
         HoverHandler { id: panelHover }
+        PanelReveal {
+            target: body
+            motion: panelMotion
+        }
+
         UnfoldPanel {
             id: body
             anchors.fill: parent

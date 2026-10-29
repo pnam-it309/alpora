@@ -54,8 +54,9 @@ Scope {
                 anchors.fill: parent; anchors.margins: 22; spacing: 13
                 RowLayout {
                     Layout.fillWidth: true; spacing: 10
-                    Rectangle {
-                        Layout.preferredWidth: 42; Layout.preferredHeight: 42; radius: 12; color: Glass.tint(Session.accent, 0.16)
+                    CutSurface {
+                        Layout.preferredWidth: 42; Layout.preferredHeight: 42
+                        edgeColor: Session.accent
                         Text { anchors.centerIn: parent; text: "DEV"; color: Session.accent; font.family: Session.fontFamily; font.pixelSize: 12; font.weight: Font.Bold }
                     }
                     ColumnLayout {
@@ -69,7 +70,7 @@ Scope {
                         onClicked: DeveloperMetricsState.closeDetails()
                     }
                 }
-                Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 1; color: Glass.tint(Session.accent, 0.22) }
+                FacetDivider { Layout.fillWidth: true }
                 ScrollView {
                     Layout.fillWidth: true; Layout.fillHeight: true; clip: true
                     ColumnLayout {

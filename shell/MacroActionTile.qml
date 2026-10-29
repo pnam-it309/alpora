@@ -4,7 +4,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
-import "theme" as PolyTheme
 
 Button {
     id: root
@@ -52,14 +51,13 @@ Button {
             Layout.preferredWidth: 36
             Layout.preferredHeight: 36
             radius: 8
-            color: root.active ? Session.accent : Glass.tint(Session.surface, 0.6)
+            color: root.active ? Glass.tint(Session.accent, 0.5) : Glass.tint(Session.surface, 0.6)
 
             Icon {
                 anchors.centerIn: parent
                 name: root.symbol
                 width: 20
                 height: 20
-                color: root.active ? PolyTheme.Theme.color("#ffffff") : Session.foreground
             }
         }
 
