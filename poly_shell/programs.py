@@ -36,6 +36,7 @@ PROGRAMS = (
     ('Slurp','slurp',('slurp',),'Screen capture region selection',False),
     ('Libnotify','libnotify',('notify-send',),'Notification for saved screenshot',False),
     ('GSettings','glib2',('gsettings',),'GTK and icon theme coordination',False),
+    ('Wine','wine',('wine',),'Windows .exe runner for apps like Zalo, UltraViewer',False),
 )
 
 

@@ -336,6 +336,22 @@ def main(argv=None):
     project_parser.add_argument("mode", choices=("toggle", "open", "close", "internal", "mirror", "extend", "external"), nargs="?", default="toggle")
     palette_parser = sub.add_parser("palette-extract", help="extract dominant palette from any image")
     palette_parser.add_argument("image", help="path to image file")
+    exe_parser = sub.add_parser("exe", help="Windows .EXE runner, downloader, and installer (Zalo, etc.)")
+    exe_sub = exe_parser.add_subparsers(dest="exe_action", required=True)
+    exe_run = exe_sub.add_parser("run", help="run a .exe with Wine and Vietnamese font fixes")
+    exe_run.add_argument("path", help="path to .exe file")
+    exe_run.add_argument("--prefix", help="optional custom Wine prefix path")
+    exe_run.add_argument("extra_args", nargs="*", help="arguments passed to the Windows program")
+    exe_dl = exe_sub.add_parser("download", help="download a Windows application .exe (zalo, ultraviewer, notepadpp)")
+    exe_dl.add_argument("target", help="app preset name (zalo, ultraviewer, notepadpp) or direct URL")
+    exe_dl.add_argument("--output", help="destination directory (defaults to ~/Downloads)")
+    exe_inst = exe_sub.add_parser("install", help="install a Windows application and create ALPORA Launcher entry")
+    exe_inst.add_argument("target", help="app preset name (e.g. zalo) or path to downloaded setup.exe")
+    exe_inst.add_argument("--name", help="display name of the application")
+    exe_zalo = exe_sub.add_parser("zalo", help="1-click installer for Zalo on Linux")
+    exe_zalo.add_argument("--aur", action="store_true", help="prefer native AUR package if available")
+    exe_sub.add_parser("list", help="list known Windows application presets")
+    exe_sub.add_parser("register-mime", help="associate .exe files with ALPORA Wine Runner")
     args = parser.parse_args(argv)
     paths = Paths.current()
     try:
@@ -504,6 +520,9 @@ def main(argv=None):
                 print(f"Display projection: {safe_mode}")
             else:
                 raise ConfigError("Cannot connect to running Poly Shell for display projection")
+        elif args.command == "exe":
+            from .commands.exe_cmd import handle_exe
+            return handle_exe(args)
         elif args.command == "palette-extract":
             from .themes import extract_palette_from_image
             palette = extract_palette_from_image(args.image)
