@@ -9,7 +9,7 @@ import unittest
 @unittest.skipUnless(shutil.which('node'), 'JavaScript status checks require node')
 class BarStatusTests(unittest.TestCase):
     def evaluate(self, expression):
-        script = Path(__file__).resolve().parents[1] / 'shell/StatusLogic.js'
+        script = Path(__file__).resolve().parents[1] / 'shell/logic/StatusLogic.js'
         code = script.read_text(encoding='utf-8') + '\nconsole.log(JSON.stringify(' + expression + '));'
         return json.loads(subprocess.check_output(['node', '-e', code], text=True, encoding='utf-8'))
 

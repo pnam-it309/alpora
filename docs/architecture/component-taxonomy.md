@@ -70,9 +70,9 @@ Khởi chạy độc lập bằng lệnh `poly-shell settings`:
 * **Chuyển động (Motion Tokens):** [`Motion.qml`](file:///d:/code/alpora/shell/Motion.qml), [`PanelMotion.qml`](file:///d:/code/alpora/shell/PanelMotion.qml), [`EntranceMotion.qml`](file:///d:/code/alpora/shell/EntranceMotion.qml), [`PointerExitGuard.qml`](file:///d:/code/alpora/shell/PointerExitGuard.qml).
 
 ### Nhóm F: Thuật toán Tính toán & Logic Thuần (.js)
-* [`StatusLogic.js`](file:///d:/code/alpora/shell/StatusLogic.js): Logic xác định cấp độ sóng Wi-Fi, trạng thái pin, trạng thái mạng.
-* [`OverviewGeometry.js`](file:///d:/code/alpora/shell/OverviewGeometry.js), [`WidgetGeometry.js`](file:///d:/code/alpora/shell/WidgetGeometry.js): Tính toán kích thước, tỷ lệ co giãn theo độ phân giải màn hình.
-* [`CompanionLogic.js`](file:///d:/code/alpora/shell/CompanionLogic.js), [`CompanionTravel.js`](file:///d:/code/alpora/shell/CompanionTravel.js), [`CompanionThrow.js`](file:///d:/code/alpora/shell/CompanionThrow.js): Thuật toán vật lý, đường bay và ném robot đồng hành.
+* [`StatusLogic.js`](file:///d:/code/alpora/shell/logic/StatusLogic.js): Logic xác định cấp độ sóng Wi-Fi, trạng thái pin, trạng thái mạng.
+* [`OverviewGeometry.js`](file:///d:/code/alpora/shell/logic/OverviewGeometry.js), [`WidgetGeometry.js`](file:///d:/code/alpora/shell/logic/WidgetGeometry.js): Tính toán kích thước, tỷ lệ co giãn theo độ phân giải màn hình.
+* [`CompanionLogic.js`](file:///d:/code/alpora/shell/logic/CompanionLogic.js), [`CompanionTravel.js`](file:///d:/code/alpora/shell/logic/CompanionTravel.js), [`CompanionThrow.js`](file:///d:/code/alpora/shell/logic/CompanionThrow.js): Thuật toán vật lý, đường bay và ném robot đồng hành.
 
 ---
 

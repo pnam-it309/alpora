@@ -29,7 +29,7 @@ assert.equal(g.destination(.85, -.004, 10, false, true), 0); // closing flick
 assert.equal(g.destination(.8, .01, 0, true, false), 0); // cancelled opening
 assert.equal(g.destination(.2, -.01, 0, true, true), 1); // cancelled closing
 '''
-        subprocess.run(['node', '-e', script, str(ROOT / 'shell/OverviewGesture.js')], check=True)
+        subprocess.run(['node', '-e', script, str(ROOT / 'shell/logic/OverviewGesture.js')], check=True)
 
     @unittest.skipUnless(shutil.which('lua'), 'Lua is needed to check compositor callbacks')
     def test_native_callbacks_accumulate_reverse_clamp_and_finish_once(self):

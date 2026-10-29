@@ -15,8 +15,9 @@ class ShortcutEditorTests(unittest.TestCase):
     def test_editor_add_apply_remove_reload_and_unsaved_form_state(self):
         with tempfile.TemporaryDirectory(prefix='poly-shortcuts-ui-') as temporary:
             d=Path(temporary)
-            for name in ('SettingsShortcuts.qml','ShortcutsState.qml'):
-                source=(ROOT/'shell'/name).read_text()
+            file_map = {'SettingsShortcuts.qml': ROOT/'shell/settings/SettingsShortcuts.qml', 'ShortcutsState.qml': ROOT/'shell/core/ShortcutsState.qml'}
+            for name, p in file_map.items():
+                source = p.read_text()
                 if name=='SettingsShortcuts.qml':source=source.replace('id: root','id: root\n    property alias testFooter:footer',1)
                 (d/name).write_text(source)
             (d/'qmldir').write_text('singleton Session 1.0 Session.qml\nsingleton ShortcutsState 1.0 ShortcutsState.qml\nSettingsShortcuts 1.0 SettingsShortcuts.qml\nSettingsCard 1.0 SettingsCard.qml\nAppearanceButton 1.0 AppearanceButton.qml\n')

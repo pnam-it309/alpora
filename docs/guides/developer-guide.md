@@ -79,7 +79,7 @@ Create `assets/themes/<theme-name>.json`:
 ```
 
 ### Step 4: Register in Whitelist
-Add `<theme-name>` to `THEMES` whitelist in `poly_shell/themes.py` and `shell/AppearanceCatalog.js`.
+Add `<theme-name>` to `THEMES` whitelist in `poly_shell/themes.py` and `shell/logic/AppearanceCatalog.js`.
 
 ### Step 5: Test the Theme
 ```bash
@@ -102,8 +102,8 @@ DEFAULTS = {
 ```
 Update `validate()` to migrate legacy widget configurations without schema validation errors.
 
-### Step 2: Widget Geometry (`shell/WidgetGeometry.js`)
-Register the widget size and bounding box in `shell/WidgetGeometry.js`:
+### Step 2: Widget Geometry (`shell/logic/WidgetGeometry.js`)
+Register the widget size and bounding box in `shell/logic/WidgetGeometry.js`:
 ```javascript
 const SIZES = {
     // ...

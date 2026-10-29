@@ -37,7 +37,7 @@ application close the landscape controls.
 
 ## Themes and coordinates
 
-`shell/LandscapeGeometry.js` describes independent light, peak and music landmarks
+`shell/logic/LandscapeGeometry.js` describes independent light, peak and music landmarks
 for Alpine, Moon Lake, Forest Mist, Warm Desert, Northern Lights, Rose Sunset and
 Timeline. Coordinates follow the original 1672 × 941 images through aspect-cover
 cropping, including ultrawide and portrait outputs. Menus are kept within screen

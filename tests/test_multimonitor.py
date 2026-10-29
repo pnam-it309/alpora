@@ -4,7 +4,7 @@ import unittest
 
 
 def widget_bounds(setting, width, height, top, natural_w, natural_h):
-    """Python model of shell/WidgetGeometry.js boundsForSize."""
+    """Python model of shell/logic/WidgetGeometry.js boundsForSize."""
     safe_setting = setting or {"x": 50, "y": 50}
     scale = max(0.25, min(1.0, width / 1000.0, height / 800.0)) if width > 0 and height > 0 else 0.25
     margin = 20.0 * scale
@@ -25,7 +25,7 @@ def widget_bounds(setting, width, height, top, natural_w, natural_h):
 
 
 def landscape_layout(width, height):
-    """Python model of shell/LandscapeGeometry.js layout scaling."""
+    """Python model of shell/logic/LandscapeGeometry.js layout scaling."""
     scale = max(0.72, min(1.35, min(width / 1920.0, height / 1080.0))) if width > 0 and height > 0 else 0.72
     return {"scale": scale}
 
