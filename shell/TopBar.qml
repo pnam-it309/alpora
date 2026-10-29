@@ -169,6 +169,11 @@ PanelWindow {
                 id: miniPlayer
                 anchors.verticalCenter: parent.verticalCenter
             }
+            TopBarVideoPipButton {
+                id: videoPipBtn
+                screenName: bar.screenName
+                anchors.verticalCenter: parent.verticalCenter
+            }
         }
         Button {
             id: clockButton

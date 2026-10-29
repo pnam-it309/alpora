@@ -37,6 +37,7 @@ ShellRoot {
     Variants { model: Quickshell.screens; PowerMenu {} }
     Variants { model: Quickshell.screens; DisplayProjectMenu {} }
     Variants { model: Quickshell.screens; BrightnessOverlay {} }
+    Variants { model: Quickshell.screens; VideoPipOverlay {} }
 
     // Native Wayland shortcuts avoid spawning an IPC client before input can
     // reach the launcher. Keep registration once per shell, not per monitor.
@@ -86,6 +87,10 @@ ShellRoot {
     NativeShortcut {
         appid: "poly-shell"; name: "display-project"; description: I18n.tr("display_project.title")
         onActivated: DisplayProjectState.toggle(root.focusedScreen())
+    }
+    NativeShortcut {
+        appid: "poly-shell"; name: "video-pip"; description: "Video PiP (TikTok / Shorts / YouTube)"
+        onActivated: VideoPipState.toggle(root.focusedScreen())
     }
 
     FileView {

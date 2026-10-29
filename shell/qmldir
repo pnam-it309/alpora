@@ -149,3 +149,6 @@ DesktopCompanion 1.0 DesktopCompanion.qml
 singleton ShortcutsState 1.0 ShortcutsState.qml
 SettingsShortcuts 1.0 SettingsShortcuts.qml
 BrightnessOverlay 1.0 BrightnessOverlay.qml
+singleton VideoPipState 1.0 VideoPipState.qml
+VideoPipOverlay 1.0 VideoPipOverlay.qml
+TopBarVideoPipButton 1.0 TopBarVideoPipButton.qml

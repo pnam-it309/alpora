@@ -352,6 +352,11 @@ def main(argv=None):
     exe_zalo.add_argument("--aur", action="store_true", help="prefer native AUR package if available")
     exe_sub.add_parser("list", help="list known Windows application presets")
     exe_sub.add_parser("register-mime", help="associate .exe files with ALPORA Wine Runner")
+    pip_parser = sub.add_parser("pip", help="floating video Picture-in-Picture player (TikTok, Shorts, YouTube)")
+    pip_parser.add_argument("target", nargs="?", default="tiktok", help="video platform preset (tiktok, shorts, youtube) or URL")
+    pip_parser.add_argument("--mode", choices=("vertical", "landscape"), help="aspect ratio mode")
+    pip_parser.add_argument("--width", type=int, help="custom window width")
+    pip_parser.add_argument("--height", type=int, help="custom window height")
     args = parser.parse_args(argv)
     paths = Paths.current()
     try:
@@ -520,6 +525,9 @@ def main(argv=None):
                 print(f"Display projection: {safe_mode}")
             else:
                 raise ConfigError("Cannot connect to running Poly Shell for display projection")
+        elif args.command == "pip":
+            from .commands.pip_cmd import handle_pip
+            return handle_pip(args)
         elif args.command == "exe":
             from .commands.exe_cmd import handle_exe
             return handle_exe(args)

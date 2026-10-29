@@ -49,6 +49,7 @@ hl.config({
 hl.layer_rule({name="alpora-glass",match={namespace="^poly-shell(-.*)?$"},blur=true,ignore_alpha=0.15,no_anim=true})
 hl.layer_rule({name="alpora-notifications",match={namespace="^notifications$"},blur=true,ignore_alpha=0.15})
 hl.layer_rule({name="alpora-overview",match={namespace="^poly-workspace-overview$"},blur=true,ignore_alpha=0.15})
+hl.layer_rule({name="alpora-video-pip",match={namespace="^poly-video-pip$"},blur=true,ignore_alpha=0.15})
 
 -- Starts only in this Hyprland session. No machine-wide desktop replacement.
 hl.on("hyprland.start", function()
@@ -86,6 +87,7 @@ hl.bind("SUPER + W", hl.dsp.global("poly-shell:toggle-mode"))
 hl.bind("SUPER + P", hl.dsp.global("poly-shell:display-project"))
 hl.bind(", XF86Display", hl.dsp.global("poly-shell:display-project"))
 hl.bind("CTRL + SHIFT + Escape", hl.dsp.global("poly-shell:task-manager"))
+hl.bind("SUPER + Y", hl.dsp.global("poly-shell:video-pip"))
 
 -- Window operations
 hl.bind("SUPER + Q", hl.dsp.window.close())
