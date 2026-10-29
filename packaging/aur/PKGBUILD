@@ -77,3 +77,4 @@ package() {
     install -dm755 "$pkgdir/usr/share/licenses/$pkgname"
     install -m644 LICENSE.md "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }
+

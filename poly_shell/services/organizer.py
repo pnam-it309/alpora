@@ -4,7 +4,7 @@ from copy import deepcopy
 import time
 import uuid
 
-from .state import ConfigError, atomic_json, read_object, state_lock
+from ..core.state import ConfigError, atomic_json, read_object, state_lock
 
 
 def empty():

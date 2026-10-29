@@ -1,8 +1,8 @@
 """Command handler for system diagnostics and preflight checks."""
 import json
 from pathlib import Path
-from ..diagnostics import collect_diagnostic_bundle
-from ..preflight import run_preflight, format_preflight_report
+from ..system.diagnostics import collect_diagnostic_bundle
+from ..system.preflight import run_preflight, format_preflight_report
 
 
 def handle_doctor(paths, args) -> int:
@@ -11,7 +11,7 @@ def handle_doctor(paths, args) -> int:
         archive = collect_diagnostic_bundle(output_dir=out)
         print(f"Diagnostic bundle written to: {archive}")
         return 0
-    from ..programs import inventory
+    from ..system.programs import inventory
     print(json.dumps(inventory(), indent=2, ensure_ascii=False))
     return 0
 

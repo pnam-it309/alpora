@@ -5,7 +5,7 @@ import shutil
 import subprocess
 from typing import Sequence
 
-from ..resilience import CircuitBreaker
+from ..core.resilience import CircuitBreaker
 
 
 class SafeRunner:

@@ -5,7 +5,7 @@ from pathlib import Path
 import shutil
 import subprocess
 
-from .state import ConfigError, ROOT, atomic_json, read_object
+from ..core.state import ConfigError, ROOT, atomic_json, read_object
 
 BEGIN = "# BEGIN poly-shell managed panel"
 END = "# END poly-shell managed panel"

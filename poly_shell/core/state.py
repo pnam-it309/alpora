@@ -14,7 +14,7 @@ import shutil
 import tempfile
 import threading
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 MODES = ("work", "vibe")
 
 
@@ -230,13 +230,13 @@ def current_mode(paths):
 
 def appearance_for(paths):
     """Resolve visual assets separately from behavior modes, with safe fallback."""
-    from .themes import resolve_appearance
+    from ..theming.themes import resolve_appearance
     return resolve_appearance(paths)
 
 
 def update_session(paths, requested=None):
-    from .visual import visual_for
-    from .hardware import detect_hardware_profile
+    from ..theming.visual import visual_for
+    from ..system.hardware import detect_hardware_profile
     with state_lock(paths):
         old = current_mode(paths)
         mode = ("vibe" if old == "work" else "work") if requested == "toggle" else (requested or old)

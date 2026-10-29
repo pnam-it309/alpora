@@ -1,5 +1,5 @@
 """Mode-independent appearance controls; only validated numbers reach Lua."""
-from .state import ConfigError, read_object
+from ..core.state import ConfigError, read_object
 
 DEFAULTS = {
     "windowRadius": 16, "barRadius": 20, "panelRadius": 20,
@@ -58,7 +58,7 @@ def visual_for(paths):
         raise ConfigError("Unsupported appearance schema version")
     value = validate(document.get("values"))
     # Existing user geometry remains authoritative until explicitly saved here.
-    from .state import settings_for
+    from ..core.state import settings_for
     bar = settings_for(paths)["bar"]
     for key, old_key in (("barHeight", "height"), ("barMargin", "margin"), ("barTop", "top")):
         if key not in document["values"]:

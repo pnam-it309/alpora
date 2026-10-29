@@ -22,3 +22,4 @@ post_upgrade() {
 post_remove() {
     echo ":: ALPORA has been removed. You can restore your previous shell config with 'poly-shell deactivate' if backed up."
 }
+

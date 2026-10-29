@@ -9,7 +9,7 @@ import tarfile
 import tempfile
 import urllib.request
 
-from .state import ROOT, ConfigError, atomic_json, state_lock
+from ..core.state import ROOT, ConfigError, atomic_json, state_lock
 from .appearance import atomic_text
 
 RELEASES = {
@@ -146,7 +146,7 @@ def apply(paths):
     old = {path: path.read_bytes() if path.exists() else None for path in files}
     previous = {}
     schema = 'org.gnome.desktop.interface'
-    from .state import appearance_for
+    from ..core.state import appearance_for
     from .themes import toolkit_theme_name
     appearance = appearance_for(paths)
     preferences = [('cursor-theme', CURSOR), ('cursor-size', str(SIZE)),

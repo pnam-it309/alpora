@@ -7,7 +7,7 @@ from pathlib import Path
 import subprocess
 import tempfile
 
-from .state import (ConfigError, atomic_json, current_mode, profile_for, settings_for,
+from ..core.state import (ConfigError, atomic_json, current_mode, profile_for, settings_for,
                     appearance_for, state_lock)
 from .visual import DEFAULTS, validate, visual_for, lua_for
 
@@ -184,7 +184,7 @@ def atomic_text(path, text):
 
 
 def hypr(*args):
-    from .adapters.base import SafeRunner
+    from ..adapters.base import SafeRunner
     result = SafeRunner.run(["hyprctl", *args], timeout=5.0)
     if result.returncode:
         raise ConfigError((result.stderr or result.stdout).strip() or "Hyprland unavailable / Hyprland недоступен")
@@ -235,7 +235,7 @@ def apply(paths, patch, expected=None):
                     "settings": settings_for(paths), "appearance": appearance_for(paths),
                     "visual": value}
         snapshot["profile"] = profile_for(paths, snapshot["mode"])
-        from .indicators import mako_style
+        from ..system.indicators import mako_style
         notification_style = mako_style(snapshot)
         notification_file = paths.state / "mako-theme.conf"
         config = paths.config / "visual.json"

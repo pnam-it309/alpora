@@ -10,7 +10,7 @@ import re
 import shutil
 import subprocess
 
-from .state import (ConfigError, ROOT, Paths, atomic_json, read_object, state_lock,
+from ..core.state import (ConfigError, ROOT, Paths, atomic_json, read_object, state_lock,
                     current_mode, profile_for, settings_for, merge)
 from .appearance import atomic_text
 from .visual import visual_for
@@ -345,8 +345,8 @@ def notify_toolkit(paths, palette, icon_name):
 
 def apply_timeline_palette(paths, minute, palette, selection):
     """Called under state_lock: publish palette/time together, without wallpaper work."""
-    from .indicators import mako_style
-    from .lockscreen import lock_style
+    from ..system.indicators import mako_style
+    from ..system.lockscreen import lock_style
     p = validate_palette(palette)
     old_palette = validate_palette(selection.get('palette') or load_theme(paths, 'timeline')['palette'])
     doc = load_theme(paths, 'timeline')
@@ -413,11 +413,11 @@ def timeline_frame(paths):
 
 
 def apply_theme(paths, ident, automatic=True, transition=None, *, activate=True):
-    from .desktop import _wallpaper
-    from .desktop import validate_transition
-    from .indicators import mako_style
-    from .lockscreen import lock_style
-    from .state import appearance_for
+    from ..system.desktop import _wallpaper
+    from ..system.desktop import validate_transition
+    from ..system.indicators import mako_style
+    from ..system.lockscreen import lock_style
+    from ..core.state import appearance_for
     if type(automatic) is not bool:
         raise ConfigError('Invalid palette mode')
     transition = validate_transition(transition)

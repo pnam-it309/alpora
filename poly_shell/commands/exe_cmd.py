@@ -7,7 +7,7 @@ import subprocess
 import sys
 from typing import Optional
 
-from ..wine_apps import (
+from ..system.wine_apps import (
     KNOWN_PRESETS,
     apply_font_fixes,
     create_desktop_entry,

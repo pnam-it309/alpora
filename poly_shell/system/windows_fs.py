@@ -10,7 +10,7 @@ import re
 import shutil
 import subprocess
 
-from .state import ConfigError
+from ..core.state import ConfigError
 
 SUPPORTED_FSTYPES = {"ntfs", "vfat", "fat32", "fat16", "exfat", "msdos"}
 

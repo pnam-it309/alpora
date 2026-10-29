@@ -8,7 +8,7 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
-from .adapters.hyprland import HyprlandAdapter
+from ..adapters.hyprland import HyprlandAdapter
 from .diagnostics import get_os_release
 from .programs import inventory
 

@@ -7,7 +7,7 @@ import time
 from typing import Any, Dict, List, Optional
 from ..contracts.base import BaseDTO
 from ..core.service import BaseService
-from ..developer_metrics import snapshot as get_raw_snapshot
+from .developer_metrics import snapshot as get_raw_snapshot
 
 logger = logging.getLogger(__name__)
 

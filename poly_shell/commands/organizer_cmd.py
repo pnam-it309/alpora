@@ -1,7 +1,7 @@
 """Command handler for local calendar, tasks, notes, and focus timer."""
 import json
-from ..organizer import organizer
-from ..state import ConfigError
+from ..services.organizer import organizer
+from ..core.state import ConfigError
 
 
 def handle_organizer(paths, args) -> int:

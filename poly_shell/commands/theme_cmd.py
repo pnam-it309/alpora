@@ -1,12 +1,12 @@
 """Command handler for color themes, Timeline transitions, widgets, and appearance."""
 import json
-from ..appearance import appearance_control
-from ..desktop_assets import install as install_assets, apply as apply_assets
-from ..state import ConfigError
-from ..themes import theme_control, extract_palette_from_image
-from ..timeline import timeline_control
-from ..toolkit_refresh import refresh as refresh_toolkit, schedule as schedule_toolkit
-from ..widgets import widgets_control
+from ..theming.appearance import appearance_control
+from ..theming.desktop_assets import install as install_assets, apply as apply_assets
+from ..core.state import ConfigError
+from ..theming.themes import theme_control, extract_palette_from_image
+from ..theming.timeline import timeline_control
+from ..theming.toolkit_refresh import refresh as refresh_toolkit, schedule as schedule_toolkit
+from ..system.widgets import widgets_control
 
 
 def handle_theme(paths, args) -> int:

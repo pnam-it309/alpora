@@ -4,7 +4,7 @@ import os
 import subprocess
 import time
 from ..adapters.base import SafeRunner
-from ..state import ConfigError, ROOT, update_session
+from ..core.state import ConfigError, ROOT, update_session
 
 
 def open_task_manager(paths, runtime_check_fn=None):

@@ -5,7 +5,7 @@ import logging
 from pathlib import Path
 import time
 
-from .state import Paths, atomic_json, read_object
+from ..core.state import Paths, atomic_json, read_object
 
 logger = logging.getLogger(__name__)
 

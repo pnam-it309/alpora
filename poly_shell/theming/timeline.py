@@ -4,7 +4,7 @@ from pathlib import Path
 import signal
 import subprocess
 
-from .state import ConfigError, ROOT, atomic_json, read_object, state_lock
+from ..core.state import ConfigError, ROOT, atomic_json, read_object, state_lock
 
 DEFAULT_MINUTE = 1110
 STOPS = ((0, 'night', 'Night'), (330, 'dawn', 'Dawn'),

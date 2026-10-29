@@ -185,3 +185,4 @@ if [[ "$install_ui_only" == true ]]; then arguments+=(--ui-only); fi
 if [[ "$install_replace_config" == true ]]; then arguments+=(--replace-config); fi
 if [[ -n "$install_theme" ]]; then arguments+=(--theme "$install_theme"); fi
 python3 "$project_dir/scripts/setup-arch-desktop" "${arguments[@]}"
+

@@ -2,10 +2,10 @@
 import json
 import subprocess
 from ..adapters.base import SafeRunner
-from ..desktop import control, wallpaper
-from ..indicators import show_indicator
-from ..lockscreen import lock_date
-from ..state import ConfigError, ROOT
+from ..system.desktop import control, wallpaper
+from ..system.indicators import show_indicator
+from ..system.lockscreen import lock_date
+from ..core.state import ConfigError, ROOT
 
 
 def handle_control(paths, args) -> int:
@@ -66,7 +66,7 @@ def handle_dotfiles(paths, args) -> int:
 
 
 def handle_windows_drives(paths, args) -> int:
-    from ..windows_fs import detect_windows_drives, mount_drive, unmount_drive, normalize_windows_path
+    from ..system.windows_fs import detect_windows_drives, mount_drive, unmount_drive, normalize_windows_path
     if args.action == "list":
         print(json.dumps(detect_windows_drives(), ensure_ascii=False))
     elif args.action == "mount":
@@ -97,7 +97,7 @@ def handle_lock_date(paths, args) -> int:
 
 
 def handle_lock_media(paths, args) -> int:
-    from ..lock_media import handle_cli
+    from ..system.lock_media import handle_cli
     handle_cli(args.field)
     return 0
 

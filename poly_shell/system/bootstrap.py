@@ -7,10 +7,10 @@ import shutil
 import subprocess
 import sys
 
-from .state import ROOT, Paths, ConfigError, atomic_json, update_session
-from .appearance import atomic_text, install_hook
+from ..core.state import ROOT, Paths, ConfigError, atomic_json, update_session
+from ..theming.appearance import atomic_text, install_hook
 from .integration import install
-from . import desktop_assets
+from ..theming import desktop_assets
 from .installer_ui import InstallerUI
 
 MARKER = '-- ALPORA managed session v1'
@@ -22,8 +22,8 @@ dofile(config .. "/hypr/alpora-session.lua")
 
 def seed_reference_preferences(paths):
     """Install reviewed public appearance only; never copy personal state."""
-    from .state import read_object
-    from .visual import validate as validate_visual
+    from ..core.state import read_object
+    from ..theming.visual import validate as validate_visual
     from .widgets import validate as validate_widgets
     preset=read_object(ROOT/'assets/profiles/desktop.json')
     if preset.get('version')!=1: raise ConfigError('Unsupported desktop preset')
@@ -44,8 +44,8 @@ def seed_reference_preferences(paths):
 
 def verify_prepared_desktop(paths):
     """Check the actual next-login files, without touching the running session."""
-    from .state import read_object
-    from .visual import visual_for
+    from ..core.state import read_object
+    from ..theming.visual import visual_for
     from .widgets import values_for
     snapshot=read_object(paths.session)
     visual_for(paths);values_for(paths)
@@ -162,13 +162,13 @@ def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--replace-config',action='store_true')
     parser.add_argument('--ui-only',action='store_true',help='Install standalone UI shell only without modifying Hyprland session configs')
-    from .themes import IDS
+    from ..theming.themes import IDS
     parser.add_argument('--theme',choices=IDS)
     args=parser.parse_args(argv)
     paths=Paths.current()
     ui=InstallerUI()
     try:
-        from .cli import runtime_check
+        from ..cli import runtime_check
         runtime_check()
         if args.ui_only:
             if not shutil.which('quickshell'):
@@ -188,7 +188,7 @@ def main(argv=None):
             signature=os.environ.pop('HYPRLAND_INSTANCE_SIGNATURE',None)
             try:
                 with ui.stage(4,'Bring the landscape together'):
-                    from .themes import catalog, apply_theme
+                    from ..theming.themes import catalog, apply_theme
                     selected=catalog(paths)
                     theme=args.theme or selected['selected']
                     apply_theme(paths,theme,True if args.theme else selected['colorsFromWallpaper'],activate=False)
@@ -231,7 +231,7 @@ def main(argv=None):
         signature=os.environ.pop('HYPRLAND_INSTANCE_SIGNATURE',None)
         try:
             with ui.stage(5,'Bring the landscape together'):
-                from .themes import catalog, apply_theme
+                from ..theming.themes import catalog, apply_theme
                 selected=catalog(paths)
                 theme=args.theme or selected['selected']
                 apply_theme(paths,theme,True if args.theme else selected['colorsFromWallpaper'],activate=False)

@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 from ..contracts.base import BaseDTO
 from ..core.service import BaseService
-from ..clipboard import History, directory
+from .clipboard import History, directory
 
 logger = logging.getLogger(__name__)
 

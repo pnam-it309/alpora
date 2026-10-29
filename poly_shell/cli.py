@@ -16,18 +16,18 @@ import time
 
 from . import __version__
 from .adapters.base import SafeRunner
-from .integration import fallback_panel, install, patch_autostart, restore_autostart
-from .state import ConfigError, MODES, Paths, ROOT, current_mode, update_session
-from .desktop import control, wallpaper, restore_desktop
-from .organizer import organizer
-from .indicators import show_indicator, sync_notifications
-from .lockscreen import lock_date, sync_lockscreen
-from .appearance import appearance_control, sync as sync_appearance
-from .themes import theme_control
-from .timeline import timeline_control
-from .widgets import widgets_control
-from .shortcuts import shortcuts_control
-from .programs import inventory
+from .system.integration import fallback_panel, install, patch_autostart, restore_autostart
+from .core.state import ConfigError, MODES, Paths, ROOT, current_mode, update_session
+from .system.desktop import control, wallpaper, restore_desktop
+from .services.organizer import organizer
+from .system.indicators import show_indicator, sync_notifications
+from .system.lockscreen import lock_date, sync_lockscreen
+from .theming.appearance import appearance_control, sync as sync_appearance
+from .theming.themes import theme_control
+from .theming.timeline import timeline_control
+from .system.widgets import widgets_control
+from .services.shortcuts import shortcuts_control
+from .system.programs import inventory
 from . import commands
 
 
@@ -165,7 +165,7 @@ def send_ipc_request(endpoint: str, action: str, params: dict | None = None) -> 
 
 def doctor(paths, bundle=False, output_dir=None):
     if bundle:
-        from .diagnostics import collect_diagnostic_bundle
+        from .system.diagnostics import collect_diagnostic_bundle
         archive = collect_diagnostic_bundle(paths, output_dir)
         print(f"Diagnostic bundle written to: {archive}")
         return 0

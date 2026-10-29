@@ -89,7 +89,7 @@ class PolyShellDaemon:
 
         # Process / Running Apps endpoints (zero python interpreter spawn)
         try:
-            from ..running_apps import snapshot as proc_snapshot, terminate as proc_terminate
+            from ..system.running_apps import snapshot as proc_snapshot, terminate as proc_terminate
             self.ipc_server.register_handler("apps.snapshot", lambda p: proc_snapshot(p.get("windows", [])))
             self.ipc_server.register_handler(
                 "apps.signal",

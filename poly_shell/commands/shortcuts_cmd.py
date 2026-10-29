@@ -1,7 +1,7 @@
 """Command handler for Hyprland persistent keyboard shortcuts."""
 import json
-from ..shortcuts import shortcuts_control
-from ..state import ConfigError
+from ..services.shortcuts import shortcuts_control
+from ..core.state import ConfigError
 
 
 def handle_shortcuts(paths, args) -> int:

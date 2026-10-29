@@ -11,8 +11,8 @@ import uuid
 import json
 import math
 
-from .adapters.base import SafeRunner
-from .state import ConfigError, ROOT, atomic_json, read_object, state_lock, settings_for, update_session
+from ..adapters.base import SafeRunner
+from ..core.state import ConfigError, ROOT, atomic_json, read_object, state_lock, settings_for, update_session
 from .radios_power import power_status, radio_status, set_airplane, set_profile
 
 
@@ -553,7 +553,7 @@ def _wallpaper(paths, image=None, *, reset=False, quiet=False, transition=None, 
     if not image.exists():
         raise ConfigError(f'Wallpaper is missing: {image}')
     if transition is not None or previous_saved.get('renderer') == 'animated':
-        from .state import settings_for
+        from ..core.state import settings_for
         if settings_for(paths).get('reducedMotion'):
             transition = None
         _animated_wallpaper(paths, image, previous_saved, transition, seed)

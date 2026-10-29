@@ -4,7 +4,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
-from .state import ConfigError, atomic_json, read_object, state_lock
+from ..core.state import ConfigError, atomic_json, read_object, state_lock
 
 SAFE_PROFILES = {
     "power-saver": "power-saver",

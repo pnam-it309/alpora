@@ -7,7 +7,7 @@ from typing import Optional
 from ..core.service import BaseService
 from ..adapters.base import SafeRunner
 from ..contracts.hardware import PowerStateDTO
-from ..state import Paths
+from ..core.state import Paths
 
 logger = logging.getLogger(__name__)
 

@@ -13,10 +13,10 @@ import sys
 import time
 from typing import Any
 
-from .adapters.base import SafeRunner
+from ..adapters.base import SafeRunner
 from .developer_metrics import _cpu_model, _cpu_percent, _cpu_temperature, _gpu, _memory
-from .resilience import TTLCache, safe_call
-from .state import ConfigError
+from ..core.resilience import TTLCache, safe_call
+from ..core.state import ConfigError
 
 _proc_cache = TTLCache(ttl=1.0, maxsize=8)
 _PAGE_SIZE_KB = os.sysconf("SC_PAGE_SIZE") // 1024 if hasattr(os, "sysconf") else 4

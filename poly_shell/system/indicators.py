@@ -5,7 +5,7 @@ import subprocess
 import tempfile
 
 from .desktop import backlight_device
-from .state import ConfigError, ROOT, read_object
+from ..core.state import ConfigError, ROOT, read_object
 
 
 SAFE_INDICATORS = {
@@ -47,7 +47,7 @@ def mako_style(snapshot):
     font = snapshot.get('appearance', {}).get('fonts', {}).get('interface', 'Noto Sans 11')
     if '\n' in font or '\r' in font:
         raise ConfigError('Invalid notification font')
-    from .visual import validate
+    from ..theming.visual import validate
     visual = validate(snapshot.get('visual', {}))
     alpha = round(visual['notificationOpacity'] * 255 / 100)
     # profile palette validation has already checked hex colors.

@@ -1,6 +1,6 @@
 """Command handler for screen tools (screenshot, record, OCR, QR)."""
 from ..adapters.base import SafeRunner
-from ..state import ROOT
+from ..core.state import ROOT
 
 
 def handle_screen(args) -> int:

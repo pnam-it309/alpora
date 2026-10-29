@@ -124,3 +124,4 @@ echo "=== ALPORA Uninstallation Complete ==="
 if [[ "$uninstall_restore_config" != true ]]; then
     echo "Tip: Use ./install/uninstall.sh --restore-config if you need to recover pre-install Hyprland configs."
 fi
+

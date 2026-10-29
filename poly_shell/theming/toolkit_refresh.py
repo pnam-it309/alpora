@@ -5,7 +5,7 @@ import re
 import subprocess
 import time
 
-from .state import ROOT, Paths, atomic_json, read_object, state_lock
+from ..core.state import ROOT, Paths, atomic_json, read_object, state_lock
 
 
 def schedule(paths):

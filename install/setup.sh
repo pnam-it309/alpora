@@ -99,3 +99,4 @@ echo "To launch ALPORA manually: poly-shell run"
 echo "To start as service:       systemctl --user start poly-shell.service"
 echo "To check system health:    poly-shell doctor"
 echo "========================================================================"
+

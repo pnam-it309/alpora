@@ -6,8 +6,8 @@ import time
 from urllib.parse import urlencode
 from urllib.request import urlopen
 
-from .state import ConfigError, atomic_json, read_object, state_lock
-from .developer_metrics import snapshot as developer_metrics_snapshot
+from ..core.state import ConfigError, atomic_json, read_object, state_lock
+from ..services.developer_metrics import snapshot as developer_metrics_snapshot
 
 DEFAULTS = {
     "animations": True,

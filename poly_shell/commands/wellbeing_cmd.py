@@ -1,6 +1,6 @@
 """Command handler for Digital Wellbeing queries."""
 import json
-from ..wellbeing import WellbeingTracker
+from ..services.wellbeing import WellbeingTracker
 
 
 def handle_wellbeing(paths, args) -> int:

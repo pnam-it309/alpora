@@ -4,7 +4,7 @@ import os
 import re
 import tempfile
 
-from .state import ConfigError, ROOT, Paths, read_object
+from ..core.state import ConfigError, ROOT, Paths, read_object
 
 
 def lock_date(now=None, locale='ru'):

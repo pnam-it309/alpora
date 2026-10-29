@@ -14,8 +14,8 @@ import time
 import tty
 import unicodedata
 
-from .state import ConfigError, Paths
-from .themes import load_theme, resolve_appearance, validate_palette
+from ..core.state import ConfigError, Paths
+from ..theming.themes import load_theme, resolve_appearance, validate_palette
 
 
 def clean(value):

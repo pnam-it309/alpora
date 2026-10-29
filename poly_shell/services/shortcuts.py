@@ -15,8 +15,8 @@ import os
 import re
 import subprocess
 
-from .appearance import atomic_text
-from .state import ConfigError, atomic_json, read_object, state_lock
+from ..theming.appearance import atomic_text
+from ..core.state import ConfigError, atomic_json, read_object, state_lock
 
 BEGIN = '-- BEGIN POLY SHELL SHORTCUTS'
 END = '-- END POLY SHELL SHORTCUTS'
@@ -208,7 +208,7 @@ def effective(paths):
 
 
 def hypr(*args):
-    from .adapters.base import SafeRunner
+    from ..adapters.base import SafeRunner
     result = SafeRunner.run(['hyprctl', *args], timeout=8.0)
     if result.returncode: raise ConfigError((result.stderr or result.stdout).strip() or 'Hyprland error / Ошибка Hyprland')
     return result.stdout
