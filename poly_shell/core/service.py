@@ -83,3 +83,4 @@ class ServiceRegistry:
             except Exception as exc:
                 logger.error("Error stopping service %s: %s", name, exc)
         self._services.clear()
+

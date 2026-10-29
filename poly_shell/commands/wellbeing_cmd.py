@@ -17,3 +17,4 @@ def handle_wellbeing(paths, args) -> int:
             app_mins = app.get("minutes", 0)
             print(f"  • {app['name']}: {app_mins:.1f}m")
     return 0
+

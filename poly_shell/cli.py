@@ -9,6 +9,7 @@ import os
 from pathlib import Path
 import shutil
 import signal
+import socket
 import subprocess
 import sys
 import time
@@ -79,9 +80,17 @@ def run(paths):
             restore_desktop(paths)
         except (ConfigError, OSError, subprocess.SubprocessError) as exc:
             print(f"Night Light restore failed: {exc}", file=sys.stderr)
+        from .core.daemon import PolyShellDaemon
+        daemon = PolyShellDaemon(socket_path=paths.runtime / "ipc.sock")
+        try:
+            daemon.start()
+        except Exception as exc:
+            print(f"Warning: Failed to start IPC daemon: {exc}", file=sys.stderr)
+
         environment = dict(os.environ, POLY_SHELL_STATE=str(paths.session),
                            POLY_SHELL_READY=str(ready), POLY_SHELL_CTL=str(ROOT / "bin/poly-shell"),
-                           POLY_SHELL_ASSETS=str(ROOT / "assets"))
+                           POLY_SHELL_ASSETS=str(ROOT / "assets"),
+                           POLY_SHELL_SOCK=daemon.ipc_server.endpoint_address)
         process = subprocess.Popen(["quickshell", "--path", str(ROOT / "shell")], env=environment)
         stopping = False
 
@@ -97,6 +106,7 @@ def run(paths):
             result = process.wait()
             return 0 if stopping else result
         finally:
+            daemon.stop()
             ready.unlink(missing_ok=True)
 
 
@@ -123,6 +133,33 @@ def start(paths):
         time.sleep(0.1)
     systemctl("stop", "poly-shell.service", check=False)
     raise ConfigError("Shell did not become ready; existing panel kept. See poly-shell logs")
+
+
+def send_ipc_request(endpoint: str, action: str, params: dict | None = None) -> dict:
+    if not endpoint:
+        raise ConfigError("No IPC endpoint specified")
+    params = params or {}
+    sock = socket.socket(
+        socket.AF_UNIX if hasattr(socket, "AF_UNIX") and ":" not in endpoint else socket.AF_INET,
+        socket.SOCK_STREAM,
+    )
+    sock.settimeout(3.0)
+    try:
+        if hasattr(socket, "AF_UNIX") and ":" not in endpoint:
+            sock.connect(endpoint)
+        else:
+            host, port = endpoint.split(":")
+            sock.connect((host, int(port)))
+        req = json.dumps({"id": "cli", "action": action, "params": params}) + "\n"
+        sock.sendall(req.encode("utf-8"))
+        resp_line = sock.makefile("r").readline()
+        if not resp_line:
+            raise ConfigError("Empty response from Poly Shell IPC server")
+        return json.loads(resp_line)
+    except OSError as exc:
+        raise ConfigError(f"Cannot connect to Poly Shell daemon ({endpoint}): {exc}") from exc
+    finally:
+        sock.close()
 
 
 def doctor(paths, bundle=False, output_dir=None):
@@ -232,6 +269,10 @@ def main(argv=None):
     sub = parser.add_subparsers(dest="command", required=True)
     for command in ("init", "refresh", "install", "run", "start", "stop", "restart", "status", "logs", "activate", "deactivate", "settings"):
         sub.add_parser(command)
+    sub.add_parser("daemon", help="run core background services daemon")
+    ipc_parser = sub.add_parser("ipc", help="send request to running Poly Shell daemon")
+    ipc_parser.add_argument("action", help="IPC action name (e.g. ping, compositor.workspaces, audio.state)")
+    ipc_parser.add_argument("payload", nargs="?", default="{}", help="JSON params payload")
     doctor_parser = sub.add_parser("doctor", help="check runtime dependencies and system health")
     doctor_parser.add_argument("--bundle", action="store_true", help="export diagnostic bundle archive for tester triage")
     doctor_parser.add_argument("--output", help="output directory for the diagnostic bundle archive")
@@ -476,6 +517,29 @@ def main(argv=None):
         elif args.command == "install":
             update_session(paths)
             install(paths)
+        elif args.command == "daemon":
+            from .core.daemon import PolyShellDaemon
+            daemon = PolyShellDaemon(socket_path=paths.runtime / "ipc.sock")
+            daemon.start()
+            print(f"Poly Shell daemon listening on {daemon.ipc_server.endpoint_address}")
+            try:
+                while True:
+                    time.sleep(1.0)
+            except KeyboardInterrupt:
+                pass
+            finally:
+                daemon.stop()
+            return 0
+        elif args.command == "ipc":
+            sock_path = str(paths.runtime / "ipc.sock")
+            endpoint = os.environ.get("POLY_SHELL_SOCK") or sock_path
+            try:
+                params = json.loads(args.payload)
+            except ValueError as exc:
+                raise ConfigError("Invalid IPC JSON payload") from exc
+            resp = send_ipc_request(endpoint, args.action, params)
+            print(json.dumps(resp, indent=2, ensure_ascii=False))
+            return 0 if resp.get("success") else 1
         elif args.command == "run":
             return run(paths)
         elif args.command == "start":

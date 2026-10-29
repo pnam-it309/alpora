@@ -36,3 +36,4 @@ class BaseCompositorAdapter(ABC):
     def dispatch(cls, command: str) -> bool:
         """Execute a compositor dispatch action (e.g. switch workspace, focus window)."""
         raise NotImplementedError
+

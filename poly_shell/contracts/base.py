@@ -32,9 +32,10 @@ class ResponseDTO(BaseDTO):
     """Standardized response structure for IPC calls."""
 
     success: bool
-    data: Dict[str, Any] = field(default_factory=dict)
+    data: Any = field(default_factory=dict)
     error: Optional[str] = None
     code: int = 0
+    id: Optional[str] = None
 
 
 @dataclass
@@ -46,3 +47,4 @@ class ShellEventEnvelope(BaseDTO):
     data: Dict[str, Any] = field(default_factory=dict)
     version: str = "1.0"
     timestamp: float = field(default_factory=time.time)
+

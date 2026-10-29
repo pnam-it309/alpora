@@ -1,0 +1,137 @@
+"""Master daemon orchestrating IPC server, system services, and compositor streams."""
+from __future__ import annotations
+
+import logging
+import os
+from pathlib import Path
+import threading
+import time
+from typing import Optional
+
+from .ipc_server import IPCServer
+from .service import ServiceRegistry
+from ..adapters.hyprland import HyprlandAdapter
+from ..contracts.base import ShellEventEnvelope
+from ..services.audio_service import AudioService
+from ..services.network_service import NetworkService
+from ..services.power_service import PowerService
+
+logger = logging.getLogger(__name__)
+
+
+class PolyShellDaemon:
+    """Core long-running supervisor for desktop shell services and event distribution."""
+
+    def __init__(self, socket_path: Optional[Path] = None):
+        self.socket_path = socket_path
+        self.ipc_server = IPCServer(socket_path=socket_path)
+        self.registry = ServiceRegistry.get_instance()
+        self._running = False
+        self._event_thread: Optional[threading.Thread] = None
+
+        # Setup standard domain services
+        self.audio_service = AudioService()
+        self.network_service = NetworkService()
+        self.power_service = PowerService()
+
+        self.registry.register(self.audio_service)
+        self.registry.register(self.network_service)
+        self.registry.register(self.power_service)
+
+        self._setup_ipc_handlers()
+
+    def _setup_ipc_handlers(self) -> None:
+        """Register RPC routes on the IPC server."""
+        # Compositor endpoints (zero-fork queries)
+        self.ipc_server.register_handler("compositor.workspaces", lambda _p: HyprlandAdapter.get_workspaces())
+        self.ipc_server.register_handler("compositor.clients", lambda _p: HyprlandAdapter.get_clients())
+        self.ipc_server.register_handler("compositor.monitors", lambda _p: HyprlandAdapter.get_monitors())
+        self.ipc_server.register_handler(
+            "compositor.dispatch",
+            lambda p: HyprlandAdapter.dispatch(p.get("dispatcher", ""), p.get("arg", "")),
+        )
+
+        # Audio endpoints
+        self.ipc_server.register_handler("audio.state", lambda _p: self.audio_service.get_state().to_dict())
+        self.ipc_server.register_handler(
+            "audio.set_volume",
+            lambda p: self.audio_service.set_volume(int(p.get("percent", 50))),
+        )
+        self.ipc_server.register_handler("audio.toggle_mute", lambda _p: self.audio_service.toggle_mute())
+
+        # Network endpoints
+        self.ipc_server.register_handler("network.state", lambda _p: self.network_service.get_state().to_dict())
+        self.ipc_server.register_handler(
+            "network.set_wifi",
+            lambda p: self.network_service.set_wifi_enabled(bool(p.get("enabled", True))),
+        )
+
+        # Power endpoints
+        self.ipc_server.register_handler("power.state", lambda _p: self.power_service.get_state().to_dict())
+        self.ipc_server.register_handler("power.toggle_caffeine", lambda _p: self.power_service.toggle_caffeine())
+
+        # System health
+        self.ipc_server.register_handler("system.health", lambda _p: self.registry.health_report())
+
+    def start(self) -> None:
+        """Start all services, IPC server, and compositor event watcher."""
+        if self._running:
+            return
+        self._running = True
+
+        for service in self.registry.all().values():
+            service.start()
+
+        self.ipc_server.start()
+
+        self._event_thread = threading.Thread(
+            target=self._hyprland_event_loop,
+            name="Hyprland-Socket2-Watcher",
+            daemon=True,
+        )
+        self._event_thread.start()
+        logger.info("PolyShellDaemon initialized and running")
+
+    def stop(self) -> None:
+        """Gracefully terminate daemon and all child workers."""
+        if not self._running:
+            return
+        self._running = False
+
+        if self._event_thread and self._event_thread.is_alive():
+            self._event_thread.join(timeout=2.0)
+
+        self.ipc_server.stop()
+
+        for service in self.registry.all().values():
+            service.stop()
+
+        logger.info("PolyShellDaemon stopped")
+
+    def _hyprland_event_loop(self) -> None:
+        """Watch Hyprland Socket2 stream with resilient auto-reconnect on reload/crash."""
+        backoff = 0.5
+        while self._running:
+            if not HyprlandAdapter.is_available():
+                time.sleep(1.0)
+                continue
+
+            try:
+                for event_name, event_data in HyprlandAdapter.stream_events(stop_check=lambda: not self._running):
+                    if not self._running:
+                        break
+                    backoff = 0.5  # Reset backoff on successful event stream
+                    envelope = ShellEventEnvelope(
+                        domain="compositor",
+                        event=event_name,
+                        data={"raw": event_data},
+                    )
+                    self.ipc_server.broadcast(envelope)
+            except Exception as exc:
+                logger.debug("Hyprland event stream disconnected: %s", exc)
+
+            if not self._running:
+                break
+
+            time.sleep(backoff)
+            backoff = min(backoff * 1.5, 5.0)  # Exponential backoff up to 5s

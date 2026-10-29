@@ -3,6 +3,7 @@ import logging
 import os
 import shutil
 import subprocess
+from typing import Optional
 from ..core.service import BaseService
 from ..adapters.base import SafeRunner
 from ..contracts.hardware import PowerStateDTO
@@ -14,9 +15,9 @@ logger = logging.getLogger(__name__)
 class PowerService(BaseService):
     """Encapsulates system power profiles, battery state, and idle inhibitor."""
 
-    def __init__(self, paths: Paths):
+    def __init__(self, paths: Optional[Paths] = None):
         super().__init__("power")
-        self.paths = paths
+        self.paths = paths or Paths.current()
 
     def health_check(self) -> bool:
         return SafeRunner.is_available("powerprofilesctl") or SafeRunner.is_available("upower")
@@ -79,3 +80,4 @@ class PowerService(BaseService):
             return False
         res = SafeRunner.run(["powerprofilesctl", "set", profile], timeout=3.0)
         return res.returncode == 0
+

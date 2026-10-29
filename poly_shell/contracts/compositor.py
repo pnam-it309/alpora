@@ -60,3 +60,4 @@ class ProcessDTO(BaseDTO):
     memory_percent: float = 0.0
     user: str = ""
     status: str = "running"
+

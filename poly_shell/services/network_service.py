@@ -30,3 +30,4 @@ class NetworkService(BaseService):
 
     def set_airplane(self, enabled: bool) -> bool:
         return self._adapter.block_rfkill("all", enabled)
+

@@ -41,3 +41,4 @@ class AudioService(BaseService):
 
     def player_control(self, action: str) -> bool:
         return self._adapter.player_control(action)
+

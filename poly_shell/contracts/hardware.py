@@ -83,3 +83,4 @@ class DisplayStateDTO(BaseDTO):
     night_light_available: bool = False
     dnd: bool = False
     dnd_available: bool = False
+

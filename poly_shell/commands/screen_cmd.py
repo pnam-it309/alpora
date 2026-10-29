@@ -19,3 +19,4 @@ def handle_screen(args) -> int:
         cmd.append("--with-audio")
     res = SafeRunner.run(cmd, timeout=30.0)
     return res.returncode
+
