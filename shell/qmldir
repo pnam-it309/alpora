@@ -152,3 +152,7 @@ BrightnessOverlay 1.0 BrightnessOverlay.qml
 singleton VideoPipState 1.0 VideoPipState.qml
 VideoPipOverlay 1.0 VideoPipOverlay.qml
 TopBarVideoPipButton 1.0 TopBarVideoPipButton.qml
+DesktopDayGlance 1.0 DesktopDayGlance.qml
+DesktopNotificationTicker 1.0 DesktopNotificationTicker.qml
+GlowSectionDivider 1.0 GlowSectionDivider.qml
+MacroActionTile 1.0 MacroActionTile.qml

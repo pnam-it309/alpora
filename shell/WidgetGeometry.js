@@ -5,7 +5,9 @@ const SIZES = {
     weather: {width: 370, height: 200},
     music: {width: 370, height: 190},
     developer: {width: 410, height: 206},
-    apps: {width: 390, height: 360}
+    apps: {width: 390, height: 360},
+    day: {width: 380, height: 200},
+    notifications: {width: 360, height: 140}
 };
 
 function size(kind) {

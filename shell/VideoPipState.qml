@@ -85,3 +85,4 @@ Singleton {
         launcherProc.running = true;
     }
 }
+

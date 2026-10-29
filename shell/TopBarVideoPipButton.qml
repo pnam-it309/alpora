@@ -54,3 +54,4 @@ Button {
 
     onClicked: VideoPipState.toggle(root.screenName)
 }
+

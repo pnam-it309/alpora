@@ -225,18 +225,31 @@ PanelWindow {
                     onExpandRequested: BarState.expandClipboard()
                 }
                 TimelinePanel { visible: popup.page === "timeline"; Layout.fillWidth: true; Layout.fillHeight: true }
+                CenterPreview {
+                    id: centerPreview
+                    active: popup.opened && popup.page === "calendar"
+                    visible: popup.page === "calendar" && popup.preview
+                    Layout.fillWidth: true; Layout.fillHeight: true
+                    onExpandRequested: BarState.expandCenter()
+                }
                 CenterPanel {
                     id: centerPanel
                     expansion: popup.expansionCurve
                     active: popup.opened && popup.page === "calendar"
-                    visible: popup.page === "calendar"
+                    visible: popup.page === "calendar" && !popup.preview
                     Layout.fillWidth: true; Layout.fillHeight: true
                     onExpandRequested: BarState.expandCenter()
+                }
+                NotificationsPreview {
+                    id: notificationsPreview
+                    visible: popup.page === "notifications" && popup.preview
+                    Layout.fillWidth: true; Layout.fillHeight: true
+                    onExpandRequested: BarState.expandNotifications()
                 }
                 NotificationsPanel {
                     id: notificationsPanel
                     expansion: popup.expansionCurve
-                    visible: popup.page === "notifications"
+                    visible: popup.page === "notifications" && !popup.preview
                     Layout.fillWidth: true; Layout.fillHeight: true
                     onExpandRequested: BarState.expandNotifications()
                 }

@@ -61,7 +61,7 @@ Scope {
     }
     Component.onCompleted: root.refreshClients()
     Variants {
-        model: ["clock", "weather", "music", "developer", "apps"]
+        model: ["clock", "weather", "music", "developer", "apps", "day"]
         // Each card has its own small surface: animating a cloud must not
         // repaint a full-screen transparent buffer and its compositor blur.
         // qmllint disable uncreatable-type
@@ -92,7 +92,7 @@ Scope {
                 x: Math.min(8, card.box.x); y: Math.min(8, card.box.y)
                 width: card.box.width; height: card.box.height
                 active: card.visible
-                sourceComponent: card.modelData === "clock" ? clockComponent : card.modelData === "weather" ? weatherComponent : card.modelData === "music" ? musicComponent : card.modelData === "developer" ? developerComponent : appsComponent
+                sourceComponent: card.modelData === "clock" ? clockComponent : card.modelData === "weather" ? weatherComponent : card.modelData === "music" ? musicComponent : card.modelData === "developer" ? developerComponent : card.modelData === "apps" ? appsComponent : dayComponent
             }
             Component {
                 id: clockComponent
@@ -113,6 +113,10 @@ Scope {
             Component {
                 id: appsComponent
                 Item { width: RunningAppsState.expanded ? 540 : 390; height: RunningAppsState.expanded ? 620 : 360; scale: card.box.width / width; transformOrigin: Item.TopLeft; DesktopRunningApps { anchors.fill: parent; motionActive: card.visible && root.exposed(card.modelData) } }
+            }
+            Component {
+                id: dayComponent
+                Item { DesktopDayGlance { width: 380; height: 200; scale: card.box.width / width; transformOrigin: Item.TopLeft; motionActive: card.visible && root.exposed(card.modelData) } }
             }
         }
     }

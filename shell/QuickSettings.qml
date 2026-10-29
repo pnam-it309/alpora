@@ -197,12 +197,21 @@ PanelWindow {
             width: content.width
             height: popup.panelHeight
 
+            QuickHoverContent {
+                id: hoverContent
+                anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
+                anchors.margins: Session.visual.panelPadding
+                visible: popup.page === "main" && popup.preview
+                onExpandRequested: BarState.expandQuick()
+                onPageRequested: page => popup.page = page
+            }
+
             ScrollView {
                 id: mainScroll
                 anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
                 anchors.margins: Session.visual.panelPadding
                 height: Math.max(0, Math.min(mainColumn.implicitHeight, popup.panelHeight - Session.visual.panelPadding * 2))
-                visible: popup.page === "main"
+                visible: popup.page === "main" && !popup.preview
                 contentWidth: availableWidth
                 clip: true
                 ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
