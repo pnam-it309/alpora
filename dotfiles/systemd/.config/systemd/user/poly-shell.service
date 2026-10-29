@@ -8,8 +8,8 @@ StartLimitBurst=3
 [Service]
 Type=simple
 ExecStart=%h/.local/bin/poly-shell run
-Restart=on-failure
-RestartSec=2
+Restart=always
+RestartSec=1
 TimeoutStopSec=5
 KillMode=control-group
 StandardOutput=journal

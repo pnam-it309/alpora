@@ -74,6 +74,7 @@ case "$MODE" in
             exit 1
         fi
         REGION="$(slurp 2>/dev/null)" || exit 0
+        notify "ALPORA OCR" "Đang nhận diện văn bản..."
         # Determine available langs
         LANGS="eng"
         if tesseract --list-langs 2>/dev/null | grep -q 'vie'; then
@@ -95,6 +96,7 @@ case "$MODE" in
             exit 1
         fi
         REGION="$(slurp 2>/dev/null)" || exit 0
+        notify "ALPORA QR" "Đang quét mã QR..."
         QR_DATA="$(grim -g "$REGION" - | zbarimg -q --raw - 2>/dev/null || true)"
         if [ -n "$QR_DATA" ]; then
             echo -n "$QR_DATA" | wl-copy

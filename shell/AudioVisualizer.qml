@@ -28,7 +28,7 @@ Item {
     Timer {
         id: animTimer
         interval: 50
-        running: root.active && root.visible
+        running: root.active && root.visible && (!Session.settings || !Session.settings.reducedMotion)
         repeat: true
         onTriggered: {
             const next = [];
