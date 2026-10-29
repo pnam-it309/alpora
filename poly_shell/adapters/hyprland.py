@@ -8,14 +8,21 @@ import socket
 from typing import Any, Callable, Generator, Sequence
 
 from .base import SafeRunner
+from .compositor_base import BaseCompositorAdapter
 
 
-class HyprlandAdapter:
+class HyprlandAdapter(BaseCompositorAdapter):
     """Encapsulates interaction with Hyprland via hyprctl and Socket2."""
 
     @classmethod
     def is_available(cls) -> bool:
         return SafeRunner.is_available("hyprctl")
+
+    @classmethod
+    def dispatch(cls, command: str) -> bool:
+        """Execute a hyprctl dispatch command."""
+        output = cls.hyprctl(["dispatch", *command.split()], timeout=3.0)
+        return "ok" in output.lower()
 
     @classmethod
     def get_socket2_path(cls) -> Path | None:

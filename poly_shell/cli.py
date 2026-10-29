@@ -325,19 +325,8 @@ def main(argv=None):
         elif args.command == "task-manager":
             open_task_manager(paths)
         elif args.command == "wellbeing":
-            from .wellbeing import WellbeingTracker
-            tracker = WellbeingTracker(paths)
-            summary = tracker.get_summary(args.date or "")
-            if args.json:
-                print(json.dumps(summary, indent=2, ensure_ascii=False))
-            else:
-                mins = summary.get("total_minutes", 0)
-                hrs = int(mins // 60)
-                rem_mins = int(mins % 60)
-                print(f"ALPORA Digital Wellbeing [{summary.get('date')}]: {hrs}h {rem_mins}m total screen time")
-                for app in summary.get("apps", []):
-                    app_mins = app.get("minutes", 0)
-                    print(f"  • {app['name']}: {app_mins:.1f}m")
+            from .commands.wellbeing_cmd import handle_wellbeing
+            return handle_wellbeing(paths, args)
         elif args.command == "tasks":
             from . import task_manager
             if args.kill:
@@ -428,21 +417,8 @@ def main(argv=None):
             except ValueError as exc: raise ConfigError("Invalid organizer JSON") from exc
             print(json.dumps(organizer(paths, args.action, payload), ensure_ascii=False))
         elif args.command == "screen":
-            action_map = {
-                "region": "screenshot-region",
-                "full": "screenshot-full",
-                "window": "screenshot-window",
-                "satty": "screenshot-satty",
-                "ocr": "ocr",
-                "qr": "qr",
-                "record": "record-start",
-                "stop-record": "record-stop"
-            }
-            cmd = [str(ROOT / "scripts" / "screen-tools.sh"), action_map.get(args.action, "screenshot-region")]
-            if getattr(args, "with_audio", False):
-                cmd.append("--with-audio")
-            res = SafeRunner.run(cmd, timeout=30.0)
-            return res.returncode
+            from .commands.screen_cmd import handle_screen
+            return handle_screen(args)
         elif args.command == "appearance":
             try: payload = json.loads(args.payload)
             except ValueError as exc: raise ConfigError("Invalid appearance JSON") from exc
