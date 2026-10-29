@@ -16,6 +16,7 @@ import time
 import re
 
 from . import __version__
+from .adapters.base import SafeRunner
 from .integration import fallback_panel, install, patch_autostart, restore_autostart
 from .state import ConfigError, MODES, Paths, ROOT, current_mode, update_session
 from .desktop import control, wallpaper, restore_desktop
@@ -232,7 +233,6 @@ def open_task_manager(paths):
     entry = ROOT / "shell/task_manager.qml"
     ipc = ["quickshell", "ipc", "--path", str(entry), "call", "task-manager-app", "raiseWindow"]
     paths.runtime.mkdir(parents=True, exist_ok=True, mode=0o700)
-    from .adapters.base import SafeRunner
     if SafeRunner.run(ipc, timeout=2.0).returncode == 0:
         return
     update_session(paths)
