@@ -51,14 +51,17 @@ mkdir -p "$TARGET_DIR/.config/poly-shell"
 mkdir -p "$TARGET_DIR/.config/foot"
 mkdir -p "$TARGET_DIR/.config/kitty"
 mkdir -p "$TARGET_DIR/.config/fcitx5"
+mkdir -p "$TARGET_DIR/.config/fontconfig"
 mkdir -p "$TARGET_DIR/.config/fastfetch"
 mkdir -p "$TARGET_DIR/.config/systemd/user"
+mkdir -p "$TARGET_DIR/.local/share/fonts/alpora"
 
 # 4. Stow all packages
-echo "[3/4] Stowing dotfile packages into $TARGET_DIR..."
+echo "[3/5] Stowing dotfile packages into $TARGET_DIR..."
 PACKAGES=(
     "hypr"
     "fcitx5"
+    "fontconfig"
     "foot"
     "kitty"
     "shell"
@@ -77,8 +80,19 @@ for pkg in "${PACKAGES[@]}"; do
     fi
 done
 
-# 5. Enable systemd user service
-echo "[4/4] Setting up ALPORA systemd user service..."
+# 5. Install Typography Fonts
+echo "[4/5] Installing ALPORA typography fonts..."
+if [ -d "$SCRIPT_DIR/../assets/fonts" ]; then
+    cp -u "$SCRIPT_DIR/../assets/fonts/"*.ttf "$TARGET_DIR/.local/share/fonts/alpora/" 2>/dev/null || true
+    echo "  [OK] Installed fonts: Inter, JetBrains Mono, Outfit, Symbols Nerd Font"
+    if command -v fc-cache >/dev/null 2>&1; then
+        fc-cache -f "$TARGET_DIR/.local/share/fonts/alpora" >/dev/null 2>&1 || true
+        echo "  [OK] Font cache updated via fc-cache."
+    fi
+fi
+
+# 6. Enable systemd user service
+echo "[5/5] Setting up ALPORA systemd user service..."
 if command -v systemctl >/dev/null 2>&1; then
     systemctl --user daemon-reload 2>/dev/null || true
     if systemctl --user enable poly-shell.service 2>/dev/null; then

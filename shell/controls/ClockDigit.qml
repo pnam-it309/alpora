@@ -23,7 +23,7 @@ Item {
         width: parent.width; height: parent.height
         y: -root.progress * height * 0.72
         text: root.previous; opacity: 1 - root.progress
-        color: Session.foreground; font.family: Session.fontFamily
+        color: Session.foreground; font.family: Session.displayFontFamily || Session.fontFamily
         font.pixelSize: root.pixelSize; font.weight: Font.Medium
         horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
     }
@@ -31,7 +31,7 @@ Item {
         width: parent.width; height: parent.height
         y: (1 - root.progress) * height * 0.72
         text: root.current; opacity: root.progress
-        color: Session.foreground; font.family: Session.fontFamily
+        color: Session.foreground; font.family: Session.displayFontFamily || Session.fontFamily
         font.pixelSize: root.pixelSize; font.weight: Font.Medium
         horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
     }

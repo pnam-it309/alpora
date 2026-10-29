@@ -6,7 +6,8 @@
 
 set -euo pipefail
 
-DOTFILES_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+DOTFILES_DIR="$(cd -- "$SCRIPT_DIR/../dotfiles" && pwd)"
 TARGET_DIR="${HOME:-/home/$USER}"
 
 echo "========================================================================"
@@ -49,62 +50,67 @@ mkdir -p "$TARGET_DIR/.config/hypr"
 mkdir -p "$TARGET_DIR/.config/poly-shell"
 mkdir -p "$TARGET_DIR/.config/foot"
 mkdir -p "$TARGET_DIR/.config/kitty"
-mkdir -p "$TARGET_DIR/.config/fcitx5/conf"
+mkdir -p "$TARGET_DIR/.config/fcitx5"
+mkdir -p "$TARGET_DIR/.config/fontconfig"
 mkdir -p "$TARGET_DIR/.config/fastfetch"
 mkdir -p "$TARGET_DIR/.config/systemd/user"
-mkdir -p "$TARGET_DIR/.local/bin"
+mkdir -p "$TARGET_DIR/.local/share/fonts/alpora"
 
-# 4. Run GNU Stow for each package
-echo "[3/4] Symlinking dotfiles via GNU Stow..."
-packages=(
+# 4. Stow all packages
+echo "[3/5] Stowing dotfile packages into $TARGET_DIR..."
+PACKAGES=(
     "hypr"
-    "poly-shell"
+    "fcitx5"
+    "fontconfig"
     "foot"
     "kitty"
-    "fcitx5"
     "shell"
     "fastfetch"
+    "poly-shell"
     "systemd"
 )
 
 cd "$DOTFILES_DIR"
-for pkg in "${packages[@]}"; do
-    if [[ -d "$pkg" ]]; then
+for pkg in "${PACKAGES[@]}"; do
+    if [ -d "$pkg" ]; then
         echo "  -> Stowing package: $pkg"
-        stow -v -R -t "$TARGET_DIR" "$pkg" 2>&1 | sed 's/^/     /'
+        stow -R -v 1 -t "$TARGET_DIR" "$pkg" 2>&1 | sed 's/^/     /'
+    else
+        echo "  [Warning] Package folder $pkg not found, skipping."
     fi
 done
 
-# 5. Enable & start ALPORA systemd user service
-echo "[4/4] Configuring systemd user services..."
+# 5. Install Typography Fonts
+echo "[4/5] Installing ALPORA typography fonts..."
+if [ -d "$SCRIPT_DIR/../assets/fonts" ]; then
+    cp -u "$SCRIPT_DIR/../assets/fonts/"*.ttf "$TARGET_DIR/.local/share/fonts/alpora/" 2>/dev/null || true
+    echo "  [OK] Installed fonts: Inter, JetBrains Mono, Outfit, Symbols Nerd Font"
+    if command -v fc-cache >/dev/null 2>&1; then
+        fc-cache -f "$TARGET_DIR/.local/share/fonts/alpora" >/dev/null 2>&1 || true
+        echo "  [OK] Font cache updated via fc-cache."
+    fi
+fi
+
+# 6. Enable systemd user service
+echo "[5/5] Setting up ALPORA systemd user service..."
 if command -v systemctl >/dev/null 2>&1; then
-    systemctl --user daemon-reload || true
+    systemctl --user daemon-reload 2>/dev/null || true
     if systemctl --user enable poly-shell.service 2>/dev/null; then
         echo "  [OK] poly-shell.service enabled for user session."
-        if [[ -n "${WAYLAND_DISPLAY:-}" ]]; then
-            systemctl --user start poly-shell.service || true
-            echo "  [OK] poly-shell.service started in current Wayland session."
-        fi
     else
-        echo "  [Notice] Could not enable systemd service (headless or non-systemd environment)."
+        echo "  [Notice] Could not enable poly-shell.service right now (systemd user daemon might be inactive)."
+        echo "           Run: systemctl --user enable --now poly-shell.service once logged into Wayland."
     fi
+else
+    echo "  [Notice] systemctl not found; skipping service activation."
 fi
 
 echo ""
 echo "========================================================================"
-echo "          ALPORA Dotfiles Successfully Installed!                       "
+echo "          ALPORA Dotfiles Installation Successfully Finished!          "
 echo "========================================================================"
-echo "Next Steps:"
-echo "  1. Log into your Hyprland session (or start from TTY via 'Hyprland')."
-echo "  2. ALPORA and Fcitx5 will autostart via exec-once."
-echo "  3. Key shortcuts to remember:"
-echo "     - Super + Enter  : Terminal (Foot)"
-echo "     - Super + Space  : App Launcher"
-echo "     - Super + I      : Quick Settings Panel"
-echo "     - Super + Tab    : Workspace Overview"
-echo "     - Super + L      : Lock Screen"
-echo "     - Ctrl + Shift   : Switch Vietnamese / English Input"
-echo "  4. Run health check at any time:"
-echo "     poly-shell doctor"
+echo "To launch ALPORA manually: poly-shell run"
+echo "To start as service:       systemctl --user start poly-shell.service"
+echo "To check system health:    poly-shell doctor"
 echo "========================================================================"
 

@@ -56,7 +56,7 @@ def verify_prepared_desktop(paths):
     expected += [Path.home()/'.local/bin'/name for name in ('poly-shell','alpora-fetch')]
     expected += [paths.config.parent/'systemd/user/poly-shell.service',
                  paths.config.parent/'quickshell/poly-shell/shell.qml',
-                 ROOT/'poly_shell/fetch.py']
+                 ROOT/'poly_shell/system/fetch.py']
     for path in expected:
         if not path.is_file() or not path.stat().st_size: raise ConfigError('Incomplete installation: '+str(path))
     wallpaper=Path(read_object(paths.config/'wallpaper.json')['image'])

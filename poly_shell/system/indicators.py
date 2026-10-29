@@ -44,7 +44,7 @@ def show_indicator(kind):
 
 def mako_style(snapshot):
     palette = snapshot.get('appearance', {}).get('palette') or snapshot['profile']['palette']
-    font = snapshot.get('appearance', {}).get('fonts', {}).get('interface', 'Noto Sans 11')
+    font = snapshot.get('appearance', {}).get('fonts', {}).get('interface', 'Inter 11')
     if '\n' in font or '\r' in font:
         raise ConfigError('Invalid notification font')
     from ..theming.visual import validate

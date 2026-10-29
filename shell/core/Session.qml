@@ -31,7 +31,29 @@ Singleton {
     readonly property int motionMs: settings.reducedMotion ? 0 : (profile.motionMs || 0)
     readonly property string controller: Quickshell.env("POLY_SHELL_CTL") || "poly-shell"
     readonly property bool switching: modeWriter.running
-    readonly property string fontFamily: settings.bar ? settings.bar.fontFamily : "Noto Sans"
+
+    FontLoader {
+        id: interFont
+        source: Quickshell.env("POLY_SHELL_ASSETS") ? ("file://" + Quickshell.env("POLY_SHELL_ASSETS") + "/fonts/Inter-Variable.ttf") : ""
+    }
+    FontLoader {
+        id: outfitFont
+        source: Quickshell.env("POLY_SHELL_ASSETS") ? ("file://" + Quickshell.env("POLY_SHELL_ASSETS") + "/fonts/Outfit-Variable.ttf") : ""
+    }
+    FontLoader {
+        id: monoFont
+        source: Quickshell.env("POLY_SHELL_ASSETS") ? ("file://" + Quickshell.env("POLY_SHELL_ASSETS") + "/fonts/JetBrainsMono-Variable.ttf") : ""
+    }
+    FontLoader {
+        id: nerdFont
+        source: Quickshell.env("POLY_SHELL_ASSETS") ? ("file://" + Quickshell.env("POLY_SHELL_ASSETS") + "/fonts/SymbolsNerdFont-Regular.ttf") : ""
+    }
+
+    readonly property string defaultFontFamily: interFont.status === FontLoader.Ready ? interFont.name : "Inter, Noto Sans, sans-serif"
+    readonly property string fontFamily: (settings.bar && settings.bar.fontFamily && settings.bar.fontFamily !== "Noto Sans") ? settings.bar.fontFamily : defaultFontFamily
+    readonly property string displayFontFamily: outfitFont.status === FontLoader.Ready ? outfitFont.name : "Outfit, Inter, sans-serif"
+    readonly property string monoFontFamily: monoFont.status === FontLoader.Ready ? monoFont.name : "JetBrains Mono, monospace"
+    readonly property string symbolFontFamily: nerdFont.status === FontLoader.Ready ? nerdFont.name : "Symbols Nerd Font, monospace"
     readonly property var source: Pipewire.defaultAudioSource
     readonly property var microphone: source && source.ready ? source.audio : null
     readonly property var pipewireNodes: Pipewire.nodes

@@ -17,7 +17,7 @@ Singleton {
     }
     Process {
         id: worker
-        command: ["python3", Quickshell.env("POLY_SHELL_ASSETS") + "/../poly_shell/clipboard.py", "serve"]
+        command: ["python3", "-m", "poly_shell.services.clipboard", "serve"]
         stdinEnabled: true
         running: true
         stdout: SplitParser {

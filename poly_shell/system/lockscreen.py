@@ -60,7 +60,7 @@ def lock_style(snapshot):
         f'$lockText = {color("text")}',
         f'$lockMuted = {color("muted")}',
         '$lockAmber = rgba(' + palette.get('secondary', '#c09d76')[1:] + 'ff)',
-        f'$lockFont = {font}', f'$lockClockFont = {font} SemiBold',
+        f'$lockFont = {font}', f'$lockClockFont = {"Outfit SemiBold" if font in ("Inter", "Noto Sans") else f"{font} SemiBold"}',
         f'$lockClockFrame = {clock_frame}',
         f'$lockTitle = {title} · ' + ('SESSION LOCKED' if snapshot.get('settings', {}).get('locale') == 'en' else ('PHIÊN ĐÃ KHÓA' if snapshot.get('settings', {}).get('locale') == 'vi' else 'СЕАНС ЗАБЛОКИРОВАН')),
         f'$lockWallpaper = {image}',

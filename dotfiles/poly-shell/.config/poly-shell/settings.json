@@ -9,7 +9,7 @@
     "browser": ["firefox"]
   },
   "bar": {
-    "fontFamily": "Noto Sans",
+    "fontFamily": "Inter",
     "position": "top"
   }
 }

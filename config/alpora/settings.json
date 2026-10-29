@@ -20,7 +20,7 @@
   "bar": {
     "height": 40,
     "workspaceCount": 4,
-    "fontFamily": "Noto Sans",
+    "fontFamily": "Inter",
     "fontSize": 13,
     "margin": 20,
     "top": 12,

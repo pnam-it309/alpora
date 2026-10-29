@@ -53,7 +53,7 @@ DesktopWidgetCard {
                         Layout.fillWidth: true; spacing: 5
                         Text { text: modelData.label; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 9; font.weight: Font.DemiBold }
                         Item { Layout.fillWidth: true }
-                        Text { text: modelData.value; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12; font.weight: Font.DemiBold; elide: Text.ElideRight }
+                        Text { text: modelData.value; color: Session.foreground; font.family: Session.monoFontFamily || Session.fontFamily; font.pixelSize: 12; font.weight: Font.DemiBold; elide: Text.ElideRight }
                     }
                     Rectangle {
                         Layout.fillWidth: true; Layout.preferredHeight: 4; radius: 2; color: Glass.tint(Session.muted, 0.16); visible: typeof modelData.percent === "number" && modelData.percent >= 0

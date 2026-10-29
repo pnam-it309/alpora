@@ -197,7 +197,7 @@ DesktopWidgetCard {
     function refreshProcesses(): void {
         if (processReader.running) return;
         const refs = windows.map(w => ({pid: Number(w.pid), appClass: appIdentity(w), appName: appName(w)}));
-        processReader.command = ["python3", Quickshell.env("POLY_SHELL_ASSETS") + "/../poly_shell/running_apps.py", "snapshot", JSON.stringify(refs)];
+        processReader.command = ["python3", "-m", "poly_shell.system.running_apps", "snapshot", JSON.stringify(refs)];
         processReader.running = true;
     }
     function closeWindow(address: string): void {
@@ -217,7 +217,7 @@ DesktopWidgetCard {
         terminationGraceElapsed = false;
         errorText = "";
         requestedSignal = force ? "KILL" : "TERM";
-        terminator.command = ["python3", Quickshell.env("POLY_SHELL_ASSETS") + "/../poly_shell/running_apps.py",
+        terminator.command = ["python3", "-m", "poly_shell.system.running_apps",
             "signal", String(proc.pid), String(proc.startTicks), requestedSignal];
         terminator.running = true;
     }

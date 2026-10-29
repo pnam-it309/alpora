@@ -100,7 +100,7 @@ def defaults():
             "lock": ["hyprlock"],
             "network": ["nm-connection-editor"],
         },
-        "bar": {"height": 40, "workspaceCount": 4, "fontFamily": "Noto Sans", "fontSize": 13,
+        "bar": {"height": 40, "workspaceCount": 4, "fontFamily": "Inter", "fontSize": 13,
                 "margin": 20, "top": 12, "uiScale": 1.0},
         "input": {
             "touchpad": {
