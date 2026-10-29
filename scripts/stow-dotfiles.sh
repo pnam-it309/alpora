@@ -8,7 +8,7 @@ target_dir="${HOME:-/home/$USER}"
 backup_base="${XDG_CONFIG_HOME:-$HOME/.config}/alpora-backups"
 
 action="${1:-status}"
-packages=("hypr" "poly-shell" "systemd")
+packages=("hypr" "poly-shell" "foot" "kitty" "fcitx5" "shell" "fastfetch" "systemd")
 
 alpora_log() {
     printf ":: %s\n" "$*"
