@@ -1,7 +1,9 @@
 from dataclasses import dataclass
+import tempfile
 import unittest
 from poly_shell.core.service import BaseService, ServiceRegistry
 from poly_shell.contracts.base import BaseDTO
+from poly_shell.services import MetricsService, ClipboardService
 
 
 @dataclass
@@ -41,6 +43,35 @@ class TestServiceCore(unittest.TestCase):
 
         self.registry.shutdown_all()
         self.assertEqual(len(self.registry.all()), 0)
+
+    def test_metrics_service(self):
+        svc = MetricsService()
+        self.assertEqual(svc.name, "metrics")
+        self.assertTrue(svc.health_check())
+        snap = svc.get_snapshot()
+        self.assertIn("cpu", snap)
+        self.assertIn("memory", snap)
+        dto = svc.get_state()
+        self.assertIsNotNone(dto.hostname)
+        self.assertIn("percent", dto.cpu)
+
+    def test_clipboard_service(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            from pathlib import Path
+            svc = ClipboardService(storage_dir=Path(tmp_dir))
+            try:
+                self.assertEqual(svc.name, "clipboard")
+                self.assertTrue(svc.health_check())
+                state = svc.get_state()
+                self.assertEqual(state.item_count, 0)
+                self.assertFalse(state.paused)
+                # 'pause' toggles paused state
+                svc.perform_action("pause")
+                self.assertTrue(svc.get_state().paused)
+                svc.perform_action("pause")
+                self.assertFalse(svc.get_state().paused)
+            finally:
+                svc.stop()
 
 
 if __name__ == "__main__":

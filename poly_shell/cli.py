@@ -13,7 +13,6 @@ import socket
 import subprocess
 import sys
 import time
-import re
 
 from . import __version__
 from .adapters.base import SafeRunner
@@ -29,6 +28,7 @@ from .timeline import timeline_control
 from .widgets import widgets_control
 from .shortcuts import shortcuts_control
 from .programs import inventory
+from . import commands
 
 
 ALLOWED_SYSTEMCTL_SUBCOMMANDS = {
@@ -173,9 +173,10 @@ def doctor(paths, bundle=False, output_dir=None):
     print(f"Poly Shell {__version__}\nProject: {ROOT}")
     for item in inventory():
         status = "OK" if item['available'] else "MISSING" if item['required'] else "OPTIONAL MISSING"
-        missing = [name for name,value in item['tools'].items() if not value]
+        missing = [name for name, value in item['tools'].items() if not value]
         print(f"{status} {item['name']} [{item['package']}]: {item['purpose']}" + ("; missing: " + ", ".join(missing) if missing else ""))
-        if item['required'] and not item['available']: ok = False
+        if item['required'] and not item['available']:
+            ok = False
     if not shutil.which("foot") and not shutil.which("kitty"):
         print("OPTIONAL MISSING terminal: install foot or kitty, or configure apps.terminal")
     try:
@@ -197,7 +198,8 @@ def open_settings(paths):
     ipc = ["quickshell", "ipc", "--path", str(entry), "call", "settings-app", "raiseWindow"]
     paths.runtime.mkdir(parents=True, exist_ok=True, mode=0o700)
     with (paths.runtime / "settings-start.lock").open("a") as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX)
+        if fcntl is not None:
+            fcntl.flock(lock, fcntl.LOCK_EX)
         if subprocess.run(ipc, capture_output=True, text=True, timeout=3).returncode == 0:
             return
         update_session(paths)
@@ -227,40 +229,8 @@ def open_settings(paths):
 
 
 def open_task_manager(paths):
-    runtime_check()
-    if not os.environ.get("WAYLAND_DISPLAY"):
-        raise ConfigError("Open task manager inside Wayland session")
-    entry = ROOT / "shell/task_manager.qml"
-    ipc = ["quickshell", "ipc", "--path", str(entry), "call", "task-manager-app", "raiseWindow"]
-    paths.runtime.mkdir(parents=True, exist_ok=True, mode=0o700)
-    if SafeRunner.run(ipc, timeout=2.0).returncode == 0:
-        return
-    update_session(paths)
-    environment = {name: os.environ[name] for name in (
-        "WAYLAND_DISPLAY", "DISPLAY", "HYPRLAND_INSTANCE_SIGNATURE",
-        "XDG_CURRENT_DESKTOP", "XDG_SESSION_TYPE", "XDG_CONFIG_HOME", "XDG_STATE_HOME",
-        "XDG_DATA_HOME") if os.environ.get(name)}
-    environment.update(
-        POLY_SHELL_STATE=str(paths.session),
-        POLY_SHELL_CTL=str(ROOT / "bin/poly-shell"),
-        POLY_SHELL_ASSETS=str(ROOT / "assets")
-    )
-    if SafeRunner.is_available("systemd-run"):
-        cmd = ["systemd-run", "--user", "--quiet", "--collect",
-               "--unit=poly-shell-task-manager", "--service-type=exec",
-               "--description=ALPORA Task Manager"]
-        cmd += ["--setenv=" + name + "=" + value for name, value in environment.items()]
-        SafeRunner.run(cmd + ["quickshell", "--path", str(entry), "--no-duplicate"], timeout=8.0)
-    else:
-        env_copy = os.environ.copy()
-        env_copy.update(environment)
-        subprocess.Popen(["quickshell", "--path", str(entry), "--no-duplicate"], env=env_copy, start_new_session=True)
-
-    for _ in range(50):
-        if SafeRunner.run(ipc, timeout=1.5).returncode == 0:
-            return
-        time.sleep(.1)
-    raise ConfigError("Task manager window failed to start.")
+    from .commands.tasks_cmd import open_task_manager as _open_tm
+    return _open_tm(paths, runtime_check_fn=runtime_check)
 
 
 def main(argv=None):
@@ -357,9 +327,45 @@ def main(argv=None):
     pip_parser.add_argument("--mode", choices=("vertical", "landscape"), help="aspect ratio mode")
     pip_parser.add_argument("--width", type=int, help="custom window width")
     pip_parser.add_argument("--height", type=int, help="custom window height")
+
     args = parser.parse_args(argv)
     paths = Paths.current()
+
+    # Route subcommands to dedicated handlers in poly_shell.commands
+    COMMAND_HANDLERS = {
+        "doctor": lambda: doctor(paths, bundle=args.bundle, output_dir=args.output),
+        "preflight": lambda: commands.handle_preflight(paths, args),
+        "task-manager": lambda: commands.handle_task_manager(paths, args, runtime_check),
+        "tasks": lambda: commands.handle_tasks(paths, args),
+        "wellbeing": lambda: commands.handle_wellbeing(paths, args),
+        "shortcuts": lambda: commands.handle_shortcuts(paths, args),
+        "organizer": lambda: commands.handle_organizer(paths, args),
+        "control": lambda: commands.handle_control(paths, args),
+        "wallpaper": lambda: commands.handle_wallpaper(paths, args),
+        "project": lambda: commands.handle_project(paths, args),
+        "dotfiles": lambda: commands.handle_dotfiles(paths, args),
+        "windows-drives": lambda: commands.handle_windows_drives(paths, args),
+        "osd": lambda: commands.handle_osd(paths, args),
+        "lock-date": lambda: commands.handle_lock_date(paths, args),
+        "lock-media": lambda: commands.handle_lock_media(paths, args),
+        "theme": lambda: commands.handle_theme(paths, args),
+        "timeline": lambda: commands.handle_timeline(paths, args),
+        "widgets": lambda: commands.handle_widgets(paths, args),
+        "appearance": lambda: commands.handle_appearance(paths, args),
+        "palette-extract": lambda: commands.handle_palette_extract(paths, args),
+        "assets": lambda: commands.handle_assets(paths, args),
+        "toolkit-refresh": lambda: commands.handle_toolkit_refresh(paths, args),
+        "screen": lambda: commands.handle_screen(args),
+        "pip": lambda: commands.handle_pip(args),
+        "exe": lambda: commands.handle_exe(args),
+    }
+
     try:
+        if args.command in COMMAND_HANDLERS:
+            result = COMMAND_HANDLERS[args.command]()
+            return result if result is not None else 0
+
+        # Session lifecycle commands
         if args.command in ("init", "refresh"):
             snapshot = update_session(paths)
             sync_appearance(paths)
@@ -374,171 +380,6 @@ def main(argv=None):
                 print(json.dumps(snapshot, ensure_ascii=False) if args.json else snapshot["mode"])
             else:
                 print(current_mode(paths))
-        elif args.command == "doctor":
-            return doctor(paths, bundle=args.bundle, output_dir=args.output)
-        elif args.command == "preflight":
-            from .preflight import run_preflight, format_preflight_report
-            report = run_preflight(paths)
-            if getattr(args, "json", False):
-                print(json.dumps(report, indent=2, ensure_ascii=False))
-            else:
-                print(format_preflight_report(report))
-            return 0 if report["ready"] else 1
-        elif args.command == "task-manager":
-            open_task_manager(paths)
-        elif args.command == "wellbeing":
-            from .commands.wellbeing_cmd import handle_wellbeing
-            return handle_wellbeing(paths, args)
-        elif args.command == "tasks":
-            from . import task_manager
-            if args.kill:
-                task_manager.kill_process(args.kill, sig=args.sig)
-                print(json.dumps({"success": True, "killed": args.kill}))
-            elif args.service:
-                name, act = args.service
-                task_manager.control_service(name, act)
-                print(json.dumps({"success": True, "service": name, "action": act}))
-            elif args.startup_toggle:
-                name, state = args.startup_toggle
-                enabled = state.lower() in ("on", "true", "1", "yes")
-                task_manager.toggle_startup_item(name, enabled)
-                print(json.dumps({"success": True, "item": name, "enabled": enabled}))
-            else:
-                tab = args.tab
-                if tab == "processes":
-                    data = task_manager.get_processes()
-                elif tab == "performance":
-                    data = task_manager.get_performance_data()
-                elif tab == "startup":
-                    data = task_manager.get_startup_items()
-                elif tab == "users":
-                    data = task_manager.get_user_sessions()
-                elif tab == "details":
-                    data = task_manager.get_process_details()
-                elif tab == "services":
-                    data = task_manager.get_services()
-                else:
-                    data = {}
-                print(json.dumps(data, ensure_ascii=False))
-        elif args.command == "control":
-            CONTROL_ACTIONS = {
-                "status": "status", "brightness": "brightness", "dnd": "dnd",
-                "nightlight": "nightlight", "bluetooth": "bluetooth",
-                "power-profile": "power-profile", "airplane": "airplane",
-                "hotspot": "hotspot", "wifi-connect": "wifi-connect",
-                "ui-scale": "ui-scale", "touchpad": "touchpad", "font": "font"
-            }
-            safe_action = CONTROL_ACTIONS.get(args.action)
-            if not safe_action:
-                raise ConfigError(f"Unknown control action: {args.action}")
-            print(json.dumps(control(paths, safe_action, args.value)))
-        elif args.command == "theme":
-            try: payload = json.loads(args.payload)
-            except ValueError as exc: raise ConfigError("Invalid theme JSON") from exc
-            print(json.dumps(theme_control(paths, args.action, payload), ensure_ascii=False))
-        elif args.command == "timeline":
-            try: payload = json.loads(args.payload)
-            except ValueError as exc: raise ConfigError("Invalid Timeline JSON") from exc
-            print(json.dumps(timeline_control(paths, args.action, payload), ensure_ascii=False))
-        elif args.command == "widgets":
-            try: payload = json.loads(args.payload)
-            except ValueError as exc: raise ConfigError("Invalid widgets JSON") from exc
-            if not isinstance(payload, dict): raise ConfigError("Invalid widgets request")
-            print(json.dumps(widgets_control(paths, args.action, payload), ensure_ascii=False))
-        elif args.command == "shortcuts":
-            try: payload = json.loads(args.payload)
-            except ValueError as exc: raise ConfigError("Invalid shortcuts JSON") from exc
-            print(json.dumps(shortcuts_control(paths,args.action,payload),ensure_ascii=False))
-        elif args.command == "assets":
-            from .desktop_assets import install as install_assets, apply as apply_assets
-            result = install_assets(paths) if args.action == "install" else apply_assets(paths)
-            print(json.dumps(result, ensure_ascii=False))
-        elif args.command == "osd":
-            if args.kind in ("capslock", "numlock", "airplane"):
-                state_val = getattr(args, 'state', 'on') == 'on'
-                SafeRunner.run(['quickshell', 'ipc', '--path', str(ROOT / 'shell'), 'call', 'shell', 'showToggleOsd', args.kind, "true" if state_val else "false"], timeout=3.0)
-            else:
-                OSD_MAP = {'brightness': 'brightness', 'volume': 'volume', 'microphone': 'microphone'}
-                safe_kind = OSD_MAP.get(args.kind)
-                if not safe_kind:
-                    raise ConfigError(f"Invalid OSD indicator: {args.kind}")
-                show_indicator(safe_kind)
-        elif args.command == "lock-date":
-            print(lock_date())
-        elif args.command == "lock-media":
-            from .lock_media import handle_cli
-            handle_cli(args.field)
-        elif args.command == "toolkit-refresh":
-            from .toolkit_refresh import refresh, schedule
-            result = refresh(paths)
-            if result.get('busy'):
-                schedule(paths)
-            print(json.dumps(result))
-        elif args.command == "organizer":
-            try: payload = json.loads(args.payload)
-            except ValueError as exc: raise ConfigError("Invalid organizer JSON") from exc
-            print(json.dumps(organizer(paths, args.action, payload), ensure_ascii=False))
-        elif args.command == "screen":
-            from .commands.screen_cmd import handle_screen
-            return handle_screen(args)
-        elif args.command == "appearance":
-            try: payload = json.loads(args.payload)
-            except ValueError as exc: raise ConfigError("Invalid appearance JSON") from exc
-            print(json.dumps(appearance_control(paths, args.action, payload), ensure_ascii=False))
-        elif args.command == "windows-drives":
-            from .windows_fs import detect_windows_drives, mount_drive, unmount_drive, normalize_windows_path
-            if args.action == "list":
-                print(json.dumps(detect_windows_drives(), ensure_ascii=False))
-            elif args.action == "mount":
-                print(json.dumps({"mountpoint": mount_drive(args.target)}, ensure_ascii=False))
-            elif args.action == "unmount":
-                print(json.dumps({"success": unmount_drive(args.target)}, ensure_ascii=False))
-            elif args.action == "normalize-path":
-                print(normalize_windows_path(args.target))
-        elif args.command == "dotfiles":
-            script = (ROOT / "scripts/stow-dotfiles.sh").resolve()
-            if args.action in ("status", "check"):
-                cmd_action = "status"
-            elif args.action in ("link", "stow", "apply"):
-                cmd_action = "link"
-            elif args.action in ("unlink", "unstow", "delete"):
-                cmd_action = "unlink"
-            elif args.action == "restow":
-                cmd_action = "restow"
-            else:
-                raise ConfigError(f"Invalid dotfiles action: {args.action}")
-            return subprocess.run(["bash", "--", str(script), cmd_action], check=False).returncode  # NOSONAR
-        elif args.command == "project":
-            entry = ROOT / "shell/shell.qml"
-            ALLOWED_MODES = {
-                "toggle": "toggle", "open": "open", "close": "close",
-                "internal": "internal", "mirror": "mirror",
-                "extend": "extend", "external": "external"
-            }
-            safe_mode = ALLOWED_MODES.get(args.mode, "toggle")
-            if safe_mode in ("toggle", "open", "close"):
-                cmd = ["quickshell", "ipc", "--path", str(entry), "call", "display-project", safe_mode]
-            else:
-                cmd = ["quickshell", "ipc", "--path", str(entry), "call", "display-project", "setMode", safe_mode]
-            res = subprocess.run(cmd, capture_output=True, text=True, timeout=3)  # NOSONAR
-            if res.returncode == 0:
-                print(f"Display projection: {safe_mode}")
-            else:
-                raise ConfigError("Cannot connect to running Poly Shell for display projection")
-        elif args.command == "pip":
-            from .commands.pip_cmd import handle_pip
-            return handle_pip(args)
-        elif args.command == "exe":
-            from .commands.exe_cmd import handle_exe
-            return handle_exe(args)
-        elif args.command == "palette-extract":
-            from .themes import extract_palette_from_image
-            palette = extract_palette_from_image(args.image)
-            print(json.dumps(palette, indent=2))
-        elif args.command == "wallpaper":
-            if args.image and (str(args.image).startswith('-') or any(c in str(args.image) for c in ('\x00', '\r', '\n'))):
-                raise ConfigError("Invalid wallpaper argument")
-            wallpaper(paths, args.image, reset=args.reset)
         elif args.command == "settings":
             open_settings(paths)
         elif args.command == "install":

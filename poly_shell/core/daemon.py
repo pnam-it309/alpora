@@ -15,6 +15,8 @@ from ..contracts.base import ShellEventEnvelope
 from ..services.audio_service import AudioService
 from ..services.network_service import NetworkService
 from ..services.power_service import PowerService
+from ..services.metrics_service import MetricsService
+from ..services.clipboard_service import ClipboardService
 
 logger = logging.getLogger(__name__)
 
@@ -33,10 +35,14 @@ class PolyShellDaemon:
         self.audio_service = AudioService()
         self.network_service = NetworkService()
         self.power_service = PowerService()
+        self.metrics_service = MetricsService()
+        self.clipboard_service = ClipboardService()
 
         self.registry.register(self.audio_service)
         self.registry.register(self.network_service)
         self.registry.register(self.power_service)
+        self.registry.register(self.metrics_service)
+        self.registry.register(self.clipboard_service)
 
         self._setup_ipc_handlers()
 
@@ -69,6 +75,17 @@ class PolyShellDaemon:
         # Power endpoints
         self.ipc_server.register_handler("power.state", lambda _p: self.power_service.get_state().to_dict())
         self.ipc_server.register_handler("power.toggle_caffeine", lambda _p: self.power_service.toggle_caffeine())
+
+        # Metrics endpoints
+        self.ipc_server.register_handler("metrics.snapshot", lambda _p: self.metrics_service.get_snapshot())
+
+        # Clipboard endpoints
+        self.ipc_server.register_handler("clipboard.state", lambda _p: self.clipboard_service.get_state().to_dict())
+        self.ipc_server.register_handler("clipboard.items", lambda _p: self.clipboard_service.get_items())
+        self.ipc_server.register_handler(
+            "clipboard.action",
+            lambda p: self.clipboard_service.perform_action(str(p.get("action", "")), str(p.get("id", ""))),
+        )
 
         # Process / Running Apps endpoints (zero python interpreter spawn)
         try:
