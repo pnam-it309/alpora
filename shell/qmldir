@@ -32,6 +32,7 @@ TopBar 1.0 TopBar.qml
 TopBarMiniPlayer 1.0 TopBarMiniPlayer.qml
 NativeShortcut 1.0 NativeShortcut.qml
 QuickSettings 1.0 QuickSettings.qml
+QuickSettingsSubpages 1.0 QuickSettingsSubpages.qml
 Icon 1.0 Icon.qml
 IconButton 1.0 IconButton.qml
 FacetedMark 1.0 FacetedMark.qml
