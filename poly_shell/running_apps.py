@@ -147,10 +147,13 @@ def _descendant_distance(processes: dict[int, dict[str, Any]], pid: int, root_pi
 
 
 def snapshot(windows: list[dict[str, Any]]) -> dict[str, Any]:
-    uid = os.getuid()
+    uid = os.getuid() if hasattr(os, "getuid") else 1000
     protected_pids = _ancestor_pids(os.getpid())
     records: dict[int, dict[str, Any]] = {}
-    for path in Path("/proc").iterdir():
+    proc_root = Path("/proc")
+    if not proc_root.exists():
+        return {"ok": True, "uid": uid, "windows": windows, "processes": []}
+    for path in proc_root.iterdir():
         if not path.name.isdigit():
             continue
         pid = int(path.name)

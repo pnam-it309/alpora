@@ -118,6 +118,14 @@ class TestIPCDaemon(unittest.TestCase):
             self.assertIn("network", resp.get("data", {}))
             self.assertIn("power", resp.get("data", {}))
 
+            # Query apps.snapshot via IPC (zero-spawn)
+            req = json.dumps({"id": "a-1", "action": "apps.snapshot", "params": {"windows": []}}) + "\n"
+            client.sendall(req.encode("utf-8"))
+            resp_line = client.makefile("r").readline()
+            resp = json.loads(resp_line)
+            self.assertTrue(resp.get("success"))
+            self.assertIn("processes", resp.get("data", {}))
+
             client.close()
         finally:
             daemon.stop()
@@ -126,3 +134,4 @@ class TestIPCDaemon(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

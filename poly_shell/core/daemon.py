@@ -70,6 +70,17 @@ class PolyShellDaemon:
         self.ipc_server.register_handler("power.state", lambda _p: self.power_service.get_state().to_dict())
         self.ipc_server.register_handler("power.toggle_caffeine", lambda _p: self.power_service.toggle_caffeine())
 
+        # Process / Running Apps endpoints (zero python interpreter spawn)
+        try:
+            from ..running_apps import snapshot as proc_snapshot, terminate as proc_terminate
+            self.ipc_server.register_handler("apps.snapshot", lambda p: proc_snapshot(p.get("windows", [])))
+            self.ipc_server.register_handler(
+                "apps.signal",
+                lambda p: proc_terminate(int(p.get("pid", 0)), int(p.get("start_ticks", 0)), str(p.get("sig", "TERM"))),
+            )
+        except ImportError:
+            pass
+
         # System health
         self.ipc_server.register_handler("system.health", lambda _p: self.registry.health_report())
 
@@ -135,3 +146,4 @@ class PolyShellDaemon:
 
             time.sleep(backoff)
             backoff = min(backoff * 1.5, 5.0)  # Exponential backoff up to 5s
+

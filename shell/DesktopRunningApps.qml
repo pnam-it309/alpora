@@ -185,7 +185,15 @@ DesktopWidgetCard {
         if (lang === "ru") return appCount + " прил. · " + windowCount + " " + (windowCount % 10 === 1 && windowCount % 100 !== 11 ? "окно" : windowCount % 10 >= 2 && windowCount % 10 <= 4 && (windowCount % 100 < 12 || windowCount % 100 > 14) ? "окна" : "окон");
         return appCount + (appCount === 1 ? " app" : " apps") + " · " + windowCount + (windowCount === 1 ? " window" : " windows");
     }
-    function refresh(): void { if (!clientReader.running) clientReader.running = true; }
+    function refresh(): void {
+        if (Hyprland.toplevels && Hyprland.toplevels.values && Hyprland.toplevels.values.length > 0) {
+            root.clients = Hyprland.toplevels.values.map(t => t.lastIpcObject).filter(c => !!c);
+            root.errorText = "";
+            root.refreshProcesses();
+            return;
+        }
+        if (!clientReader.running) clientReader.running = true;
+    }
     function refreshProcesses(): void {
         if (processReader.running) return;
         const refs = windows.map(w => ({pid: Number(w.pid), appClass: appIdentity(w), appName: appName(w)}));
