@@ -65,17 +65,17 @@ Singleton {
         }
 
         if (mode === "internal") {
-            Quickshell.execDetached(["hyprctl", "keyword", "monitor", external.name + ",disable"]);
-            Quickshell.execDetached(["hyprctl", "keyword", "monitor", internal.name + ",preferred,auto,1"]);
+            IpcClient.exec(["hyprctl", "keyword", "monitor", external.name + ",disable"]);
+            IpcClient.exec(["hyprctl", "keyword", "monitor", internal.name + ",preferred,auto,1"]);
         } else if (mode === "mirror") {
-            Quickshell.execDetached(["hyprctl", "keyword", "monitor", external.name + ",preferred,auto,1,mirror," + internal.name]);
-            Quickshell.execDetached(["hyprctl", "keyword", "monitor", internal.name + ",preferred,auto,1"]);
+            IpcClient.exec(["hyprctl", "keyword", "monitor", external.name + ",preferred,auto,1,mirror," + internal.name]);
+            IpcClient.exec(["hyprctl", "keyword", "monitor", internal.name + ",preferred,auto,1"]);
         } else if (mode === "extend") {
-            Quickshell.execDetached(["hyprctl", "keyword", "monitor", internal.name + ",preferred,0x0,1"]);
-            Quickshell.execDetached(["hyprctl", "keyword", "monitor", external.name + ",preferred,auto,1"]);
+            IpcClient.exec(["hyprctl", "keyword", "monitor", internal.name + ",preferred,0x0,1"]);
+            IpcClient.exec(["hyprctl", "keyword", "monitor", external.name + ",preferred,auto,1"]);
         } else if (mode === "external") {
-            Quickshell.execDetached(["hyprctl", "keyword", "monitor", internal.name + ",disable"]);
-            Quickshell.execDetached(["hyprctl", "keyword", "monitor", external.name + ",preferred,0x0,1"]);
+            IpcClient.exec(["hyprctl", "keyword", "monitor", internal.name + ",disable"]);
+            IpcClient.exec(["hyprctl", "keyword", "monitor", external.name + ",preferred,0x0,1"]);
         }
 
         closeTimer.restart();

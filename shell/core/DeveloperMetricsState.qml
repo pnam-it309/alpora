@@ -1,7 +1,6 @@
 pragma Singleton
 import QtQuick
 import Quickshell
-import Quickshell.Io
 
 Singleton {
     id: root
@@ -22,7 +21,7 @@ Singleton {
     property real previousRxBytes: -1
     property real previousTxBytes: -1
     property double previousSampleMs: 0
-    readonly property bool busy: reader.running
+    property bool busy: false
     readonly property bool active: detailsOpen || (WidgetState.loaded && !!WidgetState.values.developer && WidgetState.values.developer.enabled)
 
     function openDetails(screenName: string): void {
@@ -31,7 +30,22 @@ Singleton {
         refresh()
     }
     function closeDetails(): void { detailsOpen = false; detailsScreen = ""; }
-    function refresh(): void { if (active && !reader.running) reader.running = true; }
+    function refresh(): void {
+        if (!active || busy) return;
+        busy = true;
+        IpcClient.send("widgets", ["metrics"], (res, err) => {
+            busy = false;
+            if (err) {
+                root.error = err.replace(/^poly-shell:\s*/, "");
+            } else if (res) {
+                if (typeof res === "object") {
+                    acceptSnapshotObj(res);
+                } else if (typeof res === "string") {
+                    acceptSnapshot(res);
+                }
+            }
+        });
+    }
     function formatBytes(value: real): string {
         if (!isFinite(value) || value < 0) return "—"
         if (value >= 1073741824) return (value / 1073741824).toFixed(1) + " GB"
@@ -54,31 +68,30 @@ Singleton {
     }
     function acceptSnapshot(text: string): void {
         try {
-            const next = JSON.parse(text)
-            const now = Date.now()
-            const net = next.network || {}
-            const dt = previousSampleMs > 0 ? (now - previousSampleMs) / 1000 : 0
-            if (dt > 0 && previousRxBytes >= 0 && previousTxBytes >= 0) {
-                downloadBytesPerSecond = Math.max(0, (Number(net.rx_bytes || 0) - previousRxBytes) / dt)
-                uploadBytesPerSecond = Math.max(0, (Number(net.tx_bytes || 0) - previousTxBytes) / dt)
-            } else {
-                downloadBytesPerSecond = 0; uploadBytesPerSecond = 0
-            }
-            previousRxBytes = Number(net.rx_bytes || 0)
-            previousTxBytes = Number(net.tx_bytes || 0)
-            previousSampleMs = now
-            data = next
-            error = ""
+            const next = JSON.parse(text);
+            acceptSnapshotObj(next);
         } catch (_) { error = I18n.tr("Could not read system metrics"); }
+    }
+    function acceptSnapshotObj(next: var): void {
+        if (!next || typeof next !== "object") return;
+        const now = Date.now()
+        const net = next.network || {}
+        const dt = previousSampleMs > 0 ? (now - previousSampleMs) / 1000 : 0
+        if (dt > 0 && previousRxBytes >= 0 && previousTxBytes >= 0) {
+            downloadBytesPerSecond = Math.max(0, (Number(net.rx_bytes || 0) - previousRxBytes) / dt)
+            uploadBytesPerSecond = Math.max(0, (Number(net.tx_bytes || 0) - previousTxBytes) / dt)
+        } else {
+            downloadBytesPerSecond = 0; uploadBytesPerSecond = 0
+        }
+        previousRxBytes = Number(net.rx_bytes || 0)
+        previousTxBytes = Number(net.tx_bytes || 0)
+        previousSampleMs = now
+        data = next
+        error = ""
     }
 
     Timer { interval: 2000; repeat: true; running: root.active; onTriggered: root.refresh() }
-    Process {
-        id: reader
-        command: [Session.controller, "widgets", "metrics"]
-        stdout: StdioCollector { onStreamFinished: root.acceptSnapshot(text) }
-        stderr: StdioCollector { onStreamFinished: if (text.trim()) root.error = text.trim().replace(/^poly-shell: /, "") }
-    }
+
     IpcHandler {
         target: "developer-metrics"
         function status(): string { return JSON.stringify({active: root.active, busy: root.busy, detailsOpen: root.detailsOpen, downloadBytesPerSecond: root.downloadBytesPerSecond, uploadBytesPerSecond: root.uploadBytesPerSecond, error: root.error, data: root.data}); }

@@ -26,18 +26,18 @@ Singleton {
         close();
         if (action === "lock") {
             const home = Quickshell.env("HOME") || "";
-            Quickshell.execDetached(["hyprlock", "-c", home + "/.config/hypr/hyprlock.conf"]);
+            IpcClient.exec(["hyprlock", "-c", home + "/.config/hypr/hyprlock.conf"]);
         } else if (action === "suspend") {
-            Quickshell.execDetached(["systemctl", "suspend"]);
+            IpcClient.exec(["systemctl", "suspend"]);
         } else if (action === "reboot") {
-            Quickshell.execDetached(["systemctl", "reboot"]);
+            IpcClient.exec(["systemctl", "reboot"]);
         } else if (action === "poweroff") {
-            Quickshell.execDetached(["systemctl", "poweroff"]);
+            IpcClient.exec(["systemctl", "poweroff"]);
         } else if (action === "logout") {
             const comp = WindowTracker.compositor;
-            if (comp === "sway") Quickshell.execDetached(["swaymsg", "exit"]);
-            else if (comp === "niri") Quickshell.execDetached(["niri", "msg", "action", "quit"]);
-            else Quickshell.execDetached(["hyprctl", "dispatch", "exit"]);
+            if (comp === "sway") IpcClient.exec(["swaymsg", "exit"]);
+            else if (comp === "niri") IpcClient.exec(["niri", "msg", "action", "quit"]);
+            else IpcClient.exec(["hyprctl", "dispatch", "exit"]);
         }
     }
 }

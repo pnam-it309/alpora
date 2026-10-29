@@ -11,7 +11,7 @@ Singleton {
 
     function playTock(): void {
         if (!enabled || !soundPath.length) return;
-        Quickshell.execDetached([
+        IpcClient.exec([
             "sh", "-c",
             "pw-play --volume 0.7 \"$1\" 2>/dev/null || paplay --volume=45000 \"$1\" 2>/dev/null || aplay -q \"$1\" 2>/dev/null",
             "sh", soundPath

@@ -2,6 +2,7 @@
 # Auto-generated and structured for enterprise modular architecture
 
 # Singletons (core)
+singleton IpcClient 1.0 core/IpcClient.qml
 singleton Session 1.0 core/Session.qml
 singleton BarState 1.0 core/BarState.qml
 singleton Desktop 1.0 core/Desktop.qml
