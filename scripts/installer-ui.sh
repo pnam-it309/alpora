@@ -110,4 +110,12 @@ alpora_summary() {
     printf '  require consent and a configuration backup.\n\n'
     alpora_rule
 }
+alpora_welcome() {
+    alpora_summary
+    printf '\n  PREVIEW / No installation or system changes.\n\n'
+}
+alpora_theme_wizard() {
+    alpora_choose_theme
+    echo "${install_theme:-alpine}"
+}
 alpora_colour
