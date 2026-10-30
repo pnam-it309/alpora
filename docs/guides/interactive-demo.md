@@ -88,3 +88,4 @@ Micro-server cung cấp các endpoint sau:
      - **Inter Variable**: Giao diện điều khiển UI, menu, nhãn.
      - **JetBrains Mono**: Terminal, code ligatures, thông số kỹ thuật.
      - **Outfit Variable**: Chữ số đồng hồ hiển thị lớn, tiêu đề trang trọng.
+

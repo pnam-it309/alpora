@@ -1,6 +1,7 @@
 /**
  * ALPORA Unified Interactive Shell & Motion Sandbox
  * Single-Page Architecture with live Python BE telemetry & i18n support.
+ * Pure JavaScript logic: zero embedded HTML strings or innerHTML usage.
  */
 
 'use strict';
@@ -132,7 +133,7 @@ const I18N = {
     closed: "Закрыто",
     qmlCode: "Код QML",
     copied: "Скопировано!",
-    footerHint: "Нажми на значок панели в мини-баре · Esc — закрыть все карточки.",
+    footerHint: "Нажми на значок панели в mini-bar · Esc — закрыть все карточки.",
     days: ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"],
     studies: [
       { id: 'slide', title: 'Мягкий выезд', desc: 'Панель спускается из-под бара и плавно останавливается. Закрытие уводит её обратно.', hint: 'Движение вниз + прозрачность.' },
@@ -177,9 +178,6 @@ let speed = 1;
 let isLiveBackend = false;
 const controllers = [];
 
-const svg = name => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#${name}"/></svg>`;
-const closeBtn = '<button class="close" data-close aria-label="Close">×</button>';
-
 function applyTheme(key, notifyBackend = true) {
   const t = THEMES[key] || THEMES.alpine;
   currentTheme = key;
@@ -193,11 +191,12 @@ function applyTheme(key, notifyBackend = true) {
   root.style.setProperty('--accent', t.accent);
   root.style.setProperty('--secondary', t.secondary);
   const wp = window.location.protocol === 'file:' ? t.altWallpaper : t.wallpaper;
-  root.style.setProperty('--wallpaper', `url('${wp}')`);
+  root.style.setProperty('--wallpaper', "url('" + wp + "')");
 
   document.querySelectorAll('.theme-pill-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.theme === key);
   });
+
   if (notifyBackend) {
     sendAction('theme', key);
   }
@@ -216,13 +215,16 @@ async function checkBackend() {
       }
       if (data.metrics) {
         if (data.metrics.cpuPercent !== undefined) {
-          document.querySelector('#metric-cpu').textContent = `${data.metrics.cpuPercent}% · 48°C`;
+          const cpuEl = document.querySelector('#metric-cpu');
+          if (cpuEl) cpuEl.textContent = data.metrics.cpuPercent + "% · 48°C";
         }
         if (data.metrics.ramUsedGb !== undefined) {
-          document.querySelector('#metric-ram').textContent = `${data.metrics.ramUsedGb} / ${data.metrics.ramTotalGb} GB`;
+          const ramEl = document.querySelector('#metric-ram');
+          if (ramEl) ramEl.textContent = data.metrics.ramUsedGb + " / " + data.metrics.ramTotalGb + " GB";
         }
         if (data.metrics.batteryPercent !== undefined) {
-          document.querySelector('#qs-pill-btn span').textContent = `${data.metrics.batteryPercent}%`;
+          const batSpan = document.querySelector('#qs-pill-btn span');
+          if (batSpan) batSpan.textContent = data.metrics.batteryPercent + "%";
         }
       }
       if (data.session && data.session.theme && data.session.theme !== currentTheme) {
@@ -253,30 +255,120 @@ async function sendAction(action, value) {
 function updateLanguage(lang) {
   currentLang = lang;
   localStorage.setItem('alpora_demo_lang', lang);
-  const t = I18N[lang] || I18N.vi;
-  document.documentElement.lang = lang;
-
-  // Header & Nav
-  document.querySelector('#tab-nav-shell').textContent = t.navShell;
-  document.querySelector('#tab-nav-motion').textContent = t.navMotion;
-  document.querySelector('#tab-nav-typo').textContent = t.navTypo;
-  document.querySelector('#lbl-theme').textContent = t.lblTheme;
-  document.querySelector('#lbl-mode').textContent = t.lblMode;
-  document.querySelector('#btn-work-mode').textContent = t.workMode;
-  document.querySelector('#btn-vibe-mode').textContent = t.vibeMode;
-  document.querySelector('#txt-power-label').textContent = t.lblPower;
-  document.querySelector('#lbl-typo-title').textContent = t.lblTypoTitle;
-  document.querySelector('#lbl-typo-desc').textContent = t.lblTypoDesc;
-  document.querySelector('#play-all').textContent = t.playAll;
-  document.querySelector('#close-all').textContent = t.closeAll;
-  document.querySelector('#speed-label').textContent = t.speed;
-  document.querySelector('#footer-hint').textContent = t.footerHint;
+  const t = I18N[lang];
 
   document.querySelectorAll('.lang-switch button').forEach(btn => {
     btn.setAttribute('aria-pressed', String(btn.dataset.lang === lang));
   });
 
-  renderMotionStudies();
+  const setText = (selector, text) => {
+    const el = document.querySelector(selector);
+    if (el) el.textContent = text;
+  };
+
+  setText('#tab-nav-shell', t.navShell);
+  setText('#tab-nav-motion', t.navMotion);
+  setText('#tab-nav-typo', t.navTypo);
+  setText('#lbl-theme', t.lblTheme);
+  setText('#lbl-mode', t.lblMode);
+  setText('#btn-work-mode', t.workMode);
+  setText('#btn-vibe-mode', t.vibeMode);
+  setText('#txt-power-label', t.lblPower);
+  setText('#lbl-typo-title', t.lblTypoTitle);
+  setText('#lbl-typo-desc', t.lblTypoDesc);
+  setText('#play-all', t.playAll);
+  setText('#close-all', t.closeAll);
+  setText('#speed-label', t.speed);
+  setText('#footer-hint', t.footerHint);
+
+  const badge = document.querySelector('#backend-badge');
+  if (badge) {
+    badge.textContent = isLiveBackend ? t.liveBackend : t.standalone;
+  }
+
+  // Update all 16 study cards in the DOM
+  document.querySelectorAll('.study').forEach((card, i) => {
+    const s = t.studies[i];
+    if (!s) return;
+
+    const titleEl = card.querySelector('.study-title');
+    if (titleEl) titleEl.textContent = s.title;
+
+    const descEl = card.querySelector('.study-desc');
+    if (descEl) descEl.textContent = s.desc;
+
+    const hintEl = card.querySelector('.hint-line');
+    if (hintEl) hintEl.textContent = s.hint;
+
+    const repeatLabel = card.querySelector('.repeat-label');
+    if (repeatLabel) repeatLabel.textContent = t.repeat;
+
+    const qmlLabel = card.querySelector('.qml-label');
+    if (qmlLabel) qmlLabel.textContent = t.qmlCode;
+
+    const isCardOpen = controllers[i] && controllers[i].open;
+    const toggleEl = card.querySelector('.toggle');
+    if (toggleEl) toggleEl.textContent = isCardOpen ? t.close : t.open;
+
+    const stateEl = card.querySelector('.state');
+    if (stateEl) stateEl.textContent = isCardOpen ? t.opened : t.closed;
+
+    // Update settings sub-page text
+    const setPage = card.querySelector('.panel-page[data-page="settings"]');
+    if (setPage) {
+      const heading = setPage.querySelector('.heading-title');
+      if (heading) heading.textContent = t.pages.settings.title;
+      const subtitle = setPage.querySelector('.panel-subtitle');
+      if (subtitle) subtitle.textContent = t.pages.settings.subtitle;
+      const modeText = setPage.querySelector('.page-mode');
+      if (modeText) modeText.textContent = t.pages.settings.mode;
+      const balanceTag = setPage.querySelector('.mini-tag');
+      if (balanceTag) balanceTag.textContent = t.pages.settings.balance;
+    }
+
+    // Update calendar sub-page text (if present)
+    const calPage = card.querySelector('.panel-page[data-page="calendar"]');
+    if (calPage) {
+      const heading = calPage.querySelector('.heading-title');
+      if (heading) heading.textContent = t.pages.calendar.title;
+      const month = calPage.querySelector('.calendar-month');
+      if (month) month.textContent = t.pages.calendar.month;
+      const footer = calPage.querySelector('.footer-note');
+      if (footer) footer.textContent = t.pages.calendar.footer;
+      const weekdays = calPage.querySelectorAll('.weekday');
+      t.pages.calendar.days.forEach((dayStr, dIdx) => {
+        if (weekdays[dIdx]) weekdays[dIdx].textContent = dayStr;
+      });
+    }
+
+    // Update notifications sub-page text (if present)
+    const notifPage = card.querySelector('.panel-page[data-page="notifications"]');
+    if (notifPage) {
+      const heading = notifPage.querySelector('.heading-title');
+      if (heading) heading.textContent = t.pages.notifications.title;
+      const n1Title = notifPage.querySelector('.note-title-1');
+      if (n1Title) n1Title.textContent = t.pages.notifications.note1Title;
+      const n1Desc = notifPage.querySelector('.note-desc-1');
+      if (n1Desc) n1Desc.textContent = t.pages.notifications.note1Desc;
+      const n2Title = notifPage.querySelector('.note-title-2');
+      if (n2Title) n2Title.textContent = t.pages.notifications.note2Title;
+      const n2Desc = notifPage.querySelector('.note-desc-2');
+      if (n2Desc) n2Desc.textContent = t.pages.notifications.note2Desc;
+      const footer = notifPage.querySelector('.footer-note');
+      if (footer) footer.textContent = t.pages.notifications.footer;
+    }
+
+    // Update timeline sub-page text (if present)
+    const timePage = card.querySelector('.panel-page[data-page="timeline"]');
+    if (timePage) {
+      const heading = timePage.querySelector('.heading-title');
+      if (heading) heading.textContent = t.pages.timeline.title;
+      const subtitle = timePage.querySelector('.panel-subtitle');
+      if (subtitle) subtitle.textContent = t.pages.timeline.subtitle;
+    }
+  });
+
+  tick();
 }
 
 function tick() {
@@ -285,132 +377,31 @@ function tick() {
   const minutes = String(now.getMinutes()).padStart(2, '0');
   const seconds = now.getSeconds();
 
-  document.querySelector('#hero-hour').textContent = hours;
-  document.querySelector('#hero-min').textContent = minutes;
-  document.querySelector('#seconds-fill').style.width = ((seconds / 60) * 100) + '%';
+  const hourEl = document.querySelector('#hero-hour');
+  if (hourEl) hourEl.textContent = hours;
+  const minEl = document.querySelector('#hero-min');
+  if (minEl) minEl.textContent = minutes;
 
-  const t = I18N[currentLang] || I18N.vi;
+  const fillEl = document.querySelector('#seconds-fill');
+  if (fillEl) fillEl.style.width = ((seconds / 60) * 100) + '%';
+
+  const t = I18N[currentLang];
   const dayName = t.days[now.getDay()];
-  document.querySelector('#hero-date-text').textContent = `${dayName}, ${now.getDate()} / ${now.getMonth() + 1}`;
-  document.querySelector('#bar-clock').textContent = `${hours}:${minutes} · ${dayName.slice(0, 3)} ${now.getDate()}`;
+  const dateEl = document.querySelector('#hero-date-text');
+  if (dateEl) {
+    dateEl.textContent = dayName + ", " + now.getDate() + " / " + (now.getMonth() + 1);
+  }
+
+  const clockBar = document.querySelector('#bar-clock');
+  if (clockBar) {
+    clockBar.textContent = hours + ":" + minutes + " · " + dayName.slice(0, 3) + " " + now.getDate();
+  }
 
   if (!isLiveBackend) {
-    const cpuVal = 28 + Math.floor(Math.sin(now.getTime() / 2000) * 8);
-    document.querySelector('#metric-cpu').textContent = `${cpuVal}% · 48°C`;
+    const cpuVal = 28 + (seconds % 9);
+    const cpuEl = document.querySelector('#metric-cpu');
+    if (cpuEl) cpuEl.textContent = cpuVal + "% · 48°C";
   }
-}
-
-// ========================================================
-// Motion Studies Controller
-// ========================================================
-function renderMotionContent(page, langKey) {
-  const p = I18N[langKey].pages[page] || I18N[langKey].pages.settings;
-  if (page === 'calendar') {
-    return `
-      <div class="panel-heading">${svg('mountain')} ${p.title} ${closeBtn}</div>
-      <div class="calendar-top"><span>‹</span><span>${p.month}</span><span>›</span></div>
-      <div class="calendar-grid">
-        ${p.days.map(d => `<span class="weekday">${d}</span>`).join('')}
-        ${Array.from({ length: 28 }, (_, i) => `<span class="${i === 19 ? 'today' : ''}">${i + 1}</span>`).join('')}
-      </div>
-      <div class="panel-bottom"><span>${p.footer}</span></div>
-    `;
-  }
-  if (page === 'notifications') {
-    return `
-      <div class="panel-heading">${svg('bell')} ${p.title} ${closeBtn}</div>
-      <div class="notice"><strong>${p.note1Title}</strong><small>${p.note1Desc}</small></div>
-      <div class="notice"><strong>${p.note2Title}</strong><small>${p.note2Desc}</small></div>
-      <div class="panel-bottom"><span>${p.footer}</span></div>
-    `;
-  }
-  if (page === 'timeline') {
-    return `
-      <div class="panel-heading">${svg('sun')} ${p.title} <span style="margin-left:auto;color:var(--accent)">14:20</span>${closeBtn}</div>
-      <div class="panel-subtitle">${p.subtitle}</div>
-      <div class="timeline-range"></div>
-      <div class="timeline-hours"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div>
-    `;
-  }
-  return `
-    <div class="panel-heading">${svg('mountain')} ${p.title} ${closeBtn}</div>
-    <div class="panel-subtitle">${p.subtitle}</div>
-    <div class="audio">
-      ${svg('volume')}
-      <input type="range" min="0" max="100" value="68" aria-label="${p.volume}">
-      <output>68%</output>
-    </div>
-    <div class="audio">
-      ${svg('sun')}
-      <input type="range" min="0" max="100" value="85" aria-label="${p.brightness}">
-      <output>85%</output>
-    </div>
-    <div class="tiles">
-      <button class="tile" data-toggle aria-pressed="true">
-        ${svg('wifi')}
-        <span>${p.wifi}<small>${p.on}</small></span>
-      </button>
-      <button class="tile off" data-toggle aria-pressed="false">
-        ${svg('bluetooth')}
-        <span>${p.bluetooth}<small>${p.off}</small></span>
-      </button>
-    </div>
-    <div class="panel-bottom">
-      <span>${p.mode}</span>
-      <span class="mini-tag">${p.balance}</span>
-    </div>
-  `;
-}
-
-function cardHTML(item, index, langKey) {
-  const t = I18N[langKey];
-  return `
-    <article class="study" id="study-${item.id}" data-study="${item.id}">
-      <div class="study-head">
-        <span class="number">${String(index + 1).padStart(2, '0')}</span>
-        <div>
-          <h2>${item.title}</h2>
-          <p class="study-desc">${item.desc}</p>
-        </div>
-      </div>
-      <div class="desktop">
-        <div class="mini-bar">
-          ${svg('mountain')}
-          <div class="workspaces">
-            <span class="workspace active">1</span>
-            <span class="workspace">2</span>
-            <span class="workspace">3</span>
-            <span class="workspace">4</span>
-          </div>
-          <div class="mini-time">
-            ${item.pages ? '<button data-page="calendar" aria-label="Calendar">14:20</button>' : '14:20'}
-          </div>
-          <div class="bar-actions">
-            ${item.pages ? `
-              <button data-page="timeline" aria-label="Timeline">${svg('sun')}</button>
-              <button data-page="notifications" aria-label="Notifications">${svg('bell')}</button>
-            ` : svg('wifi')}
-            <button data-page="settings" aria-label="Open settings" aria-expanded="false">${svg('settings')}</button>
-          </div>
-        </div>
-        <div class="desktop-clock">
-          <strong>14:20</strong>
-          <span>ALPORA DESKTOP</span>
-        </div>
-        <span class="demo-label">ALPORA · ${item.id.toUpperCase()}</span>
-        <div class="panel" role="region" aria-label="Preview: ${item.title}" aria-hidden="true" inert>
-          <div class="panel-content">${renderMotionContent('settings', langKey)}</div>
-        </div>
-      </div>
-      <div class="study-footer">
-        <button class="toggle primary">${t.open}</button>
-        <span class="state">${t.closed}</span>
-        <button class="repeat">${svg('repeat')} ${t.repeat}</button>
-        <button class="copy-qml" data-qml-id="${item.id}">${svg('code')} ${t.qmlCode}</button>
-      </div>
-      <div class="hint-line">${item.hint}</div>
-    </article>
-  `;
 }
 
 const identity = 'translate(0px, 0px) scale(1)';
@@ -435,10 +426,13 @@ const closed = {
 
 const final = { transform: identity, opacity: 1, clipPath: 'inset(0 0 0% 0 round 14px)', borderRadius: '14px' };
 function endStyle(id) {
-  return {
-    ...final,
-    ...(id === 'iris' ? { clipPath: 'circle(145% at calc(100% - 17px) 0%)' } : id === 'slit' ? { clipPath: 'polygon(0% 0%,100% 0%,100% 100%,0% 100%)' } : {})
-  };
+  const overrides = {};
+  if (id === 'iris') {
+    overrides.clipPath = 'circle(145% at calc(100% - 17px) 0%)';
+  } else if (id === 'slit') {
+    overrides.clipPath = 'polygon(0% 0%,100% 0%,100% 100%,0% 100%)';
+  }
+  return Object.assign({}, final, overrides);
 }
 
 const ease = 'cubic-bezier(.2,.8,.2,1)';
@@ -460,31 +454,46 @@ class DemoCard {
     }
     Object.assign(this.panel.style, endStyle(config.id), closed[config.id]);
 
-    this.el.querySelector('.toggle').onclick = () => {
-      this.autoPlayed = true;
-      this.setOpen(!this.open);
-    };
-    this.el.querySelector('.repeat').onclick = () => this.replay();
-    this.el.querySelectorAll('[data-page]').forEach(b => b.onclick = () => {
-      this.autoPlayed = true;
-      const page = b.dataset.page;
-      if (this.config.pages && this.open && page !== this.page) {
-        this.changePage(page);
-      } else {
-        if (this.config.pages) this.changePage(page, false);
+    const toggleBtn = this.el.querySelector('.toggle');
+    if (toggleBtn) {
+      toggleBtn.onclick = () => {
+        this.autoPlayed = true;
         this.setOpen(!this.open);
-      }
+      };
+    }
+
+    const repeatBtn = this.el.querySelector('.repeat');
+    if (repeatBtn) {
+      repeatBtn.onclick = () => this.replay();
+    }
+
+    this.el.querySelectorAll('[data-page]').forEach(b => {
+      b.onclick = () => {
+        this.autoPlayed = true;
+        const targetPage = b.dataset.page;
+        if (this.config.pages && this.open && targetPage !== this.page) {
+          this.changePage(targetPage);
+        } else {
+          if (this.config.pages) this.changePage(targetPage, false);
+          this.setOpen(!this.open);
+        }
+      };
     });
+
     this.canvas.addEventListener('click', e => {
-      if (e.target.closest('[data-close]')) this.setOpen(false);
-      else if (!e.target.closest('.panel,.mini-bar')) this.setOpen(false);
-      const toggle = e.target.closest('[data-toggle]');
-      if (toggle) {
-        const enabled = toggle.getAttribute('aria-pressed') !== 'true';
-        toggle.setAttribute('aria-pressed', String(enabled));
-        toggle.classList.toggle('off', !enabled);
+      if (e.target.closest('[data-close]')) {
+        this.setOpen(false);
+      } else if (!e.target.closest('.panel,.mini-bar')) {
+        this.setOpen(false);
+      }
+      const toggleTile = e.target.closest('[data-toggle]');
+      if (toggleTile) {
+        const enabled = toggleTile.getAttribute('aria-pressed') !== 'true';
+        toggleTile.setAttribute('aria-pressed', String(enabled));
+        toggleTile.classList.toggle('off', !enabled);
         const t = I18N[currentLang].pages.settings;
-        toggle.querySelector('small').textContent = enabled ? t.on : t.off;
+        const smallLabel = toggleTile.querySelector('small');
+        if (smallLabel) smallLabel.textContent = enabled ? t.on : t.off;
       }
     });
   }
@@ -503,7 +512,7 @@ class DemoCard {
     this.pending.forEach(clearTimeout);
     this.pending = [];
     for (const a of this.panel.getAnimations({ subtree: true })) {
-      try { a.commitStyles(); } catch {}
+      try { a.commitStyles(); } catch (_) {}
       a.cancel();
     }
     this.cleanup();
@@ -516,7 +525,7 @@ class DemoCard {
     const width = Math.min(desiredWidth, this.canvas.clientWidth - 28);
     let left = this.canvas.clientWidth - width - 15;
     if (this.config.pages) {
-      const source = this.el.querySelector(`[data-page="${this.page}"]`);
+      const source = this.el.querySelector('[data-page="' + this.page + '"]');
       if (source) {
         const r = source.getBoundingClientRect(), c = this.canvas.getBoundingClientRect();
         left = Math.max(14, Math.min(this.canvas.clientWidth - width - 14, r.left - c.left + r.width / 2 - width / 2));
@@ -528,10 +537,13 @@ class DemoCard {
 
   update() {
     const t = I18N[currentLang];
-    this.el.querySelector('.toggle').textContent = this.open ? t.close : t.open;
+    const toggleBtn = this.el.querySelector('.toggle');
+    if (toggleBtn) toggleBtn.textContent = this.open ? t.close : t.open;
     const status = this.el.querySelector('.state');
-    status.textContent = this.open ? t.opened : t.closed;
-    status.classList.toggle('open', this.open);
+    if (status) {
+      status.textContent = this.open ? t.opened : t.closed;
+      status.classList.toggle('open', this.open);
+    }
     this.panel.setAttribute('aria-hidden', String(!this.open));
     this.panel.inert = !this.open;
     this.el.querySelectorAll('[data-page]').forEach(b => {
@@ -542,17 +554,18 @@ class DemoCard {
   }
 
   play(target, frames, options) {
-    const a = target.animate(frames, { fill: 'forwards', ...options });
+    const a = target.animate(frames, Object.assign({ fill: 'forwards' }, options));
     a.finished.catch(() => {});
     return a;
   }
 
-  setOpen(value, { instant = false } = {}) {
+  setOpen(value, opts) {
+    const instant = opts && opts.instant;
     this.stop();
     this.open = value;
     this.update();
     const opened = endStyle(this.config.id);
-    const end = value ? opened : { ...opened, ...closed[this.config.id] };
+    const end = value ? opened : Object.assign({}, opened, closed[this.config.id]);
     if (instant) {
       Object.assign(this.panel.style, end);
       this.panel.style.visibility = value ? 'visible' : 'hidden';
@@ -566,12 +579,35 @@ class DemoCard {
     const id = this.config.id;
 
     if (value) {
-      if (id === 'spring') frames = [{ ...closed.spring, offset: 0 }, { transform: 'translateY(7px)', opacity: 1, offset: .57 }, { transform: 'translateY(-2px)', opacity: 1, offset: .79 }, { ...opened, offset: 1 }];
-      if (id === 'center') frames = [{ ...opened, ...closed.center, offset: 0 }, { ...opened, clipPath: 'inset(49.5% 0% 49.5% 0% round 14px)', offset: .38 }, { ...opened, offset: 1 }];
-      if (id === 'slit') frames = [{ ...opened, ...closed.slit, offset: 0 }, { ...opened, clipPath: 'polygon(0% 0%,100% 0%,100% 1%,0% 1%)', offset: .38 }, { ...opened, offset: 1 }];
-      if (id === 'liquid') frames = [{ ...opened, ...closed.liquid, offset: 0 }, { transform: 'translateY(-12px) scale(.48,.65)', borderRadius: '58% 42% 35% 65% / 65% 40% 60% 35%', opacity: 1, offset: .36 }, { transform: 'translateY(3px) scale(1.025,.97)', borderRadius: '25px 20px 32px 18px', opacity: 1, offset: .74 }, { ...opened, offset: 1 }];
+      if (id === 'spring') {
+        frames = [
+          Object.assign({}, closed.spring, { offset: 0 }),
+          { transform: 'translateY(7px)', opacity: 1, offset: 0.57 },
+          { transform: 'translateY(-2px)', opacity: 1, offset: 0.79 },
+          Object.assign({}, opened, { offset: 1 })
+        ];
+      } else if (id === 'center') {
+        frames = [
+          Object.assign({}, opened, closed.center, { offset: 0 }),
+          Object.assign({}, opened, { clipPath: 'inset(49.5% 0% 49.5% 0% round 14px)', offset: 0.38 }),
+          Object.assign({}, opened, { offset: 1 })
+        ];
+      } else if (id === 'slit') {
+        frames = [
+          Object.assign({}, opened, closed.slit, { offset: 0 }),
+          Object.assign({}, opened, { clipPath: 'polygon(0% 0%,100% 0%,100% 1%,0% 1%)', offset: 0.38 }),
+          Object.assign({}, opened, { offset: 1 })
+        ];
+      } else if (id === 'liquid') {
+        frames = [
+          Object.assign({}, opened, closed.liquid, { offset: 0 }),
+          { transform: 'translateY(-12px) scale(.48,.65)', borderRadius: '58% 42% 35% 65% / 65% 40% 60% 35%', opacity: 1, offset: 0.36 },
+          { transform: 'translateY(3px) scale(1.025,.97)', borderRadius: '25px 20px 32px 18px', opacity: 1, offset: 0.74 },
+          Object.assign({}, opened, { offset: 1 })
+        ];
+      }
     }
-    const duration = (this.config.duration || 540) * (value ? 1 : .8) / speed;
+    const duration = (this.config.duration || 540) * (value ? 1 : 0.8) / speed;
     const animation = this.play(this.panel, frames, { duration, easing: ['spring', 'center', 'liquid', 'slit'].includes(id) ? 'linear' : ease });
 
     const token = this.token;
@@ -595,7 +631,12 @@ class DemoCard {
     this.stop();
     const previous = { left: this.panel.offsetLeft, width: this.panel.offsetWidth, height: this.panel.offsetHeight };
     this.page = page;
-    this.body.innerHTML = renderMotionContent(page, currentLang);
+
+    // Toggle hidden property on pre-rendered panel pages
+    this.panel.querySelectorAll('.panel-page').forEach(pageEl => {
+      pageEl.hidden = (pageEl.dataset.page !== page);
+    });
+
     this.layout();
     this.update();
     if (animate && this.open) {
@@ -608,13 +649,9 @@ class DemoCard {
   }
 }
 
-function renderMotionStudies() {
-  const container = document.querySelector('#studies-grid');
-  if (!container) return;
-  const t = I18N[currentLang];
+function initMotionStudies() {
   controllers.length = 0;
-  container.innerHTML = t.studies.map((item, i) => cardHTML(item, i, currentLang)).join('');
-
+  const t = I18N[currentLang];
   document.querySelectorAll('.study').forEach((el, i) => {
     controllers.push(new DemoCard(el, t.studies[i]));
   });
@@ -622,15 +659,18 @@ function renderMotionStudies() {
   document.querySelectorAll('.copy-qml').forEach(btn => {
     btn.onclick = () => {
       const qmlId = btn.dataset.qmlId;
-      const snippet = `// Quickshell QML PanelMotion definition for "${qmlId}"
-NumberAnimation on progress {
-    duration: Session.motionMs > 0 ? ${qmlId === 'spring' ? 720 : 540} : 0
-    easing.type: ${qmlId === 'spring' ? 'Easing.OutBack' : 'Easing.OutCubic'}
-}`;
+      const snippet = '// Quickshell QML PanelMotion definition for "' + qmlId + '"\n' +
+        'NumberAnimation on progress {\n' +
+        '    duration: Session.motionMs > 0 ? ' + (qmlId === 'spring' ? 720 : 540) + ' : 0\n' +
+        '    easing.type: ' + (qmlId === 'spring' ? 'Easing.OutBack' : 'Easing.OutCubic') + '\n' +
+        '}';
       navigator.clipboard.writeText(snippet).then(() => {
-        const orig = btn.innerHTML;
-        btn.innerHTML = `${svg('code')} ${t.copied}`;
-        setTimeout(() => btn.innerHTML = orig, 1800);
+        const label = btn.querySelector('.qml-label');
+        if (label) {
+          const orig = label.textContent;
+          label.textContent = t.copied;
+          setTimeout(() => { label.textContent = orig; }, 1800);
+        }
       });
     };
   });
@@ -638,6 +678,7 @@ NumberAnimation on progress {
 
 // Global initialization
 document.addEventListener('DOMContentLoaded', () => {
+  initMotionStudies();
   updateLanguage(currentLang);
   applyTheme(currentTheme, false);
   tick();
@@ -651,7 +692,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
       btn.classList.add('active');
-      const targetView = document.querySelector(`#view-${btn.dataset.tab}`);
+      const targetView = document.querySelector('#view-' + btn.dataset.tab);
       if (targetView) targetView.classList.add('active');
     };
   });
@@ -691,8 +732,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Play All / Close All
-  document.querySelector('#play-all').onclick = () => controllers.forEach(c => c.replay());
-  document.querySelector('#close-all').onclick = () => controllers.forEach(c => c.setOpen(false));
+  const playAllBtn = document.querySelector('#play-all');
+  if (playAllBtn) playAllBtn.onclick = () => controllers.forEach(c => c.replay());
+
+  const closeAllBtn = document.querySelector('#close-all');
+  if (closeAllBtn) closeAllBtn.onclick = () => controllers.forEach(c => c.setOpen(false));
 
   // Workspaces
   document.querySelectorAll('.ws-pill').forEach(pill => {
@@ -710,11 +754,14 @@ document.addEventListener('DOMContentLoaded', () => {
       hoverMenu.classList.toggle('show');
       qsPill.classList.toggle('active');
     };
-    document.querySelector('#viewport').onclick = (e) => {
-      if (!e.target.closest('#qs-pill-btn') && !e.target.closest('#hover-menu')) {
-        hoverMenu.classList.remove('show');
-        qsPill.classList.remove('active');
-      }
-    };
+    const viewport = document.querySelector('#viewport');
+    if (viewport) {
+      viewport.onclick = (e) => {
+        if (!e.target.closest('#qs-pill-btn') && !e.target.closest('#hover-menu')) {
+          hoverMenu.classList.remove('show');
+          qsPill.classList.remove('active');
+        }
+      };
+    }
   }
 });
