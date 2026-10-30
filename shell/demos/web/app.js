@@ -1,38 +1,40 @@
 /**
- * ALPORA Panel Motion Laboratory
- * Interactive animation studies for the Quickshell TopBar and popup panels.
- * Supports multi-language (VI, EN, RU), 7 visual themes, and variable playback speeds.
+ * ALPORA Unified Interactive Shell & Motion Sandbox
+ * Single-Page Architecture with live Python BE telemetry & i18n support.
  */
 
 'use strict';
 
 const I18N = {
   vi: {
-    brand: "ALPORA / CHUYỂN ĐỘNG",
-    badge: "PHÒNG THÍ NGHIỆM TƯƠNG TÁC",
-    title: "16 Phong cách chuyển động của Panel",
-    subtitle: "Khám phá các phương án mở, đóng và biến đổi cho Quick Settings, Calendar và Notifications trước khi đưa vào Quickshell.",
+    navShell: "Desktop Shell",
+    navMotion: "Phòng thí nghiệm Motion (16 Studies)",
+    navTypo: "Bộ Typography",
+    brandTitle: "ALPORA · INTERACTIVE LAB",
+    liveBackend: "● KẾT NỐI LIVE BACKEND",
+    standalone: "● MÔ PHỎNG ĐỘC LẬP",
+    lblTheme: "Chủ đề:",
+    lblMode: "Chế độ:",
+    workMode: "Làm việc",
+    vibeMode: "Thư giãn",
+    lblPower: "Hiệu năng",
+    lblTypoTitle: "Bộ Typography Tiêu Chuẩn ALPORA",
+    lblTypoDesc: "Được nạp trực tiếp qua FontLoader vào Quickshell và áp dụng đồng bộ cho toàn bộ hệ thống.",
     playAll: "↻ Chạy tất cả",
     closeAll: "Đóng tất cả",
     speed: "Tốc độ",
-    theme: "Chủ đề",
-    mode: "Chế độ",
-    workMode: "Làm việc",
-    vibeMode: "Thư giãn",
     open: "Mở",
     close: "Đóng",
     repeat: "Thử lại",
     opened: "Đang mở",
     closed: "Đã đóng",
     qmlCode: "Mã QML",
-    copyQml: "Sao chép QML",
     copied: "Đã sao chép!",
-    backToHub: "← Quay lại ALPORA Demo Hub",
-    footerHint: "Nhấp vào bất kỳ nút nào trên mini-bar hoặc thẻ để kiểm tra chuyển động · Nhấn phím Esc để đóng tất cả.",
-    hintTitle: "Gợi ý tương tác:",
+    footerHint: "Nhấn chuột vào các nút trên thanh TopBar để thử nghiệm tương tác · Phím Esc để thoát.",
+    days: ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"],
     studies: [
-      { id: 'slide', title: 'Trượt mềm (Soft Slide)', desc: 'Panel trượt xuống êm ái từ mép dưới của TopBar rồi dừng nhẹ nhàng. Khi đóng trượt ngược lên.', hint: 'Dịch chuyển trục Y + mờ dần (opacity). Chuẩn mặc định cho desktop gọn gàng.' },
-      { id: 'curtain', title: 'Kéo rèm (Curtain Drop)', desc: 'Mép trên cố định dưới TopBar. Panel mở dần xuống dưới như tấm rèm buông nhẹ.', hint: 'Mở rộng chiều cao với clip-path bo tròn 14px; văn bản không bị co giãn.' },
+      { id: 'slide', title: 'Trượt mềm (Soft Slide)', desc: 'Panel trượt xuống êm ái từ mép dưới của TopBar rồi dừng nhẹ nhàng. Khi đóng trượt ngược lên.', hint: 'Dịch chuyển trục Y + mờ dần (opacity). Chuẩn mặc định cho desktop.' },
+      { id: 'curtain', title: 'Kéo rèm (Curtain Drop)', desc: 'Mép trên cố định dưới TopBar. Panel mở dần xuống dưới như tấm rèm buông nhẹ.', hint: 'Mở rộng chiều cao với clip-path bo tròn 14px; văn bản không bị kéo giãn.' },
       { id: 'origin', title: 'Phóng từ icon (Origin Pop)', desc: 'Từ vị trí icon được nhấn trên TopBar, một khối nhỏ bung nở thành cửa sổ hoàn chỉnh.', hint: 'Tâm biến đổi (transform-origin) gắn chặt với tọa độ icon bấm.' },
       { id: 'pop', title: 'Nảy nhẹ (Subtle Pop-in)', desc: 'Panel xuất hiện với độ phóng to 94% -> 100% kèm tăng dần độ trong suốt, không rung lắc.', hint: 'Tăng nhẹ kích thước + mượt mà. Rất phù hợp với chế độ Work tối giản.' },
       { id: 'spring', title: 'Độ nảy lò xo (Spring Bounce)', desc: 'Panel trượt xuống, vượt nhẹ qua điểm dừng một chút rồi bật khẽ trở lại vị trí cân bằng.', hint: 'Hiệu ứng lò xo tinh tế tạo cảm giác phản hồi vật lý sống động.' },
@@ -56,28 +58,31 @@ const I18N = {
     }
   },
   en: {
-    brand: "ALPORA / MOTION",
-    badge: "INTERACTIVE LAB",
-    title: "16 Panel Motion Studies",
-    subtitle: "Explore, compare and fine-tune transition styles for Quick Settings, Calendar, and Notifications before porting to Quickshell.",
+    navShell: "Desktop Shell",
+    navMotion: "Motion Lab (16 Studies)",
+    navTypo: "Typography Suite",
+    brandTitle: "ALPORA · INTERACTIVE LAB",
+    liveBackend: "● LIVE PYTHON BACKEND",
+    standalone: "● STANDALONE SIMULATOR",
+    lblTheme: "Theme:",
+    lblMode: "Mode:",
+    workMode: "Work",
+    vibeMode: "Vibe",
+    lblPower: "Performance",
+    lblTypoTitle: "ALPORA Typography Suite",
+    lblTypoDesc: "Embedded natively via Quickshell FontLoader and applied system-wide for crisp legibility.",
     playAll: "↻ Play All",
     closeAll: "Close All",
     speed: "Speed",
-    theme: "Theme",
-    mode: "Mode",
-    workMode: "Work",
-    vibeMode: "Vibe",
     open: "Open",
     close: "Close",
     repeat: "Replay",
     opened: "Opened",
     closed: "Closed",
     qmlCode: "QML Code",
-    copyQml: "Copy QML",
     copied: "Copied!",
-    backToHub: "← Back to ALPORA Demo Hub",
-    footerHint: "Click any button on the mini-bar or study card to test · Press Escape to close all.",
-    hintTitle: "Interaction hint:",
+    footerHint: "Click any button on the TopBar or cards to test interactions · Press Escape to close all.",
+    days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
     studies: [
       { id: 'slide', title: 'Soft Slide', desc: 'Panel slides down smoothly from beneath the bar and eases to a stop. Closing slides it back.', hint: 'Vertical translation + opacity fade. Clean and distraction-free.' },
       { id: 'curtain', title: 'Curtain Drop', desc: 'Top edge anchored under the bar. The panel unfolds downward, revealing contents progressively.', hint: 'Height expansion with 14px rounded clip-path; text is not stretched.' },
@@ -104,28 +109,31 @@ const I18N = {
     }
   },
   ru: {
-    brand: "POLY / MOTION",
-    badge: "ЛОКАЛЬНАЯ ДЕМОНСТРАЦИЯ",
-    title: "16 вариантов анимации панелей",
-    subtitle: "Открывай, закрывай и сравнивай характер переходов для быстрых настроек, календаря и уведомлений.",
+    navShell: "Оболочка",
+    navMotion: "Анимации (16 вариантов)",
+    navTypo: "Типографика",
+    brandTitle: "ALPORA · ИНТЕРАКТИВНАЯ ЛАБОРАТОРИЯ",
+    liveBackend: "● БЭКЕНД PYTHON ПОДКЛЮЧЕН",
+    standalone: "● АВТОНОМНЫЙ РЕЖИМ",
+    lblTheme: "Тема:",
+    lblMode: "Режим:",
+    workMode: "Работа",
+    vibeMode: "Вайб",
+    lblPower: "Производительность",
+    lblTypoTitle: "Типографика ALPORA",
+    lblTypoDesc: "Загружается через Quickshell FontLoader и используется нативно по всей системе.",
     playAll: "↻ Сравнить все",
     closeAll: "Закрыть все",
     speed: "Скорость",
-    theme: "Мир",
-    mode: "Режим",
-    workMode: "Работа",
-    vibeMode: "Вайб",
     open: "Открыть",
     close: "Закрыть",
     repeat: "Повторить",
     opened: "Открыто",
     closed: "Закрыто",
     qmlCode: "Код QML",
-    copyQml: "Копировать",
     copied: "Скопировано!",
-    backToHub: "← В хаб демонстраций ALPORA",
     footerHint: "Нажми на значок панели в мини-баре · Esc — закрыть все карточки.",
-    hintTitle: "Подсказка:",
+    days: ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"],
     studies: [
       { id: 'slide', title: 'Мягкий выезд', desc: 'Панель спускается из-под бара и плавно останавливается. Закрытие уводит её обратно.', hint: 'Движение вниз + прозрачность.' },
       { id: 'curtain', title: 'Шторка', desc: 'Верхний край закреплён под баром. Панель раскрывается вниз, постепенно открывая содержимое.', hint: 'Раскрытие по высоте · текст не растягивается.' },
@@ -154,97 +162,28 @@ const I18N = {
 };
 
 const THEMES = {
-  alpine: {
-    name: "Alpine Dawn",
-    wallpaper: "../../assets/wallpapers/alpine-dawn.png",
-    bg: "#101a1b",
-    surface: "#182526",
-    line: "#344441",
-    ink: "#ecf0e7",
-    muted: "#9baea6",
-    accent: "#c0d3ae",
-    secondary: "#f1b791"
-  },
-  "moon-lake": {
-    name: "Moon Lake",
-    wallpaper: "../../assets/wallpapers/moon-lake.png",
-    bg: "#101625",
-    surface: "#1a253b",
-    line: "#374762",
-    ink: "#edf0f6",
-    muted: "#a8b5c9",
-    accent: "#b2a5f2",
-    secondary: "#a9caf6"
-  },
-  "forest-mist": {
-    name: "Forest Mist",
-    wallpaper: "../../assets/wallpapers/forest-mist.png",
-    bg: "#101f20",
-    surface: "#1c3230",
-    line: "#345550",
-    ink: "#ecf3ef",
-    muted: "#9bb5ab",
-    accent: "#a9c8ba",
-    secondary: "#dfd7bb"
-  },
-  "northern-lights": {
-    name: "Northern Lights",
-    wallpaper: "../../assets/wallpapers/northern-lights.png",
-    bg: "#0d1b22",
-    surface: "#172c38",
-    line: "#2f5367",
-    ink: "#edf3f6",
-    muted: "#97b8c7",
-    accent: "#7bd3cd",
-    secondary: "#bca4f0"
-  },
-  "warm-desert": {
-    name: "Warm Desert",
-    wallpaper: "../../assets/wallpapers/warm-desert.png",
-    bg: "#221714",
-    surface: "#35231c",
-    line: "#5c3d31",
-    ink: "#faede8",
-    muted: "#cbb1a5",
-    accent: "#efba87",
-    secondary: "#df9274"
-  },
-  "rose-sunset": {
-    name: "Rose Sunset",
-    wallpaper: "../../assets/wallpapers/rose-sunset.png",
-    bg: "#1e1724",
-    surface: "#2f2237",
-    line: "#533b5f",
-    ink: "#f7edf3",
-    muted: "#c5adc0",
-    accent: "#e5a9c4",
-    secondary: "#efb89e"
-  },
-  timeline: {
-    name: "Timeline Day",
-    wallpaper: "../../assets/wallpapers/timeline/day.png",
-    bg: "#141c21",
-    surface: "#222c32",
-    line: "#3c4d57",
-    ink: "#edf2f4",
-    muted: "#a9bac5",
-    accent: "#c7c5a6",
-    secondary: "#edb297"
-  }
+  alpine: { bg: "#101a1b", surface: "#182526", line: "#344441", ink: "#ecf0e7", muted: "#9baea6", accent: "#c0d3ae", secondary: "#f1b791", wallpaper: "/assets/wallpapers/alpine-dawn.png", altWallpaper: "../../../assets/wallpapers/alpine-dawn.png" },
+  "moon-lake": { bg: "#101625", surface: "#1a253b", line: "#374762", ink: "#edf0f6", muted: "#a8b5c9", accent: "#b2a5f2", secondary: "#a9caf6", wallpaper: "/assets/wallpapers/moon-lake.png", altWallpaper: "../../../assets/wallpapers/moon-lake.png" },
+  "forest-mist": { bg: "#101f20", surface: "#1c3230", line: "#345550", ink: "#ecf3ef", muted: "#9bb5ab", accent: "#a9c8ba", secondary: "#dfd7bb", wallpaper: "/assets/wallpapers/forest-mist.png", altWallpaper: "../../../assets/wallpapers/forest-mist.png" },
+  "northern-lights": { bg: "#0d1b22", surface: "#172c38", line: "#2f5367", ink: "#edf3f6", muted: "#97b8c7", accent: "#7bd3cd", secondary: "#bca4f0", wallpaper: "/assets/wallpapers/northern-lights.png", altWallpaper: "../../../assets/wallpapers/northern-lights.png" },
+  "warm-desert": { bg: "#221714", surface: "#35231c", line: "#5c3d31", ink: "#faede8", muted: "#cbb1a5", accent: "#efba87", secondary: "#df9274", wallpaper: "/assets/wallpapers/warm-desert.png", altWallpaper: "../../../assets/wallpapers/warm-desert.png" },
+  "rose-sunset": { bg: "#1e1724", surface: "#2f2237", line: "#533b5f", ink: "#f7edf3", muted: "#c5adc0", accent: "#e5a9c4", secondary: "#efb89e", wallpaper: "/assets/wallpapers/rose-sunset.png", altWallpaper: "../../../assets/wallpapers/rose-sunset.png" },
+  timeline: { bg: "#141c21", surface: "#222c32", line: "#3c4d57", ink: "#edf2f4", muted: "#a9bac5", accent: "#c7c5a6", secondary: "#edb297", wallpaper: "/assets/wallpapers/timeline/day.png", altWallpaper: "../../../assets/wallpapers/timeline/day.png" }
 };
 
 let currentLang = localStorage.getItem('alpora_demo_lang') || 'vi';
 let currentTheme = localStorage.getItem('alpora_demo_theme') || 'alpine';
 let speed = 1;
+let isLiveBackend = false;
 const controllers = [];
 
 const svg = name => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#${name}"/></svg>`;
-const closeButton = '<button class="close" data-close aria-label="Close">×</button>';
+const closeBtn = '<button class="close" data-close aria-label="Close">×</button>';
 
-function applyTheme(themeKey) {
-  const t = THEMES[themeKey] || THEMES.alpine;
-  currentTheme = themeKey;
-  localStorage.setItem('alpora_demo_theme', themeKey);
+function applyTheme(key, notifyBackend = true) {
+  const t = THEMES[key] || THEMES.alpine;
+  currentTheme = key;
+  localStorage.setItem('alpora_demo_theme', key);
   const root = document.documentElement;
   root.style.setProperty('--bg', t.bg);
   root.style.setProperty('--surface', t.surface);
@@ -253,18 +192,122 @@ function applyTheme(themeKey) {
   root.style.setProperty('--muted', t.muted);
   root.style.setProperty('--accent', t.accent);
   root.style.setProperty('--secondary', t.secondary);
-  root.style.setProperty('--wallpaper', `url('${t.wallpaper}')`);
+  const wp = window.location.protocol === 'file:' ? t.altWallpaper : t.wallpaper;
+  root.style.setProperty('--wallpaper', `url('${wp}')`);
 
-  document.querySelectorAll('[data-theme-key]').forEach(b => {
-    b.setAttribute('aria-pressed', String(b.dataset.themeKey === themeKey));
+  document.querySelectorAll('.theme-pill-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.theme === key);
   });
+  if (notifyBackend) {
+    sendAction('theme', key);
+  }
 }
 
-function renderContent(page, langKey) {
+async function checkBackend() {
+  try {
+    const res = await fetch('/api/state');
+    if (res.ok) {
+      const data = await res.json();
+      isLiveBackend = true;
+      const badge = document.querySelector('#backend-badge');
+      if (badge) {
+        badge.textContent = I18N[currentLang].liveBackend;
+        badge.style.color = 'var(--accent)';
+      }
+      if (data.metrics) {
+        if (data.metrics.cpuPercent !== undefined) {
+          document.querySelector('#metric-cpu').textContent = `${data.metrics.cpuPercent}% · 48°C`;
+        }
+        if (data.metrics.ramUsedGb !== undefined) {
+          document.querySelector('#metric-ram').textContent = `${data.metrics.ramUsedGb} / ${data.metrics.ramTotalGb} GB`;
+        }
+        if (data.metrics.batteryPercent !== undefined) {
+          document.querySelector('#qs-pill-btn span').textContent = `${data.metrics.batteryPercent}%`;
+        }
+      }
+      if (data.session && data.session.theme && data.session.theme !== currentTheme) {
+        applyTheme(data.session.theme, false);
+      }
+    }
+  } catch (_) {
+    isLiveBackend = false;
+    const badge = document.querySelector('#backend-badge');
+    if (badge) {
+      badge.textContent = I18N[currentLang].standalone;
+      badge.style.color = 'var(--muted)';
+    }
+  }
+}
+
+async function sendAction(action, value) {
+  if (!isLiveBackend) return;
+  try {
+    await fetch('/api/action', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, value })
+    });
+  } catch (_) {}
+}
+
+function updateLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('alpora_demo_lang', lang);
+  const t = I18N[lang] || I18N.vi;
+  document.documentElement.lang = lang;
+
+  // Header & Nav
+  document.querySelector('#tab-nav-shell').textContent = t.navShell;
+  document.querySelector('#tab-nav-motion').textContent = t.navMotion;
+  document.querySelector('#tab-nav-typo').textContent = t.navTypo;
+  document.querySelector('#lbl-theme').textContent = t.lblTheme;
+  document.querySelector('#lbl-mode').textContent = t.lblMode;
+  document.querySelector('#btn-work-mode').textContent = t.workMode;
+  document.querySelector('#btn-vibe-mode').textContent = t.vibeMode;
+  document.querySelector('#txt-power-label').textContent = t.lblPower;
+  document.querySelector('#lbl-typo-title').textContent = t.lblTypoTitle;
+  document.querySelector('#lbl-typo-desc').textContent = t.lblTypoDesc;
+  document.querySelector('#play-all').textContent = t.playAll;
+  document.querySelector('#close-all').textContent = t.closeAll;
+  document.querySelector('#speed-label').textContent = t.speed;
+  document.querySelector('#footer-hint').textContent = t.footerHint;
+
+  document.querySelectorAll('.lang-switch button').forEach(btn => {
+    btn.setAttribute('aria-pressed', String(btn.dataset.lang === lang));
+  });
+
+  renderMotionStudies();
+}
+
+function tick() {
+  const now = new Date();
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = now.getSeconds();
+
+  document.querySelector('#hero-hour').textContent = hours;
+  document.querySelector('#hero-min').textContent = minutes;
+  document.querySelector('#seconds-fill').style.width = ((seconds / 60) * 100) + '%';
+
+  const t = I18N[currentLang] || I18N.vi;
+  const dayName = t.days[now.getDay()];
+  document.querySelector('#hero-date-text').textContent = `${dayName}, ${now.getDate()} / ${now.getMonth() + 1}`;
+  document.querySelector('#bar-clock').textContent = `${hours}:${minutes} · ${dayName.slice(0, 3)} ${now.getDate()}`;
+
+  if (!isLiveBackend) {
+    const cpuVal = 28 + Math.floor(Math.sin(now.getTime() / 2000) * 8);
+    document.querySelector('#metric-cpu').textContent = `${cpuVal}% · 48°C`;
+  }
+}
+
+// ========================================================
+// Motion Studies Controller
+// ========================================================
+function renderMotionContent(page, langKey) {
   const p = I18N[langKey].pages[page] || I18N[langKey].pages.settings;
   if (page === 'calendar') {
     return `
-      <div class="panel-heading">${svg('mountain')} ${p.title} ${closeButton}</div>
+      <div class="panel-heading">${svg('mountain')} ${p.title} ${closeBtn}</div>
       <div class="calendar-top"><span>‹</span><span>${p.month}</span><span>›</span></div>
       <div class="calendar-grid">
         ${p.days.map(d => `<span class="weekday">${d}</span>`).join('')}
@@ -275,7 +318,7 @@ function renderContent(page, langKey) {
   }
   if (page === 'notifications') {
     return `
-      <div class="panel-heading">${svg('bell')} ${p.title} ${closeButton}</div>
+      <div class="panel-heading">${svg('bell')} ${p.title} ${closeBtn}</div>
       <div class="notice"><strong>${p.note1Title}</strong><small>${p.note1Desc}</small></div>
       <div class="notice"><strong>${p.note2Title}</strong><small>${p.note2Desc}</small></div>
       <div class="panel-bottom"><span>${p.footer}</span></div>
@@ -283,14 +326,14 @@ function renderContent(page, langKey) {
   }
   if (page === 'timeline') {
     return `
-      <div class="panel-heading">${svg('sun')} ${p.title} <span style="margin-left:auto;color:var(--accent)">14:20</span>${closeButton}</div>
+      <div class="panel-heading">${svg('sun')} ${p.title} <span style="margin-left:auto;color:var(--accent)">14:20</span>${closeBtn}</div>
       <div class="panel-subtitle">${p.subtitle}</div>
       <div class="timeline-range"></div>
       <div class="timeline-hours"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div>
     `;
   }
   return `
-    <div class="panel-heading">${svg('mountain')} ${p.title} ${closeButton}</div>
+    <div class="panel-heading">${svg('mountain')} ${p.title} ${closeBtn}</div>
     <div class="panel-subtitle">${p.subtitle}</div>
     <div class="audio">
       ${svg('volume')}
@@ -326,7 +369,7 @@ function cardHTML(item, index, langKey) {
       <div class="study-head">
         <span class="number">${String(index + 1).padStart(2, '0')}</span>
         <div>
-          <h2>${item.title} ${index >= 6 ? '<span class="new-tag">STUDY</span>' : ''}</h2>
+          <h2>${item.title}</h2>
           <p class="study-desc">${item.desc}</p>
         </div>
       </div>
@@ -356,7 +399,7 @@ function cardHTML(item, index, langKey) {
         </div>
         <span class="demo-label">ALPORA · ${item.id.toUpperCase()}</span>
         <div class="panel" role="region" aria-label="Preview: ${item.title}" aria-hidden="true" inert>
-          <div class="panel-content">${renderContent('settings', langKey)}</div>
+          <div class="panel-content">${renderMotionContent('settings', langKey)}</div>
         </div>
       </div>
       <div class="study-footer">
@@ -400,7 +443,7 @@ function endStyle(id) {
 
 const ease = 'cubic-bezier(.2,.8,.2,1)';
 
-class Demo {
+class DemoCard {
   constructor(element, config) {
     this.el = element;
     this.config = config;
@@ -442,11 +485,6 @@ class Demo {
         toggle.classList.toggle('off', !enabled);
         const t = I18N[currentLang].pages.settings;
         toggle.querySelector('small').textContent = enabled ? t.on : t.off;
-      }
-    });
-    this.body.addEventListener('input', e => {
-      if (e.target.matches('input[type=range]')) {
-        e.target.nextElementSibling.value = e.target.value + '%';
       }
     });
   }
@@ -509,70 +547,7 @@ class Demo {
     return a;
   }
 
-  fold(value, duration) {
-    this.panel.classList.add('folding');
-    for (const [index, name] of ['upper', 'lower'].entries()) {
-      const half = document.createElement('div');
-      half.className = `fold-piece ${name} motion-extra`;
-      half.setAttribute('aria-hidden', 'true');
-      half.inert = true;
-      const face = document.createElement('div');
-      face.className = 'fold-face';
-      face.style.height = this.panel.offsetHeight + 'px';
-      if (index) face.style.top = -this.panel.offsetHeight / 2 + 'px';
-      face.innerHTML = this.body.outerHTML;
-      half.append(face);
-      this.panel.append(half);
-      const rotated = `perspective(750px) rotateX(${index ? 125 : -85}deg)`;
-      this.play(half, value
-        ? [{ transform: rotated, opacity: .4 }, { transform: 'perspective(750px) rotateX(0deg)', opacity: 1 }]
-        : [{ transform: 'perspective(750px) rotateX(0deg)', opacity: 1 }, { transform: rotated, opacity: .2 }],
-        { duration: duration * .72, delay: value ? (index ? duration * .27 : 0) : (index ? 0 : duration * .27), easing: ease });
-    }
-  }
-
-  outline(value, duration) {
-    this.panel.classList.add('outlining');
-    const fill = document.createElement('div');
-    fill.className = 'outline-fill motion-extra';
-    this.panel.append(fill);
-    this.play(fill, value
-      ? [{ opacity: 0, offset: 0 }, { opacity: 0, offset: .45 }, { opacity: 1, offset: .82 }, { opacity: 1 }]
-      : [{ opacity: 1 }, { opacity: 0, offset: .4 }, { opacity: 0 }],
-      { duration, easing: 'linear' });
-    const ns = 'http://www.w3.org/2000/svg';
-    const drawing = document.createElementNS(ns, 'svg');
-    drawing.classList.add('outline-trace', 'motion-extra');
-    drawing.setAttribute('viewBox', `0 0 ${this.panel.offsetWidth} ${this.panel.offsetHeight}`);
-    drawing.setAttribute('aria-hidden', 'true');
-    const rect = document.createElementNS(ns, 'rect');
-    for (const [key, v] of Object.entries({ x: 1, y: 1, width: this.panel.offsetWidth - 2, height: this.panel.offsetHeight - 2, rx: 14, pathLength: 1 })) {
-      rect.setAttribute(key, v);
-    }
-    drawing.append(rect);
-    this.panel.append(drawing);
-    this.play(rect, value
-      ? [{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }]
-      : [{ strokeDashoffset: 0 }, { strokeDashoffset: 1 }],
-      { duration: duration * .72, delay: value ? 0 : duration * .26, easing: 'ease-in-out' });
-    this.play(this.body, value
-      ? [{ opacity: 0 }, { opacity: 1 }]
-      : [{ opacity: 1 }, { opacity: 0 }],
-      { duration: duration * .45, delay: value ? duration * .53 : 0, easing: ease });
-  }
-
-  cascade(value, duration) {
-    const children = [...this.body.children];
-    children.forEach((child, index) => {
-      this.play(child, value
-        ? [{ opacity: 0, transform: 'translateY(15px)' }, { opacity: 1, transform: 'translateY(0px)' }]
-        : [{ opacity: 1, transform: 'translateY(0px)' }, { opacity: 0, transform: 'translateY(-9px)' }],
-        { duration: duration * .46, delay: (value ? index : children.length - index - 1) * duration * .075, easing: ease });
-    });
-  }
-
   setOpen(value, { instant = false } = {}) {
-    const wasMoving = this.panel.getAnimations().some(a => a.playState === 'running');
     this.stop();
     this.open = value;
     this.update();
@@ -590,26 +565,14 @@ class Demo {
     let frames = [start, end];
     const id = this.config.id;
 
-    if (value && !wasMoving) {
+    if (value) {
       if (id === 'spring') frames = [{ ...closed.spring, offset: 0 }, { transform: 'translateY(7px)', opacity: 1, offset: .57 }, { transform: 'translateY(-2px)', opacity: 1, offset: .79 }, { ...opened, offset: 1 }];
       if (id === 'center') frames = [{ ...opened, ...closed.center, offset: 0 }, { ...opened, clipPath: 'inset(49.5% 0% 49.5% 0% round 14px)', offset: .38 }, { ...opened, offset: 1 }];
       if (id === 'slit') frames = [{ ...opened, ...closed.slit, offset: 0 }, { ...opened, clipPath: 'polygon(0% 0%,100% 0%,100% 1%,0% 1%)', offset: .38 }, { ...opened, offset: 1 }];
       if (id === 'liquid') frames = [{ ...opened, ...closed.liquid, offset: 0 }, { transform: 'translateY(-12px) scale(.48,.65)', borderRadius: '58% 42% 35% 65% / 65% 40% 60% 35%', opacity: 1, offset: .36 }, { transform: 'translateY(3px) scale(1.025,.97)', borderRadius: '25px 20px 32px 18px', opacity: 1, offset: .74 }, { ...opened, offset: 1 }];
-      if (['fold', 'outline'].includes(id)) frames = [{ ...opened, opacity: 0, offset: 0 }, { ...opened, opacity: 1, offset: .08 }, { ...opened, offset: 1 }];
-      if (id === 'cascade') frames = [{ ...opened, opacity: 0, offset: 0 }, { ...opened, opacity: 1, offset: .22 }, { ...opened, offset: 1 }];
     }
     const duration = (this.config.duration || 540) * (value ? 1 : .8) / speed;
     const animation = this.play(this.panel, frames, { duration, easing: ['spring', 'center', 'liquid', 'slit'].includes(id) ? 'linear' : ease });
-
-    if (['origin', 'liquid'].includes(id)) {
-      this.play(this.body, value
-        ? [{ opacity: 0, offset: 0 }, { opacity: 0, offset: .42 }, { opacity: 1, offset: .86 }, { opacity: 1 }]
-        : [{ opacity: 1 }, { opacity: 0, offset: .4 }, { opacity: 0 }],
-        { duration, easing: 'linear' });
-    }
-    if (id === 'fold') this.fold(value, duration);
-    if (id === 'outline') this.outline(value, duration);
-    if (id === 'cascade') this.cascade(value, duration);
 
     const token = this.token;
     animation.finished.then(() => {
@@ -632,73 +595,30 @@ class Demo {
     this.stop();
     const previous = { left: this.panel.offsetLeft, width: this.panel.offsetWidth, height: this.panel.offsetHeight };
     this.page = page;
-    this.body.innerHTML = renderContent(page, currentLang);
+    this.body.innerHTML = renderMotionContent(page, currentLang);
     this.layout();
     this.update();
     if (animate && this.open) {
       const next = { left: this.panel.style.left, width: this.panel.style.width, height: this.panel.style.height };
       const old = { left: previous.left + 'px', width: previous.width + 'px', height: previous.height + 'px' };
-      let frames = [old, next];
-      if (this.config.id === 'travel') {
-        const capsuleLeft = Math.max(14, Math.min(this.canvas.clientWidth - 134, previous.left + previous.width / 2 - 60));
-        const targetLeft = Math.max(14, Math.min(this.canvas.clientWidth - 134, this.panel.offsetLeft + this.panel.offsetWidth / 2 - 60));
-        frames = [
-          { ...old, borderRadius: '14px', offset: 0 },
-          { left: capsuleLeft + 'px', width: '120px', height: '34px', borderRadius: '18px', offset: .28 },
-          { left: targetLeft + 'px', width: '120px', height: '34px', borderRadius: '18px', offset: .64 },
-          { ...next, borderRadius: '14px', offset: 1 }
-        ];
-      }
-      const duration = (this.config.id === 'travel' ? 1000 : 580) / speed;
-      const animation = this.play(this.panel, frames, { duration, easing: ease });
-      this.play(this.body, this.config.id === 'travel'
-        ? [{ opacity: 0, offset: 0 }, { opacity: 0, offset: .64 }, { opacity: 1, offset: 1 }]
-        : [{ opacity: 0 }, { opacity: 1 }],
-        { duration, easing: 'linear' });
-      const token = this.token;
-      animation.finished.then(() => {
-        if (token !== this.token) return;
-        for (const a of this.panel.getAnimations({ subtree: true })) a.cancel();
-        Object.assign(this.panel.style, next);
-        this.cleanup();
-      }).catch(() => {});
+      const duration = 540 / speed;
+      this.play(this.panel, [old, next], { duration, easing: ease });
+      this.play(this.body, [{ opacity: 0 }, { opacity: 1 }], { duration, easing: 'linear' });
     }
   }
 }
 
-function initPage() {
+function renderMotionStudies() {
+  const container = document.querySelector('#studies-grid');
+  if (!container) return;
   const t = I18N[currentLang];
-  document.documentElement.lang = currentLang;
-
-  // Header & Brand
-  document.querySelector('#brand-title').textContent = t.brand;
-  document.querySelector('#brand-badge').textContent = t.badge;
-  document.querySelector('#hero-title').textContent = t.title;
-  document.querySelector('#hero-subtitle').textContent = t.subtitle;
-  document.querySelector('#play-all').textContent = t.playAll;
-  document.querySelector('#close-all').textContent = t.closeAll;
-  document.querySelector('#speed-label').textContent = t.speed;
-  document.querySelector('#theme-label').textContent = t.theme;
-  document.querySelector('#footer-hint').textContent = t.footerHint;
-  document.querySelector('#back-link').textContent = t.backToHub;
-
-  // Render cards
-  const studiesContainer = document.querySelector('#studies');
-  const catalogContainer = document.querySelector('#catalog');
   controllers.length = 0;
-
-  studiesContainer.innerHTML = t.studies.map((item, i) => cardHTML(item, i, currentLang)).join('');
-  catalogContainer.innerHTML = t.studies.map((item, i) => `
-    <a href="#study-${item.id}">
-      <span>${String(i + 1).padStart(2, '0')}</span> ${item.title}
-    </a>
-  `).join('');
+  container.innerHTML = t.studies.map((item, i) => cardHTML(item, i, currentLang)).join('');
 
   document.querySelectorAll('.study').forEach((el, i) => {
-    controllers.push(new Demo(el, t.studies[i]));
+    controllers.push(new DemoCard(el, t.studies[i]));
   });
 
-  // Wire QML snippets
   document.querySelectorAll('.copy-qml').forEach(btn => {
     btn.onclick = () => {
       const qmlId = btn.dataset.qmlId;
@@ -714,23 +634,53 @@ NumberAnimation on progress {
       });
     };
   });
-
-  applyTheme(currentTheme);
 }
 
-// Global Event Listeners
+// Global initialization
 document.addEventListener('DOMContentLoaded', () => {
-  initPage();
+  updateLanguage(currentLang);
+  applyTheme(currentTheme, false);
+  tick();
+  setInterval(tick, 1000);
+  checkBackend();
+  setInterval(checkBackend, 4000);
 
-  // Language buttons
-  document.querySelectorAll('[data-lang]').forEach(btn => {
+  // Tab Navigation
+  document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.onclick = () => {
-      currentLang = btn.dataset.lang;
-      localStorage.setItem('alpora_demo_lang', currentLang);
-      document.querySelectorAll('[data-lang]').forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
-      initPage();
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
+      btn.classList.add('active');
+      const targetView = document.querySelector(`#view-${btn.dataset.tab}`);
+      if (targetView) targetView.classList.add('active');
     };
   });
+
+  // Language buttons
+  document.querySelectorAll('.lang-switch button').forEach(btn => {
+    btn.onclick = () => updateLanguage(btn.dataset.lang);
+  });
+
+  // Theme buttons
+  document.querySelectorAll('.theme-pill-btn[data-theme]').forEach(btn => {
+    btn.onclick = () => applyTheme(btn.dataset.theme);
+  });
+
+  // Mode buttons
+  const btnWork = document.querySelector('#btn-work-mode');
+  const btnVibe = document.querySelector('#btn-vibe-mode');
+  if (btnWork && btnVibe) {
+    btnWork.onclick = () => {
+      btnWork.classList.add('active');
+      btnVibe.classList.remove('active');
+      sendAction('mode', 'work');
+    };
+    btnVibe.onclick = () => {
+      btnVibe.classList.add('active');
+      btnWork.classList.remove('active');
+      sendAction('mode', 'vibe');
+    };
+  }
 
   // Speed buttons
   document.querySelectorAll('[data-speed]').forEach(btn => {
@@ -740,64 +690,31 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   });
 
-  // Theme swatches
-  document.querySelectorAll('[data-theme-key]').forEach(btn => {
-    btn.onclick = () => applyTheme(btn.dataset.themeKey);
+  // Play All / Close All
+  document.querySelector('#play-all').onclick = () => controllers.forEach(c => c.replay());
+  document.querySelector('#close-all').onclick = () => controllers.forEach(c => c.setOpen(false));
+
+  // Workspaces
+  document.querySelectorAll('.ws-pill').forEach(pill => {
+    pill.onclick = () => {
+      document.querySelectorAll('.ws-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+    };
   });
 
-  document.querySelector('#play-all').onclick = () => {
-    controllers.forEach(c => c.replay());
-  };
-
-  document.querySelector('#close-all').onclick = () => {
-    controllers.forEach(c => {
-      c.autoPlayed = true;
-      c.setOpen(false);
-    });
-  };
-
-  document.addEventListener('keydown', event => {
-    if (event.key === 'Escape') {
-      controllers.forEach(c => {
-        c.autoPlayed = true;
-        c.setOpen(false);
-      });
-      document.querySelector('#play-all').focus();
-    }
-  });
-
-  let resizeTimer;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-      controllers.forEach(c => {
-        c.stop();
-        c.layout();
-        c.setOpen(c.open, { instant: true });
-      });
-    }, 120);
-  });
-
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-      controllers.forEach(c => c.setOpen(c.open, { instant: true }));
-    }
-  });
-
-  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const observer = new IntersectionObserver(entries => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        const c = controllers.find(item => item.el === entry.target);
-        if (c) {
-          observer.unobserve(entry.target);
-          if (!c.autoPlayed) {
-            c.autoPlayed = true;
-            c.pending.push(setTimeout(() => c.setOpen(true), 250));
-          }
-        }
+  // Hover-Faceted Quick Menu
+  const qsPill = document.querySelector('#qs-pill-btn');
+  const hoverMenu = document.querySelector('#hover-menu');
+  if (qsPill && hoverMenu) {
+    qsPill.onclick = () => {
+      hoverMenu.classList.toggle('show');
+      qsPill.classList.toggle('active');
+    };
+    document.querySelector('#viewport').onclick = (e) => {
+      if (!e.target.closest('#qs-pill-btn') && !e.target.closest('#hover-menu')) {
+        hoverMenu.classList.remove('show');
+        qsPill.classList.remove('active');
       }
-    }, { threshold: 0.3 });
-    controllers.forEach(c => observer.observe(c.el));
+    };
   }
 });

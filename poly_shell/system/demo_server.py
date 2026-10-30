@@ -132,16 +132,16 @@ class DemoRequestHandler(http.server.SimpleHTTPRequestHandler):
 
     def __init__(self, *args, paths: Paths | None = None, **kwargs):
         self.paths = paths or Paths.current()
-        # Serve from repository root so assets and docs/demos are accessible
+        # Serve from repository root so assets and shell/demos are accessible
         super().__init__(*args, directory=str(ROOT), **kwargs)
 
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
 
-        # Redirect root to docs/demos/index.html
+        # Redirect root to shell/demos/web/index.html
         if parsed.path in ("/", "/index.html", "/demo", "/demo/"):
             self.send_response(302)
-            self.send_header("Location", "/docs/demos/index.html")
+            self.send_header("Location", "/shell/demos/web/index.html")
             self.end_headers()
             return
 
@@ -245,13 +245,12 @@ def start_demo_server(
         return DemoRequestHandler(*args, paths=paths, **kwargs)
 
     server = ThreadedTCPServer(("127.0.0.1", actual_port), handler_factory)
-    url = f"http://127.0.0.1:{actual_port}/docs/demos/index.html"
+    url = f"http://127.0.0.1:{actual_port}/shell/demos/web/index.html"
 
     _safe_print("=" * 68)
     _safe_print("      ALPORA Interactive Design Lab & Shell Simulator Server        ")
     _safe_print("=" * 68)
     _safe_print(f"  * URL:            {url}")
-    _safe_print(f"  * Panel Motion:   http://127.0.0.1:{actual_port}/docs/demos/panel-motion/index.html")
     _safe_print(f"  * Live Telemetry: http://127.0.0.1:{actual_port}/api/state")
     _safe_print(f"  * Serving from:   {ROOT}")
     _safe_print("  * Press Ctrl+C to stop the server.")

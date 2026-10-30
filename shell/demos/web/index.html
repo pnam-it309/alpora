@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101a1b">
+  <title>ALPORA · Unified Interactive Shell & Motion Sandbox</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Global SVG Symbol Definitions -->
+<svg class="icons" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <defs>
+    <symbol id="mountain" viewBox="0 0 24 24"><path d="m2 20 8-16 5 10 3-6 5 12Z" fill="currentColor"/><path d="m10 4 1 13 4-3Z" fill="#fff" opacity=".35"/></symbol>
+    <symbol id="settings" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16M9 3v8M16 13v8"/></symbol>
+    <symbol id="wifi" viewBox="0 0 24 24"><path d="M3 8a14 14 0 0 1 18 0M6 12a9 9 0 0 1 12 0M9 16a4 4 0 0 1 6 0M12 20h.01"/></symbol>
+    <symbol id="volume" viewBox="0 0 24 24"><path d="m11 4-5 4H2v8h4l5 4ZM16 8a6 6 0 0 1 0 8M19 4a11 11 0 0 1 0 16"/></symbol>
+    <symbol id="bluetooth" viewBox="0 0 24 24"><path d="M12 2v20l7-6L6 6m0 12L19 8 12 2"/></symbol>
+    <symbol id="bell" viewBox="0 0 24 24"><path d="M5 17h14l-2-4V9a5 5 0 0 0-10 0v4ZM10 21h4"/></symbol>
+    <symbol id="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 1v2m0 18v2M1 12h2m18 0h2M4 4l2 2m12 12 2 2M4 20l2-2M18 6l2-2"/></symbol>
+    <symbol id="repeat" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5M5 7a8 8 0 0 1 13-2l2 3M4 16l2 3a8 8 0 0 0 13-2"/></symbol>
+    <symbol id="code" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></symbol>
+  </defs>
+</svg>
+
+<!-- Header Hub Navigation -->
+<header class="hub-header">
+  <div class="hub-brand">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m2 20 8-16 5 10 3-6 5 12Z" fill="currentColor"/><path d="m10 4 1 13 4-3Z" fill="#fff" opacity=".35"/></svg>
+    <span>ALPORA · INTERACTIVE LAB</span>
+    <span class="backend-badge" id="backend-badge">● STANDALONE</span>
+  </div>
+
+  <div class="hub-tabs">
+    <button class="tab-btn active" data-tab="shell" id="tab-nav-shell">Desktop Shell</button>
+    <button class="tab-btn" data-tab="motion" id="tab-nav-motion">Phòng thí nghiệm Motion (16 Studies)</button>
+    <button class="tab-btn" data-tab="typo" id="tab-nav-typo">Bộ Typography</button>
+  </div>
+
+  <div class="lang-switch" aria-label="Language selection">
+    <button data-lang="vi" aria-pressed="true">VI</button>
+    <button data-lang="en" aria-pressed="false">EN</button>
+    <button data-lang="ru" aria-pressed="false">RU</button>
+  </div>
+</header>
+
+<main class="main-container">
+
+  <!-- TAB 1: Desktop Shell Simulator -->
+  <section id="view-shell" class="tab-view active">
+    <div class="desktop-viewport" id="viewport">
+      <!-- TopBar -->
+      <div class="sim-topbar">
+        <div class="sim-workspaces">
+          <div class="sim-logo">ALPORA</div>
+          <div class="ws-pill active" data-ws="1">1</div>
+          <div class="ws-pill" data-ws="2">2</div>
+          <div class="ws-pill" data-ws="3">3</div>
+          <div class="ws-pill" data-ws="4">4</div>
+        </div>
+
+        <div class="sim-clock-bar" id="bar-clock">10:14 · Th 6, 30 Th10</div>
+
+        <div class="sim-tray">
+          <button class="tray-icon-btn" id="dnd-btn" title="Do Not Disturb">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14l-2-4V9a5 5 0 0 0-10 0v4ZM10 21h4"/></svg>
+          </button>
+          <button class="tray-icon-btn" id="wifi-icon-btn" title="Wi-Fi">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8a14 14 0 0 1 18 0M6 12a9 9 0 0 1 12 0M9 16a4 4 0 0 1 6 0M12 20h.01"/></svg>
+          </button>
+          <button class="tray-icon-btn" id="audio-icon-btn" title="Volume">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m11 4-5 4H2v8h4l5 4ZM16 8a6 6 0 0 1 0 8M19 4a11 11 0 0 1 0 16"/></svg>
+          </button>
+          <button class="qs-toggle-pill" id="qs-pill-btn">
+            <span>98%</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 17h16M9 3v8M16 13v8"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Approved Hover-Faceted Quick Menu -->
+      <div class="hover-faceted-menu" id="hover-menu">
+        <div class="faceted-cards-grid">
+          <div class="faceted-card active" id="hover-card-wifi">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8a14 14 0 0 1 18 0M6 12a9 9 0 0 1 12 0M9 16a4 4 0 0 1 6 0M12 20h.01"/></svg>
+            <small>Wi-Fi</small>
+          </div>
+          <div class="faceted-card" id="hover-card-bt">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20l7-6L6 6m0 12L19 8 12 2"/></svg>
+            <small>Bluetooth</small>
+          </div>
+          <div class="faceted-card" id="hover-card-power">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10"/></svg>
+            <small id="txt-power-label">Hiệu năng</small>
+          </div>
+        </div>
+        <div class="faceted-slider-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m11 4-5 4H2v8h4l5 4ZM16 8a6 6 0 0 1 0 8"/></svg>
+          <input type="range" min="0" max="100" value="72" id="sim-vol-range">
+          <span id="sim-vol-val">72%</span>
+        </div>
+        <div class="faceted-slider-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+          <input type="range" min="0" max="100" value="85" id="sim-bri-range">
+          <span id="sim-bri-val">85%</span>
+        </div>
+      </div>
+
+      <!-- Desktop Widgets -->
+      <div class="sim-widgets-layer">
+        <!-- Desktop Clock Widget (Outfit Display font) -->
+        <div class="desktop-hero-clock">
+          <div class="hero-digits">
+            <span id="hero-hour">10</span>
+            <span class="colon">:</span>
+            <span id="hero-min">14</span>
+          </div>
+          <div class="hero-date" id="hero-date-text">Thứ Sáu, 30 Tháng 10</div>
+          <div class="seconds-bar-track">
+            <div class="seconds-bar-fill" id="seconds-fill"></div>
+          </div>
+        </div>
+
+        <!-- Developer Metrics Widget (JetBrains Mono font) -->
+        <div class="desktop-metrics-card">
+          <div class="metrics-head">
+            <span class="dev-badge">DEV METRICS</span>
+            <span style="font-family: var(--font-mono); font-size: 11px; color: var(--accent);">● LIVE</span>
+          </div>
+          <div class="metrics-grid">
+            <div class="metric-tile">
+              <span>CPU</span>
+              <strong id="metric-cpu">32% · 48°C</strong>
+            </div>
+            <div class="metric-tile">
+              <span>RAM</span>
+              <strong id="metric-ram">4.8 / 16 GB</strong>
+            </div>
+            <div class="metric-tile">
+              <span>GPU</span>
+              <strong id="metric-gpu">24% · RTX</strong>
+            </div>
+            <div class="metric-tile">
+              <span>NET RATE</span>
+              <strong id="metric-net">↓ 2.4 MB/s</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Control Dock -->
+    <div class="control-dock">
+      <div class="dock-group">
+        <span class="dock-label" id="lbl-theme">Chủ đề:</span>
+        <button class="theme-pill-btn active" data-theme="alpine">Alpine</button>
+        <button class="theme-pill-btn" data-theme="moon-lake">Moon Lake</button>
+        <button class="theme-pill-btn" data-theme="forest-mist">Forest Mist</button>
+        <button class="theme-pill-btn" data-theme="northern-lights">Northern Lights</button>
+        <button class="theme-pill-btn" data-theme="warm-desert">Warm Desert</button>
+        <button class="theme-pill-btn" data-theme="rose-sunset">Rose Sunset</button>
+        <button class="theme-pill-btn" data-theme="timeline">Timeline</button>
+      </div>
+
+      <div class="dock-group">
+        <span class="dock-label" id="lbl-mode">Chế độ:</span>
+        <button class="mode-btn active" id="btn-work-mode">Work</button>
+        <button class="mode-btn" id="btn-vibe-mode">Vibe</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 2: Motion Studies Lab (16 Animation Studies) -->
+  <section id="view-motion" class="tab-view">
+    <div class="toolbar" aria-label="Controls">
+      <button class="primary" id="play-all">↻ Chạy tất cả</button>
+      <button id="close-all">Đóng tất cả</button>
+      <div class="divider"></div>
+      <span class="label-tag" id="speed-label">Tốc độ</span>
+      <div class="segmented" aria-label="Animation Speed">
+        <button data-speed="1" aria-pressed="true">1×</button>
+        <button data-speed="0.5" aria-pressed="false">½×</button>
+        <button data-speed="0.25" aria-pressed="false">¼×</button>
+        <button data-speed="0.1" aria-pressed="false">0.1×</button>
+      </div>
+    </div>
+
+    <div class="grid" id="studies-grid"></div>
+
+    <footer style="margin-top: 30px; padding-top: 16px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; font-size: 12px; color: var(--muted);">
+      <span id="footer-hint">Nhấn chuột vào các nút trên thanh TopBar để thử nghiệm tương tác · Phím Esc để thoát.</span>
+      <span>ALPORA Design System · 16 Motion Studies Native Spec</span>
+    </footer>
+  </section>
+
+  <!-- TAB 3: Typography Suite Showcase -->
+  <section id="view-typo" class="tab-view">
+    <div class="typography-section">
+      <h2 style="font-family: var(--font-display); font-size: 24px; margin: 0 0 4px;" id="lbl-typo-title">Bộ Typography Tiêu Chuẩn ALPORA</h2>
+      <p style="color: var(--muted); font-size: 14px; margin: 0 0 20px;" id="lbl-typo-desc">Được nạp trực tiếp qua FontLoader vào Quickshell và áp dụng đồng bộ cho toàn bộ hệ thống.</p>
+
+      <div class="typo-grid">
+        <div class="typo-card">
+          <h3 style="font-family: 'Inter', sans-serif;">Inter Variable</h3>
+          <div class="typo-spec">UI Sans-Serif · 100–900 Variable Weight</div>
+          <div class="typo-preview-large" style="font-family: 'Inter', sans-serif;">Aa Gg Rr 123</div>
+          <div class="typo-preview-sample" style="font-family: 'Inter', sans-serif;">
+            Sử dụng cho toàn bộ giao diện điều khiển, taskbar, nhãn biểu tượng, danh sách ứng dụng, và bộ gõ tiếng Việt Fcitx5. Cực kỳ sắc nét ở kích thước nhỏ.
+          </div>
+        </div>
+
+        <div class="typo-card">
+          <h3 style="font-family: 'JetBrains Mono', monospace;">JetBrains Mono</h3>
+          <div class="typo-spec">Code & Terminal Monospace · Ligatures</div>
+          <div class="typo-preview-large" style="font-family: 'JetBrains Mono', monospace;">0 != &lt;=&gt;</div>
+          <div class="typo-preview-sample" style="font-family: 'JetBrains Mono', monospace;">
+            Áp dụng cho terminal Foot, Kitty, widget chỉ số lập trình viên Developer Metrics, và các công cụ dòng lệnh poly-shell doctor.
+          </div>
+        </div>
+
+        <div class="typo-card">
+          <h3 style="font-family: 'Outfit', sans-serif;">Outfit Variable</h3>
+          <div class="typo-spec">Geometric Display · Rounded Curves</div>
+          <div class="typo-preview-large" style="font-family: 'Outfit', sans-serif;">10:14 ALPORA</div>
+          <div class="typo-preview-sample" style="font-family: 'Outfit', sans-serif;">
+            Dành riêng cho các chữ số đồng hồ lớn trên màn hình chính (DesktopClock), đồng hồ màn hình khóa (Hyprlock), và các tiêu đề trang trọng.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>

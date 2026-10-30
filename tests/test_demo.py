@@ -55,20 +55,30 @@ class TestDemoModule(unittest.TestCase):
         try:
             base_url = f"http://127.0.0.1:{port}"
 
-            # 1. Test /api/state
+            # 1. Test redirect to /shell/demos/web/index.html
+            class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+                def http_error_302(self, req, fp, code, msg, headers):
+                    return fp
+
+            opener = urllib.request.build_opener(NoRedirectHandler)
+            with opener.open(f"{base_url}/", timeout=3) as resp:
+                self.assertEqual(resp.status, 302)
+                self.assertEqual(resp.headers.get("Location"), "/shell/demos/web/index.html")
+
+            # 2. Test /api/state
             with urllib.request.urlopen(f"{base_url}/api/state", timeout=3) as resp:
                 self.assertEqual(resp.status, 200)
                 data = json.loads(resp.read().decode("utf-8"))
                 self.assertTrue(data.get("online"))
                 self.assertIn("metrics", data)
 
-            # 2. Test /api/themes
+            # 3. Test /api/themes
             with urllib.request.urlopen(f"{base_url}/api/themes", timeout=3) as resp:
                 self.assertEqual(resp.status, 200)
                 themes = json.loads(resp.read().decode("utf-8"))
                 self.assertTrue(len(themes) > 0)
 
-            # 3. Test /api/action POST
+            # 4. Test /api/action POST
             req = urllib.request.Request(
                 f"{base_url}/api/action",
                 data=json.dumps({"action": "mode", "value": "vibe"}).encode("utf-8"),
@@ -100,3 +110,4 @@ class TestDemoModule(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
