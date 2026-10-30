@@ -573,6 +573,7 @@ header.hub-header {
   <div class="hub-brand">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m2 20 8-16 5 10 3-6 5 12Z" fill="currentColor"/><path d="m10 4 1 13 4-3Z" fill="#fff" opacity=".35"/></svg>
     <span>ALPORA · INTERACTIVE LAB</span>
+    <small id="backend-status-badge" style="font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-left: 10px;">● STANDALONE</small>
   </div>
   <div class="hub-nav">
     <a href="index.html" class="active" id="nav-shell">Desktop Shell</a>
@@ -803,6 +804,49 @@ const THEMES_CONFIG = {
 };
 
 let currentLang = localStorage.getItem('alpora_demo_lang') || 'vi';
+let isLiveBackend = false;
+
+async function checkBackend() {
+  try {
+    const res = await fetch('/api/state');
+    if (res.ok) {
+      const data = await res.json();
+      isLiveBackend = true;
+      const badge = document.querySelector('#backend-status-badge');
+      if (badge) {
+        badge.textContent = '● LIVE BACKEND';
+        badge.style.color = 'var(--accent)';
+      }
+      if (data.metrics) {
+        if (data.metrics.cpuPercent !== undefined) {
+          document.querySelector('#metric-cpu').textContent = `${data.metrics.cpuPercent}% · 48°C`;
+        }
+        if (data.metrics.ramUsedGb !== undefined) {
+          document.querySelector('#metric-ram').textContent = `${data.metrics.ramUsedGb} / ${data.metrics.ramTotalGb} GB`;
+        }
+        if (data.metrics.batteryPercent !== undefined) {
+          document.querySelector('#qs-pill-btn span').textContent = `${data.metrics.batteryPercent}%`;
+        }
+      }
+      if (data.session && data.session.theme) {
+        applyTheme(data.session.theme, false);
+      }
+    }
+  } catch (_) {
+    isLiveBackend = false;
+  }
+}
+
+async function sendAction(action, value) {
+  if (!isLiveBackend) return;
+  try {
+    await fetch('/api/action', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, value })
+    });
+  } catch (_) {}
+}
 
 function updateLanguage(lang) {
   currentLang = lang;
@@ -825,7 +869,7 @@ function updateLanguage(lang) {
   });
 }
 
-function applyTheme(key) {
+function applyTheme(key, notifyBackend = true) {
   const t = THEMES_CONFIG[key] || THEMES_CONFIG.alpine;
   const root = document.documentElement;
   root.style.setProperty('--bg', t.bg);
@@ -840,6 +884,9 @@ function applyTheme(key) {
   document.querySelectorAll('.theme-pill-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.theme === key);
   });
+  if (notifyBackend) {
+    sendAction('theme', key);
+  }
 }
 
 // Live Clock & Metrics Tick
@@ -867,6 +914,8 @@ document.addEventListener('DOMContentLoaded', () => {
   updateLanguage(currentLang);
   tick();
   setInterval(tick, 1000);
+  checkBackend();
+  setInterval(checkBackend, 4000);
 
   // Theme buttons
   document.querySelectorAll('.theme-pill-btn[data-theme]').forEach(btn => {
@@ -916,13 +965,16 @@ document.addEventListener('DOMContentLoaded', () => {
   btnWork.onclick = () => {
     btnWork.classList.add('active');
     btnVibe.classList.remove('active');
+    sendAction('mode', 'work');
   };
   btnVibe.onclick = () => {
     btnVibe.classList.add('active');
     btnWork.classList.remove('active');
+    sendAction('mode', 'vibe');
   };
 });
 </script>
 
 </body>
 </html>
+

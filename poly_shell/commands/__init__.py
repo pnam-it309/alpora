@@ -17,6 +17,7 @@ from .desktop_cmd import (
     handle_lock_date,
     handle_lock_media,
 )
+from .demo_cmd import handle_demo
 from .theme_cmd import (
     handle_theme,
     handle_timeline,
@@ -54,4 +55,5 @@ __all__ = [
     "handle_palette_extract",
     "handle_assets",
     "handle_toolkit_refresh",
+    "handle_demo",
 ]

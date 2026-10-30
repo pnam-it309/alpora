@@ -327,6 +327,10 @@ def main(argv=None):
     pip_parser.add_argument("--mode", choices=("vertical", "landscape"), help="aspect ratio mode")
     pip_parser.add_argument("--width", type=int, help="custom window width")
     pip_parser.add_argument("--height", type=int, help="custom window height")
+    demo_parser = sub.add_parser("demo", help="ALPORA interactive design lab, motion studies and shell simulator")
+    demo_parser.add_argument("mode", choices=("web", "native", "server"), default="web", nargs="?", help="demo mode: web (browser), native (Quickshell window), or server only")
+    demo_parser.add_argument("--port", type=int, default=8080, help="port for the demo HTTP server (default: 8080)")
+    demo_parser.add_argument("--no-browser", action="store_true", help="do not auto-open default web browser")
 
     args = parser.parse_args(argv)
     paths = Paths.current()
@@ -358,6 +362,7 @@ def main(argv=None):
         "screen": lambda: commands.handle_screen(args),
         "pip": lambda: commands.handle_pip(args),
         "exe": lambda: commands.handle_exe(args),
+        "demo": lambda: commands.handle_demo(paths, args),
     }
 
     try:

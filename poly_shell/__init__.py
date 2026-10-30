@@ -51,6 +51,7 @@ _DOMAIN_MODULES = {
     "widgets": "poly_shell.system.widgets",
     "windows_fs": "poly_shell.system.windows_fs",
     "wine_apps": "poly_shell.system.wine_apps",
+    "demo_server": "poly_shell.system.demo_server",
 }
 
 
