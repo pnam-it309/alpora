@@ -1,0 +1,928 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101a1b">
+<title>ALPORA · Interactive Shell & Design Lab</title>
+<style>
+@font-face {
+  font-family: 'Inter';
+  src: url('../../assets/fonts/Inter-Variable.ttf') format('truetype');
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('../../assets/fonts/JetBrainsMono-Variable.ttf') format('truetype');
+  font-weight: 100 800;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Outfit';
+  src: url('../../assets/fonts/Outfit-Variable.ttf') format('truetype');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: dark;
+  --bg: #101a1b;
+  --surface: #182526;
+  --surface-alpha: rgba(24, 37, 38, 0.78);
+  --line: #344441;
+  --ink: #ecf0e7;
+  --muted: #9baea6;
+  --accent: #c0d3ae;
+  --secondary: #f1b791;
+  --wallpaper: url('../../assets/wallpapers/alpine-dawn.png');
+  --radius: 14px;
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: 'Outfit', 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  font: 14px/1.5 var(--font-ui);
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: background 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
+}
+
+header.hub-header {
+  padding: 16px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(16, 26, 27, 0.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.hub-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 1.5px;
+}
+.hub-brand svg { color: var(--accent); }
+.hub-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.hub-nav a {
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  transition: all .15s ease;
+}
+.hub-nav a:hover, .hub-nav a.active {
+  background: var(--accent);
+  color: #101c15;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+.lang-switch {
+  display: flex;
+  gap: 3px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+}
+.lang-switch button {
+  padding: 4px 10px;
+  border: 0;
+  background: transparent;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 6px;
+  color: var(--muted);
+  cursor: pointer;
+}
+.lang-switch button[aria-pressed=true] {
+  background: var(--accent);
+  color: #101c15;
+}
+
+/* Simulator Canvas */
+.viewport-container {
+  flex: 1;
+  padding: 24px;
+  max-width: 1400px;
+  margin: auto;
+  width: 100%;
+}
+.desktop-viewport {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9.6;
+  max-height: 720px;
+  min-height: 520px;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background-image: linear-gradient(rgba(10, 18, 24, 0.15), rgba(10, 18, 24, 0.35)), var(--wallpaper);
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  isolation: isolate;
+  user-select: none;
+}
+
+/* TopBar */
+.sim-topbar {
+  position: absolute;
+  top: 14px;
+  left: 18px;
+  right: 18px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-radius: 14px;
+  background: var(--surface-alpha);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  z-index: 50;
+  color: var(--ink);
+}
+
+.sim-workspaces {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sim-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--accent);
+  margin-right: 10px;
+}
+.ws-pill {
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.ws-pill:hover { background: rgba(255, 255, 255, 0.16); color: var(--ink); }
+.ws-pill.active {
+  background: var(--accent);
+  color: #101c15;
+  font-weight: 700;
+}
+
+.sim-clock-bar {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 4px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.sim-clock-bar:hover { background: rgba(255, 255, 255, 0.08); }
+
+.sim-tray {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tray-icon-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.tray-icon-btn:hover, .tray-icon-btn.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--accent);
+}
+.qs-toggle-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.qs-toggle-pill:hover, .qs-toggle-pill.active {
+  background: var(--accent);
+  color: #101c15;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+/* Hover-Faceted Quick Menu (Approved design requirement) */
+.hover-faceted-menu {
+  position: absolute;
+  top: 64px;
+  right: 18px;
+  width: 320px;
+  background: var(--surface-alpha);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  padding: 14px;
+  z-index: 60;
+  display: none;
+  animation: slideInDown 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.hover-faceted-menu.show { display: block; }
+@keyframes slideInDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.faceted-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.faceted-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 10px 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .15s;
+}
+.faceted-card:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--accent);
+}
+.faceted-card.active {
+  background: rgba(192, 211, 174, 0.15);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.faceted-card svg { width: 18px; height: 18px; margin-bottom: 4px; }
+.faceted-card small { display: block; font-size: 10px; font-weight: 600; }
+
+.faceted-slider-row {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+}
+.faceted-slider-row svg { width: 16px; height: 16px; color: var(--accent); }
+.faceted-slider-row input[type=range] {
+  flex: 1;
+  height: 5px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* Full Quick Settings Panel */
+.full-qs-panel {
+  position: absolute;
+  top: 64px;
+  right: 18px;
+  width: 340px;
+  background: var(--surface-alpha);
+  backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--radius);
+  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.55);
+  padding: 18px;
+  z-index: 70;
+  display: none;
+}
+.full-qs-panel.show { display: block; animation: slideInDown 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+/* Desktop Widgets */
+.sim-widgets-layer {
+  position: absolute;
+  inset: 0;
+  padding: 70px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+}
+.sim-widgets-layer > * { pointer-events: auto; }
+
+.desktop-hero-clock {
+  max-width: 440px;
+  padding: 22px 26px;
+  border-radius: 18px;
+  background: rgba(16, 26, 27, 0.65);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  color: var(--ink);
+}
+.hero-digits {
+  font-family: var(--font-display);
+  font-size: 68px;
+  font-weight: 350;
+  line-height: 1;
+  letter-spacing: -2px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.hero-digits .colon {
+  opacity: 0.8;
+  animation: pulseColon 1.6s ease-in-out infinite alternate;
+}
+@keyframes pulseColon { from { opacity: 0.3; } to { opacity: 1; } }
+.hero-date {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 14px;
+}
+.seconds-bar-track {
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.seconds-bar-fill {
+  height: 100%;
+  width: 45%;
+  background: var(--accent);
+  transition: width 0.9s linear;
+}
+
+.desktop-metrics-card {
+  align-self: flex-end;
+  width: 360px;
+  padding: 18px 20px;
+  border-radius: 18px;
+  background: rgba(16, 26, 27, 0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+.metrics-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.dev-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+  background: rgba(192, 211, 174, 0.18);
+  color: var(--accent);
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+.metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.metric-tile {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.metric-tile span {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.metric-tile strong {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* Control Dock */
+.control-dock {
+  margin-top: 22px;
+  padding: 18px 24px;
+  border-radius: 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.dock-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.dock-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.theme-pill-btn {
+  padding: 6px 14px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.theme-pill-btn:hover { border-color: var(--accent); }
+.theme-pill-btn.active {
+  background: var(--accent);
+  color: #101c15;
+  border-color: var(--accent);
+}
+
+.mode-btn {
+  padding: 6px 14px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.mode-btn.active {
+  background: var(--accent);
+  color: #101c15;
+  border-color: var(--accent);
+}
+
+/* Typography Showcase Section */
+.typography-section {
+  max-width: 1400px;
+  margin: 30px auto 60px;
+  padding: 0 24px;
+  width: 100%;
+}
+.typo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 16px;
+}
+.typo-card {
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+.typo-card h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.typo-spec {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 18px;
+}
+.typo-preview-large {
+  font-size: 40px;
+  line-height: 1.1;
+  margin-bottom: 12px;
+}
+.typo-preview-sample {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+@media (max-width: 960px) {
+  .typo-grid { grid-template-columns: 1fr; }
+  .control-dock { flex-direction: column; align-items: flex-start; }
+  .metrics-grid { grid-template-columns: 1fr; }
+  .desktop-metrics-card { width: 100%; max-width: 320px; }
+}
+</style>
+</head>
+<body>
+
+<header class="hub-header">
+  <div class="hub-brand">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m2 20 8-16 5 10 3-6 5 12Z" fill="currentColor"/><path d="m10 4 1 13 4-3Z" fill="#fff" opacity=".35"/></svg>
+    <span>ALPORA · INTERACTIVE LAB</span>
+  </div>
+  <div class="hub-nav">
+    <a href="index.html" class="active" id="nav-shell">Desktop Shell</a>
+    <a href="panel-motion/index.html" id="nav-motion">Panel Motion (16 Studies)</a>
+    <div class="lang-switch">
+      <button data-lang="vi" aria-pressed="true">VI</button>
+      <button data-lang="en" aria-pressed="false">EN</button>
+      <button data-lang="ru" aria-pressed="false">RU</button>
+    </div>
+  </div>
+</header>
+
+<main class="viewport-container">
+  <div class="desktop-viewport" id="viewport">
+    <!-- TopBar -->
+    <div class="sim-topbar">
+      <div class="sim-workspaces">
+        <div class="sim-logo">ALPORA</div>
+        <div class="ws-pill active" data-ws="1">1</div>
+        <div class="ws-pill" data-ws="2">2</div>
+        <div class="ws-pill" data-ws="3">3</div>
+        <div class="ws-pill" data-ws="4">4</div>
+      </div>
+
+      <div class="sim-clock-bar" id="bar-clock">10:14 · Th 6, 30 Th10</div>
+
+      <div class="sim-tray">
+        <button class="tray-icon-btn" id="dnd-btn" title="Do Not Disturb">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14l-2-4V9a5 5 0 0 0-10 0v4ZM10 21h4"/></svg>
+        </button>
+        <button class="tray-icon-btn" id="wifi-icon-btn" title="Wi-Fi">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8a14 14 0 0 1 18 0M6 12a9 9 0 0 1 12 0M9 16a4 4 0 0 1 6 0M12 20h.01"/></svg>
+        </button>
+        <button class="tray-icon-btn" id="audio-icon-btn" title="Volume">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m11 4-5 4H2v8h4l5 4ZM16 8a6 6 0 0 1 0 8M19 4a11 11 0 0 1 0 16"/></svg>
+        </button>
+        <button class="qs-toggle-pill" id="qs-pill-btn">
+          <span>98%</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 17h16M9 3v8M16 13v8"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Approved Hover-Faceted Quick Menu -->
+    <div class="hover-faceted-menu" id="hover-menu">
+      <div class="faceted-cards-grid">
+        <div class="faceted-card active" id="hover-card-wifi">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8a14 14 0 0 1 18 0M6 12a9 9 0 0 1 12 0M9 16a4 4 0 0 1 6 0M12 20h.01"/></svg>
+          <small>Wi-Fi</small>
+        </div>
+        <div class="faceted-card" id="hover-card-bt">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20l7-6L6 6m0 12L19 8 12 2"/></svg>
+          <small>Bluetooth</small>
+        </div>
+        <div class="faceted-card" id="hover-card-power">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10"/></svg>
+          <small id="txt-power-label">Hiệu năng</small>
+        </div>
+      </div>
+      <div class="faceted-slider-row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m11 4-5 4H2v8h4l5 4ZM16 8a6 6 0 0 1 0 8"/></svg>
+        <input type="range" min="0" max="100" value="72" id="sim-vol-range">
+        <span id="sim-vol-val">72%</span>
+      </div>
+      <div class="faceted-slider-row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        <input type="range" min="0" max="100" value="85" id="sim-bri-range">
+        <span id="sim-bri-val">85%</span>
+      </div>
+    </div>
+
+    <!-- Desktop Widgets -->
+    <div class="sim-widgets-layer">
+      <!-- Desktop Clock Widget (Outfit Display font) -->
+      <div class="desktop-hero-clock">
+        <div class="hero-digits">
+          <span id="hero-hour">10</span>
+          <span class="colon">:</span>
+          <span id="hero-min">14</span>
+        </div>
+        <div class="hero-date" id="hero-date-text">Thứ Sáu, 30 Tháng 10</div>
+        <div class="seconds-bar-track">
+          <div class="seconds-bar-fill" id="seconds-fill"></div>
+        </div>
+      </div>
+
+      <!-- Developer Metrics Widget (JetBrains Mono font) -->
+      <div class="desktop-metrics-card">
+        <div class="metrics-head">
+          <span class="dev-badge">DEV METRICS</span>
+          <span style="font-family: var(--font-mono); font-size: 11px; color: var(--accent);">● LIVE</span>
+        </div>
+        <div class="metrics-grid">
+          <div class="metric-tile">
+            <span>CPU</span>
+            <strong id="metric-cpu">32% · 48°C</strong>
+          </div>
+          <div class="metric-tile">
+            <span>RAM</span>
+            <strong id="metric-ram">4.8 / 16 GB</strong>
+          </div>
+          <div class="metric-tile">
+            <span>GPU</span>
+            <strong id="metric-gpu">24% · RTX</strong>
+          </div>
+          <div class="metric-tile">
+            <span>NET RATE</span>
+            <strong id="metric-net">↓ 2.4 MB/s</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Control Dock -->
+  <div class="control-dock">
+    <div class="dock-group">
+      <span class="dock-label" id="lbl-theme">Chủ đề:</span>
+      <button class="theme-pill-btn active" data-theme="alpine">Alpine</button>
+      <button class="theme-pill-btn" data-theme="moon-lake">Moon Lake</button>
+      <button class="theme-pill-btn" data-theme="forest-mist">Forest Mist</button>
+      <button class="theme-pill-btn" data-theme="northern-lights">Northern Lights</button>
+      <button class="theme-pill-btn" data-theme="warm-desert">Warm Desert</button>
+      <button class="theme-pill-btn" data-theme="rose-sunset">Rose Sunset</button>
+      <button class="theme-pill-btn" data-theme="timeline">Timeline</button>
+    </div>
+
+    <div class="dock-group">
+      <span class="dock-label" id="lbl-mode">Chế độ:</span>
+      <button class="mode-btn active" id="btn-work-mode">Work</button>
+      <button class="mode-btn" id="btn-vibe-mode">Vibe</button>
+    </div>
+
+    <div class="dock-group">
+      <a href="panel-motion/index.html" class="theme-pill-btn" style="text-decoration:none;" id="btn-lab-link">
+        16 Animation Studies →
+      </a>
+    </div>
+  </div>
+</main>
+
+<!-- Typography Suite Showcase -->
+<section class="typography-section">
+  <h2 style="font-family: var(--font-display); font-size: 24px; margin: 0 0 4px;" id="lbl-typo-title">Bộ Typography Tiêu Chuẩn ALPORA</h2>
+  <p style="color: var(--muted); font-size: 14px; margin: 0 0 16px;" id="lbl-typo-desc">Được tích hợp trực tiếp qua FontLoader vào Quickshell và áp dụng đồng bộ cho toàn bộ hệ thống.</p>
+
+  <div class="typo-grid">
+    <div class="typo-card">
+      <h3 style="font-family: 'Inter', sans-serif;">Inter Variable</h3>
+      <div class="typo-spec">UI Sans-Serif · 100–900 Variable Weight</div>
+      <div class="typo-preview-large" style="font-family: 'Inter', sans-serif;">Aa Gg Rr 123</div>
+      <div class="typo-preview-sample" style="font-family: 'Inter', sans-serif;">
+        Sử dụng cho toàn bộ giao diện điều khiển, taskbar, nhãn biểu tượng, danh sách ứng dụng, và bộ gõ tiếng Việt Fcitx5. Cực kỳ sắc nét ở kích thước nhỏ.
+      </div>
+    </div>
+
+    <div class="typo-card">
+      <h3 style="font-family: 'JetBrains Mono', monospace;">JetBrains Mono</h3>
+      <div class="typo-spec">Code & Terminal Monospace · Ligatures</div>
+      <div class="typo-preview-large" style="font-family: 'JetBrains Mono', monospace;">0 != &lt;=&gt;</div>
+      <div class="typo-preview-sample" style="font-family: 'JetBrains Mono', monospace;">
+        Áp dụng cho terminal Foot, Kitty, widget chỉ số lập trình viên Developer Metrics, và các công cụ dòng lệnh poly-shell doctor.
+      </div>
+    </div>
+
+    <div class="typo-card">
+      <h3 style="font-family: 'Outfit', sans-serif;">Outfit Variable</h3>
+      <div class="typo-spec">Geometric Display · Rounded Curves</div>
+      <div class="typo-preview-large" style="font-family: 'Outfit', sans-serif;">10:14 ALPORA</div>
+      <div class="typo-preview-sample" style="font-family: 'Outfit', sans-serif;">
+        Dành riêng cho các chữ số đồng hồ lớn trên màn hình chính (DesktopClock), đồng hồ màn hình khóa (Hyprlock), và các tiêu đề trang trọng.
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+const HUB_I18N = {
+  vi: {
+    navShell: "Desktop Shell",
+    navMotion: "Panel Motion (16 Chuyển động)",
+    lblTheme: "Chủ đề:",
+    lblMode: "Chế độ:",
+    workMode: "Làm việc",
+    vibeMode: "Thư giãn",
+    btnLabLink: "16 Mẫu chuyển động →",
+    lblTypoTitle: "Bộ Typography Tiêu Chuẩn ALPORA",
+    lblTypoDesc: "Được tích hợp trực tiếp qua FontLoader vào Quickshell và áp dụng đồng bộ cho toàn bộ hệ thống.",
+    powerLabel: "Hiệu năng",
+    days: ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"]
+  },
+  en: {
+    navShell: "Desktop Shell",
+    navMotion: "Panel Motion (16 Studies)",
+    lblTheme: "Theme:",
+    lblMode: "Mode:",
+    workMode: "Work",
+    vibeMode: "Vibe",
+    btnLabLink: "16 Motion Studies →",
+    lblTypoTitle: "ALPORA Typography Suite",
+    lblTypoDesc: "Embedded natively via Quickshell FontLoader and applied system-wide for crisp legibility.",
+    powerLabel: "Performance",
+    days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+  },
+  ru: {
+    navShell: "Оболочка",
+    navMotion: "Анимации (16 вариантов)",
+    lblTheme: "Тема:",
+    lblMode: "Режим:",
+    workMode: "Работа",
+    vibeMode: "Вайб",
+    btnLabLink: "16 вариантов движения →",
+    lblTypoTitle: "Типографика ALPORA",
+    lblTypoDesc: "Загружается через Quickshell FontLoader и используется нативно по всей системе.",
+    powerLabel: "Производительность",
+    days: ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"]
+  }
+};
+
+const THEMES_CONFIG = {
+  alpine: { bg: "#101a1b", surface: "#182526", line: "#344441", ink: "#ecf0e7", muted: "#9baea6", accent: "#c0d3ae", secondary: "#f1b791", wallpaper: "../../assets/wallpapers/alpine-dawn.png" },
+  "moon-lake": { bg: "#101625", surface: "#1a253b", line: "#374762", ink: "#edf0f6", muted: "#a8b5c9", accent: "#b2a5f2", secondary: "#a9caf6", wallpaper: "../../assets/wallpapers/moon-lake.png" },
+  "forest-mist": { bg: "#101f20", surface: "#1c3230", line: "#345550", ink: "#ecf3ef", muted: "#9bb5ab", accent: "#a9c8ba", secondary: "#dfd7bb", wallpaper: "../../assets/wallpapers/forest-mist.png" },
+  "northern-lights": { bg: "#0d1b22", surface: "#172c38", line: "#2f5367", ink: "#edf3f6", muted: "#97b8c7", accent: "#7bd3cd", secondary: "#bca4f0", wallpaper: "../../assets/wallpapers/northern-lights.png" },
+  "warm-desert": { bg: "#221714", surface: "#35231c", line: "#5c3d31", ink: "#faede8", muted: "#cbb1a5", accent: "#efba87", secondary: "#df9274", wallpaper: "../../assets/wallpapers/warm-desert.png" },
+  "rose-sunset": { bg: "#1e1724", surface: "#2f2237", line: "#533b5f", ink: "#f7edf3", muted: "#c5adc0", accent: "#e5a9c4", secondary: "#efb89e", wallpaper: "../../assets/wallpapers/rose-sunset.png" },
+  timeline: { bg: "#141c21", surface: "#222c32", line: "#3c4d57", ink: "#edf2f4", muted: "#a9bac5", accent: "#c7c5a6", secondary: "#edb297", wallpaper: "../../assets/wallpapers/timeline/day.png" }
+};
+
+let currentLang = localStorage.getItem('alpora_demo_lang') || 'vi';
+
+function updateLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('alpora_demo_lang', lang);
+  const t = HUB_I18N[lang] || HUB_I18N.vi;
+  document.documentElement.lang = lang;
+  document.querySelector('#nav-shell').textContent = t.navShell;
+  document.querySelector('#nav-motion').textContent = t.navMotion;
+  document.querySelector('#lbl-theme').textContent = t.lblTheme;
+  document.querySelector('#lbl-mode').textContent = t.lblMode;
+  document.querySelector('#btn-work-mode').textContent = t.workMode;
+  document.querySelector('#btn-vibe-mode').textContent = t.vibeMode;
+  document.querySelector('#btn-lab-link').textContent = t.btnLabLink;
+  document.querySelector('#lbl-typo-title').textContent = t.lblTypoTitle;
+  document.querySelector('#lbl-typo-desc').textContent = t.lblTypoDesc;
+  document.querySelector('#txt-power-label').textContent = t.powerLabel;
+
+  document.querySelectorAll('.lang-switch button').forEach(btn => {
+    btn.setAttribute('aria-pressed', String(btn.dataset.lang === lang));
+  });
+}
+
+function applyTheme(key) {
+  const t = THEMES_CONFIG[key] || THEMES_CONFIG.alpine;
+  const root = document.documentElement;
+  root.style.setProperty('--bg', t.bg);
+  root.style.setProperty('--surface', t.surface);
+  root.style.setProperty('--line', t.line);
+  root.style.setProperty('--ink', t.ink);
+  root.style.setProperty('--muted', t.muted);
+  root.style.setProperty('--accent', t.accent);
+  root.style.setProperty('--secondary', t.secondary);
+  root.style.setProperty('--wallpaper', `url('${t.wallpaper}')`);
+
+  document.querySelectorAll('.theme-pill-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.theme === key);
+  });
+}
+
+// Live Clock & Metrics Tick
+function tick() {
+  const now = new Date();
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = now.getSeconds();
+
+  document.querySelector('#hero-hour').textContent = hours;
+  document.querySelector('#hero-min').textContent = minutes;
+  document.querySelector('#seconds-fill').style.width = ((seconds / 60) * 100) + '%';
+
+  const t = HUB_I18N[currentLang] || HUB_I18N.vi;
+  const dayName = t.days[now.getDay()];
+  document.querySelector('#hero-date-text').textContent = `${dayName}, ${now.getDate()} / ${now.getMonth() + 1}`;
+  document.querySelector('#bar-clock').textContent = `${hours}:${minutes} · ${dayName.slice(0, 3)} ${now.getDate()}`;
+
+  // Slightly jitter developer metrics to feel live
+  const cpuVal = 28 + Math.floor(Math.sin(now.getTime() / 2000) * 8);
+  document.querySelector('#metric-cpu').textContent = `${cpuVal}% · 48°C`;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  updateLanguage(currentLang);
+  tick();
+  setInterval(tick, 1000);
+
+  // Theme buttons
+  document.querySelectorAll('.theme-pill-btn[data-theme]').forEach(btn => {
+    btn.onclick = () => applyTheme(btn.dataset.theme);
+  });
+
+  // Language buttons
+  document.querySelectorAll('.lang-switch button').forEach(btn => {
+    btn.onclick = () => updateLanguage(btn.dataset.lang);
+  });
+
+  // Workspaces
+  document.querySelectorAll('.ws-pill').forEach(pill => {
+    pill.onclick = () => {
+      document.querySelectorAll('.ws-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+    };
+  });
+
+  // Hover-Faceted Menu Toggle
+  const qsPill = document.querySelector('#qs-pill-btn');
+  const hoverMenu = document.querySelector('#hover-menu');
+  qsPill.onclick = () => {
+    hoverMenu.classList.toggle('show');
+    qsPill.classList.toggle('active');
+  };
+
+  // Close popup if clicking outside
+  document.querySelector('#viewport').onclick = (e) => {
+    if (!e.target.closest('#qs-pill-btn') && !e.target.closest('#hover-menu')) {
+      hoverMenu.classList.remove('show');
+      qsPill.classList.remove('active');
+    }
+  };
+
+  // Sliders
+  document.querySelector('#sim-vol-range').oninput = (e) => {
+    document.querySelector('#sim-vol-val').textContent = e.target.value + '%';
+  };
+  document.querySelector('#sim-bri-range').oninput = (e) => {
+    document.querySelector('#sim-bri-val').textContent = e.target.value + '%';
+  };
+
+  // Mode buttons
+  const btnWork = document.querySelector('#btn-work-mode');
+  const btnVibe = document.querySelector('#btn-vibe-mode');
+  btnWork.onclick = () => {
+    btnWork.classList.add('active');
+    btnVibe.classList.remove('active');
+  };
+  btnVibe.onclick = () => {
+    btnVibe.classList.add('active');
+    btnWork.classList.remove('active');
+  };
+});
+</script>
+
+</body>
+</html>
