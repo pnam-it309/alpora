@@ -171,6 +171,7 @@ jobs:
           pacman -Syu --noconfirm git python sudo which
           useradd -m -s /bin/bash archuser
           echo "archuser ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+          chmod +x install/*.sh scripts/*.sh scripts/check scripts/format scripts/build/*
           chown -R archuser:archuser "$GITHUB_WORKSPACE"
 
       - name: Test 1 - Standard Dry-Run Installation
@@ -213,6 +214,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+
+      - name: Ensure installer scripts are executable
+        run: chmod +x install/*.sh scripts/*.sh scripts/check scripts/format scripts/build/*
 
       - name: Test UI-Only Standalone Dry-Run on Ubuntu
         run: |

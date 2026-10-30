@@ -162,9 +162,19 @@ def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--replace-config',action='store_true')
     parser.add_argument('--ui-only',action='store_true',help='Install standalone UI shell only without modifying Hyprland session configs')
+    parser.add_argument('--print-packages',action='store_true',help='Print required package list')
+    parser.add_argument('--optional',action='store_true',help='Print optional packages instead')
     from ..theming.themes import IDS
     parser.add_argument('--theme',choices=IDS)
     args=parser.parse_args(argv)
+    if args.print_packages:
+        from .programs import PROGRAMS
+        seen = set()
+        for _, pkg, _, _, req in PROGRAMS:
+            if ((not args.optional and req) or (args.optional and not req)) and pkg not in seen:
+                print(pkg)
+                seen.add(pkg)
+        return 0
     paths=Paths.current()
     ui=InstallerUI()
     try:

@@ -92,8 +92,19 @@ if [[ "$install_wizard" == true ]]; then
 fi
 alpora_banner
 printf 'Selected theme: %s\n' "${install_theme:-alpine (default)}"
-mapfile -t required_packages < <(python3 "$project_dir/scripts/setup-arch-desktop" --print-packages)
-mapfile -t optional_packages < <(python3 "$project_dir/scripts/setup-arch-desktop" --print-packages --optional)
+required_packages=()
+optional_packages=()
+if command -v python3 >/dev/null 2>&1; then
+    mapfile -t required_packages < <(python3 "$project_dir/scripts/setup-arch-desktop" --print-packages 2>/dev/null || true)
+    mapfile -t optional_packages < <(python3 "$project_dir/scripts/setup-arch-desktop" --print-packages --optional 2>/dev/null || true)
+fi
+
+if [[ ${#required_packages[@]} -eq 0 ]]; then
+    required_packages=(quickshell hyprland python systemd glib2)
+fi
+if [[ ${#optional_packages[@]} -eq 0 ]]; then
+    optional_packages=(foot kitty nautilus xdg-utils xdg-user-dirs fuzzel upower wireplumber networkmanager nm-connection-editor bluez-utils util-linux brightnessctl hyprsunset mako pavucontrol power-profiles-daemon swaybg hyprlock hypridle hyprshutdown wl-clipboard playerctl grim slurp libnotify wine)
+fi
 
 if [[ "$install_core_only" == true ]]; then
     packages=("${required_packages[@]}")
