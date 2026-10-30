@@ -34,14 +34,14 @@ jobs:
         run: |
           echo "Running ShellCheck on installation and helper scripts..."
           shellcheck -x -S warning \
-            install.sh uninstall.sh \
+            install/*.sh \
             scripts/*.sh scripts/check scripts/format scripts/build/build-shaders
 
       - name: 2. Shell Script Formatting Check (shfmt)
         run: |
           echo "Verifying shell script indentation & format with shfmt..."
           shfmt -d -i 4 -ci \
-            install.sh uninstall.sh \
+            install/*.sh \
             scripts/*.sh scripts/check scripts/format scripts/build/build-shaders || true
 
       - name: 3. Python Code Style & Syntax Check (Ruff)
@@ -149,7 +149,8 @@ jobs:
             tests/test_themes.py \
             tests/test_landscapes.py \
             tests/test_state.py \
-            tests/test_shortcuts.py
+            tests/test_shortcuts.py \
+            tests/test_demo.py
 
   # ---------------------------------------------------------------------------
   # 3. Dry-Run Installation Test (Clean Arch Linux Container)
@@ -174,32 +175,32 @@ jobs:
 
       - name: Test 1 - Standard Dry-Run Installation
         run: |
-          sudo -u archuser ./install.sh --dry-run
+          sudo -u archuser ./install/install.sh --dry-run
 
       - name: Test 2 - UI-Only Standalone Dry-Run
         run: |
-          sudo -u archuser ./install.sh --ui-only --dry-run
+          sudo -u archuser ./install/install.sh --ui-only --dry-run
 
       - name: Test 3 - Core-Only Minimal Dry-Run
         run: |
-          sudo -u archuser ./install.sh --core-only --dry-run
+          sudo -u archuser ./install/install.sh --core-only --dry-run
 
       - name: Test 4 - Custom Theme Preset Dry-Run
         run: |
-          sudo -u archuser ./install.sh --dry-run --theme=forest-mist
+          sudo -u archuser ./install/install.sh --dry-run --theme=forest-mist
 
       - name: Test 5 - Terminal Welcome Banner & Preview Mode
         run: |
-          sudo -u archuser ./install.sh --preview
+          sudo -u archuser ./install/install.sh --preview
 
       - name: Test 6 - Dry-Run Uninstall Script
         run: |
-          sudo -u archuser ./uninstall.sh --dry-run || true
+          sudo -u archuser ./install/uninstall.sh --dry-run || true
 
       - name: Test 7 - Arch Linux PKGBUILD Validation
         run: |
           echo "Validating Arch Linux PKGBUILD syntax with makepkg..."
-          sudo -u archuser bash -c "makepkg --nobuild --nodeps || true"
+          sudo -u archuser bash -c "cd packaging/aur && makepkg --nobuild --nodeps || true"
 
   # ---------------------------------------------------------------------------
   # 4. Dry-Run Installation Test (Debian / Ubuntu Non-Arch Distro)
@@ -215,8 +216,8 @@ jobs:
 
       - name: Test UI-Only Standalone Dry-Run on Ubuntu
         run: |
-          ./install.sh --ui-only --dry-run
+          ./install/install.sh --ui-only --dry-run
 
       - name: Test Skip-Packages Dry-Run on Ubuntu
         run: |
-          ./install.sh --skip-packages --dry-run
+          ./install/install.sh --skip-packages --dry-run

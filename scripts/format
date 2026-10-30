@@ -30,7 +30,7 @@ EOF
 
 echo "=== 2. Formatting Shell scripts ==="
 if command -v shfmt >/dev/null 2>&1; then
-    shfmt -w -i 4 -ci install.sh uninstall.sh integrations/*.sh scripts/* || true
+    shfmt -w -i 4 -ci install/*.sh scripts/*.sh scripts/check scripts/format scripts/build/* || true
     echo "Shell scripts formatted with shfmt."
 else
     echo "shfmt not found. Install shfmt for shell script formatting (pacman -S shfmt / brew install shfmt)."

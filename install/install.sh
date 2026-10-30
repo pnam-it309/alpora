@@ -11,6 +11,7 @@ install_ignore_distro=false
 install_theme=''
 install_wizard=false
 install_preview=false
+# shellcheck source=scripts/installer-ui.sh
 source "$project_dir/scripts/installer-ui.sh"
 for argument in "$@"; do
     case "$argument" in
