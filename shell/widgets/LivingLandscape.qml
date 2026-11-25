@@ -24,7 +24,7 @@ PanelWindow {
     color: "transparent"
     readonly property var scene: Scene.layout(Session.appearance.id || "alpine", TimelineState.shownMinute, width, height)
     readonly property real fit: scene.scale
-    readonly property var monitor: modelData ? Hyprland.monitorFor(modelData) : null
+    readonly property var monitor: root.modelData ? Hyprland.monitorFor(root.modelData) : null
     readonly property bool fullscreen: !!monitor && !!monitor.activeWorkspace && monitor.activeWorkspace.hasFullscreen
     readonly property bool screenAwake: !monitor || (monitor.lastIpcObject && monitor.lastIpcObject.dpmsStatus !== false)
     readonly property bool isWorkMode: Session.mode === "work"

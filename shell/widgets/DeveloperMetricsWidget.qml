@@ -1,7 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import ".."
-import QtQuick.Controls
 import QtQuick.Layouts
 import "../theme" as PolyTheme
 
@@ -49,19 +48,20 @@ DesktopWidgetCard {
                     {label: "NET", value: "↓ " + DeveloperMetricsState.formatRate(DeveloperMetricsState.downloadBytesPerSecond), detail: "↑ " + DeveloperMetricsState.formatRate(DeveloperMetricsState.uploadBytesPerSecond), percent: -1}
                 ]
                 delegate: ColumnLayout {
+                    id: metricDelegate
                     required property var modelData
                     Layout.fillWidth: true; Layout.fillHeight: true; spacing: 3
                     RowLayout {
                         Layout.fillWidth: true; spacing: 5
-                        Text { text: modelData.label; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 9; font.weight: Font.DemiBold }
+                        Text { text: metricDelegate.modelData.label; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 9; font.weight: Font.DemiBold }
                         Item { Layout.fillWidth: true }
-                        Text { text: modelData.value; color: Session.foreground; font.family: Session.monoFontFamily || Session.fontFamily; font.pixelSize: 12; font.weight: Font.DemiBold; elide: Text.ElideRight }
+                        Text { text: metricDelegate.modelData.value; color: Session.foreground; font.family: Session.monoFontFamily || Session.fontFamily; font.pixelSize: 12; font.weight: Font.DemiBold; elide: Text.ElideRight }
                     }
                     Rectangle {
-                        Layout.fillWidth: true; Layout.preferredHeight: 4; radius: 2; color: Glass.tint(Session.muted, 0.16); visible: typeof modelData.percent === "number" && modelData.percent >= 0
-                        Rectangle { width: parent.width * Math.max(0, Math.min(100, Number(modelData.percent) || 0)) / 100; height: parent.height; radius: 2; color: modelData.label === "GPU" ? PolyTheme.Theme.cool : Session.accent }
+                        Layout.fillWidth: true; Layout.preferredHeight: 4; radius: 2; color: Glass.tint(Session.muted, 0.16); visible: typeof metricDelegate.modelData.percent === "number" && metricDelegate.modelData.percent >= 0
+                        Rectangle { width: parent.width * Math.max(0, Math.min(100, Number(metricDelegate.modelData.percent) || 0)) / 100; height: parent.height; radius: 2; color: metricDelegate.modelData.label === "GPU" ? PolyTheme.Theme.cool : Session.accent }
                     }
-                    Text { Layout.fillWidth: true; text: modelData.detail; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 9; elide: Text.ElideRight }
+                    Text { Layout.fillWidth: true; text: metricDelegate.modelData.detail; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 9; elide: Text.ElideRight }
                 }
             }
         }
