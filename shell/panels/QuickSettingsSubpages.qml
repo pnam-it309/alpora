@@ -452,117 +452,9 @@ ColumnLayout {
     }
 
     // Hotspot subpage
-    ColumnLayout {
+    QuickHotspotSubpage {
         visible: root.popup.page === "hotspot"
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        spacing: 12
-        Text {
-            Layout.fillWidth: true
-            text: I18n.tr("wifi.hotspot_desc")
-            color: Session.muted
-            font.family: Session.fontFamily
-            font.pixelSize: 12
-            wrapMode: Text.Wrap
-        }
-        SettingsRow {
-            Layout.fillWidth: true
-            text: I18n.tr("quick.mobile_hotspot")
-            symbol: "hotspot"
-            selected: !!Desktop.data.hotspot
-            subtitle: Desktop.data.hotspot ? (Desktop.data.hotspotClients > 0 ? I18n.trWith("wifi.hotspot_devices", {count: Desktop.data.hotspotClients}) : I18n.tr("common.enabled")) : I18n.tr("common.disabled")
-            enabled: Desktop.data.hotspotAvailable && !Desktop.changingSettings && !Desktop.data.airplane
-            onClicked: Desktop.request("hotspot", Desktop.data.hotspot ? "off" : "on")
-        }
-        GlowSectionDivider {
-            Layout.fillWidth: true
-        }
-        Text {
-            text: I18n.tr("wifi.hotspot_name")
-            color: Session.muted
-            font.family: Session.fontFamily
-            font.pixelSize: 11
-        }
-        TextField {
-            id: hotspotSsidEdit
-            Layout.fillWidth: true
-            text: Desktop.data.hotspotSsid || "Alpora-Hotspot"
-            color: Session.foreground
-            selectionColor: Session.accent
-            font.family: Session.fontFamily
-            font.pixelSize: 13
-            padding: 10
-            background: Rectangle {
-                radius: 10
-                color: Glass.tint(PolyTheme.Theme.color("#303939"), 0.5)
-                border.width: 1
-                border.color: hotspotSsidEdit.activeFocus ? Session.accent : PolyTheme.Theme.color("#49534b")
-            }
-        }
-        Text {
-            text: I18n.tr("wifi.hotspot_password")
-            color: Session.muted
-            font.family: Session.fontFamily
-            font.pixelSize: 11
-        }
-        RowLayout {
-            Layout.fillWidth: true
-            spacing: 6
-            TextField {
-                id: hotspotPasswordEdit
-                Layout.fillWidth: true
-                text: Desktop.data.hotspotPassword || "alporapassword"
-                echoMode: root.popup.showPassword ? TextInput.Normal : TextInput.Password
-                color: Session.foreground
-                selectionColor: Session.accent
-                font.family: Session.fontFamily
-                font.pixelSize: 13
-                padding: 10
-                background: Rectangle {
-                    radius: 10
-                    color: Glass.tint(PolyTheme.Theme.color("#303939"), 0.5)
-                    border.width: 1
-                    border.color: hotspotPasswordEdit.activeFocus ? Session.accent : PolyTheme.Theme.color("#49534b")
-                }
-            }
-            Rectangle {
-                Layout.preferredWidth: 42
-                Layout.preferredHeight: 38
-                radius: 9
-                color: Glass.tint(Session.surface, 0.4)
-                border.width: 1
-                border.color: Glass.tint(Session.accent, 0.2)
-                Text {
-                    anchors.centerIn: parent
-                    text: root.popup.showPassword ? I18n.tr("wifi.hide_password") : I18n.tr("wifi.show_password")
-                    color: Session.accent
-                    font.family: Session.fontFamily
-                    font.pixelSize: 10
-                    font.weight: Font.Medium
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.popup.showPassword = !root.popup.showPassword
-                }
-            }
-        }
-        Text {
-            text: I18n.tr("wifi.hotspot_band")
-            color: Session.muted
-            font.family: Session.fontFamily
-            font.pixelSize: 11
-        }
-        SettingsRow {
-            Layout.fillWidth: true
-            text: I18n.tr("wifi.hotspot_save")
-            symbol: "check"
-            enabled: hotspotSsidEdit.text.trim().length > 0 && hotspotPasswordEdit.text.trim().length >= 8 && !Desktop.changingSettings
-            onClicked: {
-                Desktop.request("hotspot", JSON.stringify({ ssid: hotspotSsidEdit.text.trim(), password: hotspotPasswordEdit.text.trim(), active: Desktop.data.hotspot }));
-            }
-        }
-        Item { Layout.fillHeight: true }
+        popup: root.popup
     }
 
     // Devices subpage
@@ -637,77 +529,15 @@ ColumnLayout {
     }
 
     // Power Profiles subpage
-    ColumnLayout {
+    QuickProfilesSubpage {
         visible: root.popup.page === "profiles"
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        spacing: 12
-        Text {
-            Layout.fillWidth: true
-            text: Desktop.data.powerProfilesAvailable ? I18n.tr("quick.power_profiles_desc") : I18n.tr("quick.power_profiles_unavailable")
-            color: Session.muted
-            font.family: Session.fontFamily
-            font.pixelSize: 12
-            wrapMode: Text.Wrap
-        }
-        Repeater {
-            model: [{key: "power-saver", label: I18n.tr("quick.power_saver"), detail: I18n.tr("quick.power_saver_desc"), icon: "leaf"}, {key: "balanced", label: I18n.tr("quick.balanced"), detail: I18n.tr("quick.balanced_desc"), icon: "balance"}, {key: "performance", label: I18n.tr("quick.performance"), detail: I18n.tr("quick.performance_desc"), icon: "performance"}]
-            QuickTile {
-                required property var modelData
-                Layout.fillWidth: true
-                title: modelData.label
-                subtitle: modelData.detail
-                symbol: modelData.icon
-                active: Desktop.data.powerProfile === modelData.key
-                enabled: Desktop.data.powerProfilesAvailable && (Desktop.data.powerProfiles || []).includes(modelData.key) && !Desktop.changingSettings
-                onClicked: Desktop.request("power-profile", modelData.key)
-            }
-        }
-        Text {
-            visible: !!Desktop.data.powerDegraded
-            Layout.fillWidth: true
-            text: I18n.tr("quick.power_throttled")
-            color: PolyTheme.Theme.color("#d9b38d")
-            font.family: Session.fontFamily
-            font.pixelSize: 12
-            wrapMode: Text.Wrap
-        }
-        Item { Layout.fillHeight: true }
+        popup: root.popup
     }
 
     // Airplane subpage
-    ColumnLayout {
+    QuickAirplaneSubpage {
         visible: root.popup.page === "airplane"
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        spacing: 14
-        Text {
-            Layout.fillWidth: true
-            text: I18n.tr("quick.airplane_desc")
-            color: Session.muted
-            font.family: Session.fontFamily
-            font.pixelSize: 12
-            wrapMode: Text.Wrap
-        }
-        SettingsRow {
-            Layout.fillWidth: true
-            text: I18n.tr("quick.airplane_mode")
-            symbol: "airplane"
-            selected: !!Desktop.data.airplane
-            subtitle: Desktop.data.airplaneManaged && !selected ? I18n.tr("quick.airplane_restore") : (selected ? I18n.tr("quick.airplane_on_desc") : I18n.tr("quick.airplane_off_desc"))
-            enabled: Desktop.data.airplaneAvailable && !Desktop.changingSettings
-            onClicked: Desktop.request("airplane", Desktop.data.airplane || Desktop.data.airplaneManaged ? "off" : "on")
-        }
-        Text {
-            visible: !!Desktop.data.airplaneHardwareBlocked
-            Layout.fillWidth: true
-            text: I18n.tr("quick.airplane_hardware_rfkill")
-            color: PolyTheme.Theme.color("#d9b38d")
-            font.family: Session.fontFamily
-            font.pixelSize: 12
-            wrapMode: Text.Wrap
-        }
-        Item { Layout.fillHeight: true }
+        popup: root.popup
     }
 
     // Nightlight / DND subpage
@@ -737,21 +567,9 @@ ColumnLayout {
     }
 
     // Power Actions subpage
-    ColumnLayout {
+    QuickPowerActionsSubpage {
         visible: root.popup.page === "power"
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        spacing: 12
-        Text {
-            text: root.popup.powerAction ? I18n.trWith("quick.confirm_action", {action: root.popup.powerAction === "poweroff" ? I18n.tr("quick.shutdown") : I18n.tr("quick.reboot")}) : I18n.tr("quick.choose_action")
-            color: Session.foreground
-            font.family: Session.fontFamily
-            font.pixelSize: 14
-        }
-        SettingsRow { text: I18n.tr("quick.reboot"); symbol: "refresh"; Layout.fillWidth: true; onClicked: root.popup.powerAction = "reboot" }
-        SettingsRow { text: I18n.tr("quick.shutdown"); symbol: "power"; Layout.fillWidth: true; onClicked: root.popup.powerAction = "poweroff" }
-        SettingsRow { text: I18n.tr("common.confirm"); selected: true; symbol: "check"; visible: !!root.popup.powerAction; Layout.fillWidth: true; onClicked: { Quickshell.execDetached(["systemctl", root.popup.powerAction]); Session.closeQuickSettings(); } }
-        Item { Layout.fillHeight: true }
+        popup: root.popup
     }
 }
 

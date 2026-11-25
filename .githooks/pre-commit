@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# ALPORA Automated Pre-Commit Verification Guard
+# Runs the blocking project checks before committing; full Ruff lint remains advisory.
+
+set -e
+
+PROJECT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "$PROJECT_DIR"
+
+echo ":: Running ALPORA pre-commit checks..."
+
+# 1. Report project-wide Ruff debt without blocking commits.
+if command -v ruff >/dev/null 2>&1; then
+    echo ":: [1/2] Running advisory project-wide Ruff check..."
+    if ! ruff check poly_shell/ tests/; then
+        echo "::warning::Ruff reports existing project-wide lint debt; see CI output."
+    fi
+elif [[ -x "$HOME/.local/bin/ruff" ]]; then
+    echo ":: [1/2] Running advisory Ruff check from ~/.local/bin..."
+    if ! "$HOME/.local/bin/ruff" check poly_shell/ tests/; then
+        echo "::warning::Ruff reports existing project-wide lint debt; see CI output."
+    fi
+else
+    echo ":: [1/2] Ruff not found; skipping advisory lint."
+fi
+
+# 2. Run the blocking full test suite and QML linter.
+echo ":: [2/2] Running full tests and QML lint (scripts/check)..."
+./scripts/check
+
+echo ":: All ALPORA pre-commit checks passed successfully!"
+exit 0

@@ -124,6 +124,10 @@ NotificationsPreview 1.0 panels/NotificationsPreview.qml
 Osd 1.0 panels/Osd.qml
 PowerMenu 1.0 panels/PowerMenu.qml
 QuickHoverContent 1.0 panels/QuickHoverContent.qml
+QuickHotspotSubpage 1.0 panels/QuickHotspotSubpage.qml
+QuickProfilesSubpage 1.0 panels/QuickProfilesSubpage.qml
+QuickAirplaneSubpage 1.0 panels/QuickAirplaneSubpage.qml
+QuickPowerActionsSubpage 1.0 panels/QuickPowerActionsSubpage.qml
 QuickSettings 1.0 panels/QuickSettings.qml
 QuickSettingsSubpages 1.0 panels/QuickSettingsSubpages.qml
 ScreenshotOverlay 1.0 panels/ScreenshotOverlay.qml
@@ -157,6 +161,7 @@ WeatherScene 1.0 widgets/WeatherScene.qml
 AppearancePage 1.0 settings/AppearancePage.qml
 SettingsAppearance 1.0 settings/SettingsAppearance.qml
 SettingsDetails 1.0 settings/SettingsDetails.qml
+SettingsLanguage 1.0 settings/SettingsLanguage.qml
 SettingsNav 1.0 settings/SettingsNav.qml
 SettingsOverview 1.0 settings/SettingsOverview.qml
 SettingsShortcuts 1.0 settings/SettingsShortcuts.qml

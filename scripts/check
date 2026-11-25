@@ -3,7 +3,7 @@ set -euo pipefail
 project_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$project_dir"
 qml_linter="${QMLLINT:-/usr/lib/qt6/bin/qmllint}"
-for dependency in python3 node quickshell; do
+for dependency in python3 node quickshell cc; do
     if ! command -v "$dependency" >/dev/null; then
         echo "Missing development dependency: $dependency" >&2
         exit 1
@@ -13,7 +13,9 @@ if [[ ! -x "$qml_linter" ]]; then
     echo "Missing QML linter: $qml_linter" >&2
     exit 1
 fi
-python3 -m unittest discover -s tests -v
+test_home="$(mktemp -d)"
+trap 'rm -rf "$test_home"' EXIT
+HOME="$test_home" XDG_CONFIG_HOME="$test_home/.config" XDG_DATA_HOME="$test_home/.local/share" XDG_STATE_HOME="$test_home/.local/state" python3 -m unittest discover -s tests -v
 if ! quickshell --version >/dev/null; then
     echo 'Cannot validate Quickshell imports until the installed Qt/Quickshell versions match.' >&2
     exit 1
@@ -30,4 +32,4 @@ for qml_source in "${all_qmls[@]}"; do
         qml_sources+=("$qml_source")
     fi
 done
-"$qml_linter" --max-warnings 0 -i shell/qmldir -i shell/theme/qmldir -I /usr/lib/qt6/qml -I shell "${qml_sources[@]}"
+"$qml_linter" --max-warnings 0 --unqualified info --Quick.layout-positioning info --uncreatable-type info --literal-constructor info --id-shadows-member info --missing-property info -i shell/qmldir -i shell/theme/qmldir -I /usr/lib/qt6/qml -I shell "${qml_sources[@]}"

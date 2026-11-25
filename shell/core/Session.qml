@@ -62,6 +62,7 @@ Singleton {
     readonly property var inputs: (pipewireNodes && pipewireNodes.values) ? pipewireNodes.values.filter(node => node && !node.isStream && node.audio && !node.isSink) : []
     readonly property var audioStreams: (pipewireNodes && pipewireNodes.values) ? pipewireNodes.values.filter(node => node && node.isStream && node.audio && node.isSink) : []
     readonly property var sink: Pipewire.defaultAudioSink
+    readonly property var audio: sink && sink.ready ? sink.audio : null
     property string lastSinkName: ""
     onSinkChanged: {
         const nextName = sink ? (sink.description || sink.nickname || sink.name || "") : "";

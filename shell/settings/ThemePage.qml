@@ -148,8 +148,8 @@ ColumnLayout {
                         }
                         RowLayout {
                             Layout.fillWidth: true; spacing: 7
-                            Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 28; radius: 6; color: root.previewSurface; Behavior on color { ColorAnimation { duration: Motion.reduced ? 0 : 250 } }; Icon { anchors.centerIn: parent; name: "wifi"; width: 15; height: 15 } }
-                            Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 28; radius: 6; color: root.previewSurface; Behavior on color { ColorAnimation { duration: Motion.reduced ? 0 : 250 } }; Icon { anchors.centerIn: parent; name: "bluetooth"; width: 15; height: 15 } }
+                            Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 28; radius: 6; color: root.previewSurface; Behavior on color { ColorAnimation { duration: Motion.reduced ? 0 : 250 } } Icon { anchors.centerIn: parent; name: "wifi"; width: 15; height: 15 } }
+                            Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 28; radius: 6; color: root.previewSurface; Behavior on color { ColorAnimation { duration: Motion.reduced ? 0 : 250 } } Icon { anchors.centerIn: parent; name: "bluetooth"; width: 15; height: 15 } }
                         }
                     }
                 }

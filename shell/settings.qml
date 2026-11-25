@@ -44,7 +44,6 @@ ShellRoot {
             root.confirmClose = true;
         } else {
             settingsWindow.visible = false;
-            settingsWindow.close();
             Qt.quit();
         }
     }
@@ -234,9 +233,10 @@ ShellRoot {
                 Loader { Layout.fillWidth: true; Layout.fillHeight: true; visible: root.page === "widgets"; active: visible; sourceComponent: SettingsWidgets { wallpaper: root.wallpaperUrl } }
                 Loader { Layout.fillWidth: true; Layout.fillHeight: true; visible: root.page === "input"; active: visible; sourceComponent: SettingsShortcuts {} }
                 ThemePage { Layout.fillWidth: true; Layout.fillHeight: true; visible: root.page === "wallpaper"; onImportRequested: wallpaperDialog.open() }
+                Loader { Layout.fillWidth: true; Layout.fillHeight: true; visible: root.page === "language"; active: visible; sourceComponent: SettingsLanguage {} }
                 SettingsDetails {
                     Layout.fillWidth: true; Layout.fillHeight: true
-                    visible: !["overview", "appearance", "wallpaper", "widgets", "input"].includes(root.page)
+                    visible: !["overview", "appearance", "wallpaper", "widgets", "input", "language"].includes(root.page)
                     page: root.page; monitors: root.monitors; wallpaper: root.wallpaperUrl
                     onNavigate: page => root.navigate(page)
                     onChooseWallpaper: wallpaperDialog.open()
@@ -255,7 +255,7 @@ ShellRoot {
                 RowLayout {
                     Layout.fillWidth: true
                     AppearanceButton { Layout.fillWidth: true; text: I18n.tr("settings.stay"); symbol: "chevron-left"; primary: true; onClicked: root.confirmClose = false }
-                    AppearanceButton { Layout.fillWidth: true; text: I18n.tr("common.close"); symbol: "close"; onClicked: { settingsWindow.visible = false; settingsWindow.close(); Qt.quit(); } }
+                    AppearanceButton { Layout.fillWidth: true; text: I18n.tr("common.close"); symbol: "close"; onClicked: { settingsWindow.visible = false; Qt.quit(); } }
                 }
             }
         }

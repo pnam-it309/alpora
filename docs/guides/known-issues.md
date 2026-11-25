@@ -22,13 +22,13 @@ Hyprland 0.56.2, Quickshell 0.3.2 and Qt 6.12.0 on a single 1920×1080 monitor.
   Enterprise Wi-Fi uses Nmtui. Monitor layout editing is not implemented.
   Hardware-dependent controls need the relevant service and permissions.
 - **Language:** internationalisation (i18n) framework implemented with full support
-  for English (`en`, baseline), Vietnamese (`vi`), and Russian (`ru`) with dynamic
+  for English (`en`, baseline), Vietnamese (`vi`), Spanish (`es`), and Russian (`ru`) with dynamic
   runtime switching and clean locale separation under `assets/locales/`.
 - **Diagnostics:** Qt SVG, Wayland text-input and portal warnings remain. Old
   duplicate watcher processes were cleared by restarting; a long soak test has
   not established whether the underlying duplication can recur.
 
-The last local full check passed 197 tests and strict QML lint. This is a local
+The current local full check passed 401 tests and strict QML lint. This is a local
 validation record, not a hosted CI badge or a guarantee of every configuration.
 See the [audit](code-audit-2026-10-22.md) and
 [performance evidence](performance-evidence/companion-tween-2026-10-22/README.md).

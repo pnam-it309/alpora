@@ -5,6 +5,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
+import "../theme" as PolyTheme
 
 Scope {
     id: root
@@ -65,7 +66,7 @@ Scope {
                         Text { text: I18n.tr("Developer panel"); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 21; font.weight: Font.DemiBold }
                         Text { text: (root.metrics.hostname || I18n.tr("System")) + " · " + I18n.tr("Updates every 2 s"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11 }
                     }
-                    Text { text: DeveloperMetricsState.busy ? I18n.tr("Refreshing…") : DeveloperMetricsState.error ? I18n.tr("Partial data") : I18n.tr("Real time"); color: DeveloperMetricsState.error ? "#E7B477" : Session.accent; font.family: Session.fontFamily; font.pixelSize: 11 }
+                    Text { text: DeveloperMetricsState.busy ? I18n.tr("Refreshing…") : DeveloperMetricsState.error ? I18n.tr("Partial data") : I18n.tr("Real time"); color: DeveloperMetricsState.error ? PolyTheme.Theme.color("#E7B477") : Session.accent; font.family: Session.fontFamily; font.pixelSize: 11 }
                     ToolButton {
                         text: "×"; Accessible.name: I18n.tr("Close developer panel")
                         onClicked: DeveloperMetricsState.closeDetails()

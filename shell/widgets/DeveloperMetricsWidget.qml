@@ -3,6 +3,7 @@ import QtQuick
 import ".."
 import QtQuick.Controls
 import QtQuick.Layouts
+import "../theme" as PolyTheme
 
 DesktopWidgetCard {
     id: root
@@ -58,7 +59,7 @@ DesktopWidgetCard {
                     }
                     Rectangle {
                         Layout.fillWidth: true; Layout.preferredHeight: 4; radius: 2; color: Glass.tint(Session.muted, 0.16); visible: typeof modelData.percent === "number" && modelData.percent >= 0
-                        Rectangle { width: parent.width * Math.max(0, Math.min(100, Number(modelData.percent) || 0)) / 100; height: parent.height; radius: 2; color: modelData.label === "GPU" ? "#9CC8DF" : Session.accent }
+                        Rectangle { width: parent.width * Math.max(0, Math.min(100, Number(modelData.percent) || 0)) / 100; height: parent.height; radius: 2; color: modelData.label === "GPU" ? PolyTheme.Theme.cool : Session.accent }
                     }
                     Text { Layout.fillWidth: true; text: modelData.detail; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 9; elide: Text.ElideRight }
                 }

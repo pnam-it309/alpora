@@ -6,6 +6,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import Quickshell.Hyprland
+import "../theme" as PolyTheme
 
 DesktopWidgetCard {
     id: root
@@ -335,7 +336,7 @@ DesktopWidgetCard {
         Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 1; color: Session.accent; opacity: 0.18 }
         Text {
             visible: !!root.errorText; Layout.fillWidth: true; text: root.errorText
-            color: "#e8a2a2"; font.family: Session.fontFamily; font.pixelSize: 10; wrapMode: Text.Wrap
+            color: PolyTheme.Theme.color("#e8a2a2"); font.family: Session.fontFamily; font.pixelSize: 10; wrapMode: Text.Wrap
         }
 
         // Compact preview: only applications that currently own at least one open window.
@@ -482,7 +483,7 @@ DesktopWidgetCard {
                                 Layout.fillWidth: true; spacing: 5
                                 Text { Layout.fillWidth: true; visible: !processRow.modelData.canSignal; text: root.tr("protected"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 9; wrapMode: Text.Wrap }
                                 Text { Layout.fillWidth: true; visible: processRow.modelData.canSignal && root.forceProcessKey !== root.processKey(processRow.modelData); text: "" }
-                                Text { Layout.fillWidth: true; visible: root.forceProcessKey === root.processKey(processRow.modelData); text: root.tr("forceWarning"); color: "#e5b878"; font.family: Session.fontFamily; font.pixelSize: 9; wrapMode: Text.Wrap }
+                                Text { Layout.fillWidth: true; visible: root.forceProcessKey === root.processKey(processRow.modelData); text: root.tr("forceWarning"); color: PolyTheme.Theme.color("#e5b878"); font.family: Session.fontFamily; font.pixelSize: 9; wrapMode: Text.Wrap }
                                 Button {
                                     visible: processRow.modelData.canSignal
                                     enabled: !terminator.running && root.pendingProcessKey !== root.processKey(processRow.modelData)

@@ -57,9 +57,9 @@ Singleton {
         id: pump
         interval: 0
         onTriggered: {
-            if (worker.running || !queue.length) return;
-            root.currentTask = queue.shift();
-            root.queueLength = queue.length;
+            if (worker.running || !root.queue.length) return;
+            root.currentTask = root.queue.shift();
+            root.queueLength = root.queue.length;
 
             const fullCommand = [Session.controller, root.currentTask.subcommand].concat(root.currentTask.args);
             worker.command = fullCommand;
@@ -110,7 +110,7 @@ Singleton {
             }
 
             root.currentTask = null;
-            if (queue.length > 0) {
+            if (root.queue.length > 0) {
                 pump.restart();
             }
         }

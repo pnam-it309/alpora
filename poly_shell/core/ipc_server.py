@@ -19,6 +19,10 @@ logger = logging.getLogger(__name__)
 class IPCServer:
     """Non-blocking, multithreaded IPC server supporting request/response and push events."""
 
+    MAX_CLIENTS = 32
+    MAX_REQUEST_BYTES = 1_048_576
+    CLIENT_IO_TIMEOUT = 2.0
+
     def __init__(self, socket_path: Optional[Path] = None):
         self.socket_path = socket_path
         self._server_socket: Optional[socket.socket] = None
@@ -152,9 +156,13 @@ class IPCServer:
         while self._running and self._server_socket:
             try:
                 client_sock, _ = self._server_socket.accept()
-                client_sock.settimeout(None)
                 with self._clients_lock:
+                    if len(self._clients) >= self.MAX_CLIENTS:
+                        client_sock.close()
+                        logger.warning("Rejected IPC client: connection limit reached")
+                        continue
                     self._clients.add(client_sock)
+                client_sock.settimeout(self.CLIENT_IO_TIMEOUT)
                 worker = threading.Thread(
                     target=self._handle_client,
                     args=(client_sock,),
@@ -173,18 +181,27 @@ class IPCServer:
         buffer = ""
         try:
             while self._running:
-                data = client_sock.recv(4096)
+                try:
+                    data = client_sock.recv(4096)
+                except socket.timeout:
+                    continue
                 if not data:
                     break
                 buffer += data.decode("utf-8", errors="replace")
                 while "\n" in buffer:
                     line, buffer = buffer.split("\n", 1)
+                    if len(line.encode("utf-8")) > self.MAX_REQUEST_BYTES:
+                        logger.warning("Rejected oversized IPC request")
+                        return
                     line = line.strip()
                     if not line:
                         continue
                     response = self._process_request(line)
                     if response is not None:
                         client_sock.sendall((json.dumps(response) + "\n").encode("utf-8"))
+                if len(buffer.encode("utf-8")) > self.MAX_REQUEST_BYTES:
+                    logger.warning("Rejected oversized IPC request")
+                    return
         except (ConnectionResetError, BrokenPipeError, OSError):
             pass
         finally:

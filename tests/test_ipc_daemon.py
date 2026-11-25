@@ -1,13 +1,16 @@
 import json
+import os
+import shutil
 import socket
+import subprocess
 import tempfile
 import time
 import unittest
 from pathlib import Path
 
-from poly_shell.contracts.base import ShellEventEnvelope, ResponseDTO
-from poly_shell.core.ipc_server import IPCServer
+from poly_shell.contracts.base import ShellEventEnvelope
 from poly_shell.core.daemon import PolyShellDaemon
+from poly_shell.core.ipc_server import IPCServer
 
 
 class TestIPCDaemon(unittest.TestCase):
@@ -98,6 +101,41 @@ class TestIPCDaemon(unittest.TestCase):
         finally:
             server.stop()
 
+    def test_ipc_server_rejects_clients_over_limit(self):
+        server = IPCServer(socket_path=self.sock_path)
+        server.MAX_CLIENTS = 1
+        server.start()
+
+        try:
+            first = self._create_connected_client(server)
+            deadline = time.monotonic() + 2
+            while server.client_count != 1 and time.monotonic() < deadline:
+                time.sleep(0.01)
+            self.assertEqual(server.client_count, 1)
+
+            second = self._create_connected_client(server)
+            second.settimeout(2)
+            self.assertEqual(second.recv(1), b"")
+            self.assertEqual(server.client_count, 1)
+            first.close()
+            second.close()
+        finally:
+            server.stop()
+
+    def test_ipc_server_rejects_oversized_request(self):
+        server = IPCServer(socket_path=self.sock_path)
+        server.MAX_REQUEST_BYTES = 8
+        server.start()
+
+        try:
+            client = self._create_connected_client(server)
+            client.settimeout(2)
+            client.sendall(b'{"action":"ping"}\n')
+            self.assertEqual(client.recv(1), b"")
+            client.close()
+        finally:
+            server.stop()
+
     def test_daemon_initialization_and_routes(self):
         daemon = PolyShellDaemon(socket_path=self.sock_path)
         self.assertFalse(daemon._running)
@@ -130,6 +168,43 @@ class TestIPCDaemon(unittest.TestCase):
         finally:
             daemon.stop()
             self.assertFalse(daemon._running)
+
+    def test_fast_c_ipc_client(self):
+        compiler = shutil.which("cc")
+        if not compiler:
+            self.skipTest("C compiler not available")
+
+        source = Path(__file__).resolve().parents[1] / "poly_shell" / "core" / "fast_ipc_client.c"
+        with tempfile.TemporaryDirectory() as build_dir:
+            binary = Path(build_dir) / "poly-ipc-fast"
+            subprocess.run(
+                [compiler, "-std=c11", "-O2", "-Wall", "-Wextra", "-Werror", "-o", str(binary), str(source)],
+                check=True,
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
+
+            server = IPCServer(socket_path=self.sock_path)
+            server.register_handler("fast.test", lambda params: {"pong": True, "num": params.get("num")})
+            server.start()
+
+            try:
+                env = dict(os.environ, POLY_SHELL_SOCK=str(self.sock_path))
+                res = subprocess.run(
+                    [str(binary), "fast.test", '{"num": 777}'],
+                    capture_output=True,
+                    text=True,
+                    timeout=3,
+                    check=False,
+                    env=env,
+                )
+                self.assertEqual(res.returncode, 0)
+                data = json.loads(res.stdout.strip())
+                self.assertTrue(data.get("success"))
+                self.assertEqual(data.get("data", {}).get("num"), 777)
+            finally:
+                server.stop()
 
 
 if __name__ == "__main__":

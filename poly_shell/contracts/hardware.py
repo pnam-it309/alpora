@@ -12,7 +12,7 @@ class AudioDeviceDTO(BaseDTO):
     name: str
     description: str = ""
     volume: float = 1.0
-    muted: bool = false if False else False
+    muted: bool = False
     is_default: bool = False
     is_sink: bool = True
 

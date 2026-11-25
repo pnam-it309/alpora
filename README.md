@@ -75,15 +75,15 @@ You can also import your own wallpaper and extract its palette.
 | :--- | :--- |
 | **Move between ideas** | Workspace overview, application search, shared favourites and an edge-revealed dock. |
 | **Keep a little structure** | Calendar, local tasks, notes and a focus timer. No account needed for the organiser. |
-| **Stay in control** | Quick settings for sound, connectivity and supported hardware, plus notification and clipboard history. |
+| **Stay in control** | Quick settings for sound, connectivity, airplane mode, mobile hotspot, power profiles and power actions, plus notification and clipboard history. |
 | **Play something** | Music widgets and controls connect to real MPRIS players. |
 | **Meet Грань** | A small articulated robot that walks, flies, lands on exposed window/widget edges and can be picked up. Optional, like its flights. |
 | **Choose your finish** | Papirus application icons, palette-matched folders, Bibata Modern Ice and editable Lua hotkeys. |
+| **Use your language** | Switch the interface between English, Vietnamese, Spanish and Russian in Settings. |
 | **ALPORA Fetch** | A faceted mountain and real system data in your terminal. The open card follows the desktop palette. [Moon Lake view](docs/media/showcase-moon.png). |
 
 Reduced motion is supported. Desktop widgets and the robot have visibility
-controls. Optional interactive wallpaper landmarks start disabled. The current
-application interface is primarily Russian.
+controls. Optional interactive wallpaper landmarks start disabled.
 
 <a id="install"></a>
 ## 04 &nbsp; From a terminal to your landscape
@@ -166,12 +166,13 @@ ALPORA preset, rather than the author's notes, clipboard, accounts or location.
 Hardware status, weather, app lists and third-party application internals vary.
 
 Animated widgets and companion timers have been optimized for idle CPU efficiency.
-The shell supports English (baseline), Vietnamese, and Russian via the i18n framework.
+The shell supports English (baseline), Vietnamese, Spanish and Russian via the
+i18n framework; choose a language in Settings.
 Suspend/resume, monitor hotplug and more device combinations remain to be checked.
 Bluetooth pairing uses a terminal helper; monitor layout editing is pending.
 
-The last local check passed **197 tests and strict QML lint**. These are local
-results, not a hosted CI claim. Read the [known issues](docs/guides/known-issues.md),
+The current local checkout passes `./scripts/check`: **401 tests and strict QML
+lint**. This is a local result, not a hosted CI claim. Read the [known issues](docs/guides/known-issues.md),
 [new-user validation](docs/audits/install-validation-2026-10-22.md) and [code audit](docs/audits/code-audit-2026-10-22.md).
 
 </details>
