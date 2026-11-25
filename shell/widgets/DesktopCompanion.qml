@@ -87,7 +87,7 @@ PanelWindow {
     onThemeIdChanged: react("greet")
     onAllowedChanged: if (!allowed) {cancelGesture();lastTick=0;}
     readonly property bool music: !!MusicState.player && MusicState.player.isPlaying
-    readonly property bool lowBattery: Session.batteryPresent && Session.onBattery && Session.battery.percentage < 0.18
+    readonly property bool lowBattery: Session.batteryPresent && Session.batteryPowered && Session.battery.percentage < 0.18
     readonly property var context: ({music:music,charging:Session.batteryCharging,lowBattery:lowBattery,lively:CompanionState.lively})
     property var behavior: Logic.create(Date.now() % 4294967296)
     readonly property string activity: Motion.reduced ? "sit" : pressing ? "grabbed" : tossing ? toss.mode : airborne ? "fly" : away ? travel.walking ? "walk" : behavior.activity === "walk" ? "look" : behavior.activity : behavior.activity

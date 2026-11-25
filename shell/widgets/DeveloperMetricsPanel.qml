@@ -89,18 +89,19 @@ Scope {
                                     {title: I18n.tr("Root disk · /"), value: root.disk.percent === null ? "—" : root.percent(root.disk.percent), detail: DeveloperMetricsState.formatBytes((root.disk.free_gb || 0) * 1073741824) + " " + I18n.tr("free of") + " " +DeveloperMetricsState.formatBytes((root.disk.total_gb || 0) * 1073741824), percent: root.disk.percent}
                                 ]
                                 delegate: Rectangle {
+                                    id: metricCard
                                     required property var modelData
                                     Layout.fillWidth: true; Layout.preferredHeight: 106; radius: 12
                                     color: Glass.tint(Session.accent, 0.055)
                                     border.width: 1; border.color: Glass.tint(Session.accent, 0.12)
                                     ColumnLayout {
                                         anchors.fill: parent; anchors.margins: 12; spacing: 5
-                                        Text { text: modelData.title; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11; font.weight: Font.Medium }
-                                        Text { Layout.fillWidth: true; text: modelData.value; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 17; font.weight: Font.DemiBold; elide: Text.ElideRight }
-                                        Text { Layout.fillWidth: true; text: modelData.detail; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 10; elide: Text.ElideRight }
+                                        Text { text: metricCard.modelData.title; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11; font.weight: Font.Medium }
+                                        Text { Layout.fillWidth: true; text: metricCard.modelData.value; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 17; font.weight: Font.DemiBold; elide: Text.ElideRight }
+                                        Text { Layout.fillWidth: true; text: metricCard.modelData.detail; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 10; elide: Text.ElideRight }
                                         Rectangle {
-                                            Layout.fillWidth: true; Layout.preferredHeight: 4; radius: 2; color: Glass.tint(Session.muted, 0.16); visible: typeof modelData.percent === "number" && modelData.percent >= 0
-                                            Rectangle { width: parent.width * Math.max(0, Math.min(100, Number(modelData.percent) || 0)) / 100; height: parent.height; radius: 2; color: Session.accent }
+                                            Layout.fillWidth: true; Layout.preferredHeight: 4; radius: 2; color: Glass.tint(Session.muted, 0.16); visible: typeof metricCard.modelData.percent === "number" && metricCard.modelData.percent >= 0
+                                            Rectangle { width: parent.width * Math.max(0, Math.min(100, Number(metricCard.modelData.percent) || 0)) / 100; height: parent.height; radius: 2; color: Session.accent }
                                         }
                                     }
                                 }
@@ -123,11 +124,12 @@ Scope {
                                 Repeater {
                                     model: root.metrics.processes_cpu || []
                                     delegate: RowLayout {
+                                        id: cpuProcessRow
                                         required property var modelData
                                         Layout.fillWidth: true; spacing: 8
-                                        Text { Layout.preferredWidth: 44; text: String(modelData.pid); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 10 }
-                                        Text { Layout.fillWidth: true; text: modelData.name; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 10; elide: Text.ElideRight }
-                                        Text { text: modelData.cpu_percent.toFixed(1) + "%"; color: Session.accent; font.family: Session.fontFamily; font.pixelSize: 10 }
+                                        Text { Layout.preferredWidth: 44; text: String(cpuProcessRow.modelData.pid); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 10 }
+                                        Text { Layout.fillWidth: true; text: cpuProcessRow.modelData.name; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 10; elide: Text.ElideRight }
+                                        Text { text: cpuProcessRow.modelData.cpu_percent.toFixed(1) + "%"; color: Session.accent; font.family: Session.fontFamily; font.pixelSize: 10 }
                                     }
                                 }
                             }
@@ -138,11 +140,12 @@ Scope {
                                 Repeater {
                                     model: root.metrics.processes_memory || []
                                     delegate: RowLayout {
+                                        id: memoryProcessRow
                                         required property var modelData
                                         Layout.fillWidth: true; spacing: 8
-                                        Text { Layout.preferredWidth: 44; text: String(modelData.pid); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 10 }
-                                        Text { Layout.fillWidth: true; text: modelData.name; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 10; elide: Text.ElideRight }
-                                        Text { text: modelData.memory_percent.toFixed(1) + "%"; color: Session.accent; font.family: Session.fontFamily; font.pixelSize: 10 }
+                                        Text { Layout.preferredWidth: 44; text: String(memoryProcessRow.modelData.pid); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 10 }
+                                        Text { Layout.fillWidth: true; text: memoryProcessRow.modelData.name; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 10; elide: Text.ElideRight }
+                                        Text { text: memoryProcessRow.modelData.memory_percent.toFixed(1) + "%"; color: Session.accent; font.family: Session.fontFamily; font.pixelSize: 10 }
                                     }
                                 }
                             }

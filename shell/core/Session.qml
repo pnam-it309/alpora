@@ -83,11 +83,11 @@ Singleton {
     readonly property bool batteryPresent: isLaptop && hardware.batteryAvailable !== false && !!battery && battery.ready && battery.isLaptopBattery
     readonly property bool batteryCharging: batteryPresent && battery.state === UPowerDeviceState.Charging
     onBatteryChargingChanged: if (batteryCharging) AudioFeedback.playTock()
-    readonly property bool onBattery: UPower.onBattery
+    readonly property bool batteryPowered: UPower.onBattery
     readonly property string batteryStatus: !batteryPresent ? I18n.tr("power.ac")
         : batteryCharging ? I18n.tr("power.charging")
         : battery.state === UPowerDeviceState.FullyCharged ? I18n.tr("power.full")
-        : !onBattery ? I18n.tr("power.plugged_idle")
+        : !batteryPowered ? I18n.tr("power.plugged_idle")
         : I18n.tr("power.battery")
     readonly property string batteryDescription: (batteryPresent ? Math.round(battery.percentage * 100) + "% · " : "") + batteryStatus
     readonly property int focusedWorkspace: Hyprland.focusedWorkspace ? Hyprland.focusedWorkspace.id : 0

@@ -6,7 +6,7 @@ Item {
     id: root
     property real charge: 1
     property bool charging: Session.batteryCharging
-    property bool pluggedIn: !Session.onBattery
+    property bool pluggedIn: !Session.batteryPowered
     readonly property color ink: pluggedIn ? Session.accent : Session.foreground
     implicitWidth: 25
     implicitHeight: 16
