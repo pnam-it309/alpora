@@ -109,10 +109,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Prepare non-root test user
+        run: |
+          useradd --create-home --shell /bin/bash ciuser
+          chown -R ciuser:ciuser "$GITHUB_WORKSPACE"
+
       - name: Run authoritative checks in the supported Arch environment
         run: |
           pacman -Syu --noconfirm --needed python python-pillow nodejs quickshell qt6-declarative
-          ./scripts/check
+          su ciuser -s /bin/bash -c 'cd "$GITHUB_WORKSPACE" && ./scripts/check'
 
   # ---------------------------------------------------------------------------
   # 3. Dry-Run Installation Test (Clean Arch Linux Container)
