@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+- Update Center TUI (24-bit TrueColor) and 3 new Settings pages (Update, System Care, Ecosystem).
+- Wallpapers: pick any local image, native file picker, slideshow; fixed lockscreen rejecting custom wallpapers.
+- Calendar panel: Open-Meteo 7-day weather, event reminders via notifications.
+- Maintainability: modularized large files, file-size guard test, CODEOWNERS, Dependabot, SECURITY.md, `docs/MAINTAINING.md`.
+
 ## [v1.0.0] — 2026-11-03 — Official First Release
 
 The first production-ready release of **ALPORA OS**: a coordinated, fluid Wayland desktop operating environment built on Arch Linux, Hyprland, and Quickshell.
