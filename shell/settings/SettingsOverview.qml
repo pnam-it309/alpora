@@ -121,10 +121,10 @@ ColumnLayout {
         }
     }
     RowLayout {
-        Layout.fillWidth: true; Layout.preferredHeight: 78; spacing: 12
-        SettingsTile { Layout.fillWidth: true; Layout.fillHeight: true; padding: 12; title: I18n.tr("settings.language"); subtitle: I18n.locale === "vi" ? "Tiếng Việt" : (I18n.locale === "es" ? "Español" : (I18n.locale === "ru" ? "Русский" : "English")); symbol: "globe"; tint: PolyTheme.Theme.color("#a8d5bc"); onClicked: root.navigate("language") }
-        SettingsTile { Layout.fillWidth: true; Layout.fillHeight: true; padding: 12; title: I18n.tr("settings.power"); subtitle: root.powerLabel; symbol: "battery"; onClicked: root.navigate("power") }
-        SettingsTile { Layout.fillWidth: true; Layout.fillHeight: true; padding: 12; title: I18n.tr("settings.notifications"); subtitle: Desktop.data.dnd ? I18n.tr("notification.dnd") : I18n.tr("notifications.apps_and_behavior"); symbol: "bell"; tint: PolyTheme.Theme.color("#edb493"); onClicked: root.navigate("notifications") }
-        SettingsTile { Layout.fillWidth: true; Layout.fillHeight: true; padding: 12; title: I18n.tr("shortcuts.title"); subtitle: I18n.tr("shortcuts.overview_subtitle"); symbol: "performance"; tint: PolyTheme.Theme.color("#b5c99d"); onClicked: root.navigate("input") }
+        Layout.fillWidth: true; Layout.preferredHeight: 74; spacing: 12
+        SettingsTile { Layout.fillWidth: true; Layout.fillHeight: true; padding: 10; title: I18n.tr("settings.language"); subtitle: I18n.locale === "vi" ? "Tiếng Việt" : (I18n.locale === "es" ? "Español" : (I18n.locale === "ru" ? "Русский" : "English")); symbol: "globe"; tint: PolyTheme.Theme.color("#a8d5bc"); onClicked: root.navigate("language") }
+        SettingsTile { Layout.fillWidth: true; Layout.fillHeight: true; padding: 10; title: I18n.tr("settings.storage_memory"); subtitle: "zRAM · CleanGuard"; symbol: "performance"; tint: PolyTheme.Theme.color("#b5c99d"); onClicked: root.navigate("storage") }
+        SettingsTile { Layout.fillWidth: true; Layout.fillHeight: true; padding: 10; title: I18n.tr("settings.security_ecosystem"); subtitle: "Shield · Phone · Tools"; symbol: "shield"; tint: PolyTheme.Theme.color("#9cc8df"); onClicked: root.navigate("security") }
+        SettingsTile { Layout.fillWidth: true; Layout.fillHeight: true; padding: 10; title: I18n.tr("settings.update_about"); subtitle: "ALPORA OS · TUI OTA"; symbol: "refresh"; tint: PolyTheme.Theme.color("#edb493"); onClicked: root.navigate("about") }
     }
 }

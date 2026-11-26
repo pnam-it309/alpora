@@ -1,4 +1,5 @@
 """Theme persistence, palette extraction, mode independence and rollback."""
+import os
 from pathlib import Path
 import tempfile
 import unittest
@@ -194,6 +195,80 @@ class ThemeTests(unittest.TestCase):
         palette = themes.load_theme(self.paths, 'alpine')['palette']
         for key in themes.KEYS:
             with self.subTest(key=key), self.assertRaises(ConfigError): themes.validate_palette(palette | {key: '#fff\nexecute'})
+
+    def test_discover_local_images_and_folders(self):
+        root = self.paths.state / 'local-gallery'
+        nested = root / 'nature'
+        nested.mkdir(parents=True)
+        older = root / 'older.png'
+        newer = nested / 'newer.webp'
+        ignored = root / 'notes.txt'
+        older.write_bytes(b'png')
+        newer.write_bytes(b'webp')
+        ignored.write_text('ignore me', encoding='utf-8')
+        os.utime(older, (1000, 1000))
+        os.utime(newer, (2000, 2000))
+
+        images = themes.discover_local_images(str(root))
+        self.assertEqual([item['path'] for item in images], [str(newer.resolve()), str(older.resolve())])
+        self.assertEqual(images[0]['name'], 'newer')
+        self.assertEqual(images[0]['folder'], 'nature')
+
+        single = themes.discover_local_images(str(older))
+        self.assertEqual(single, [{'path': str(older.resolve()), 'name': 'older', 'folder': str(older.parent.resolve())}])
+        self.assertEqual(themes.discover_local_images(str(root / 'missing')), [])
+
+        listed = themes.theme_control(self.paths, 'list', {'folder': str(root)})
+        self.assertEqual(listed['activeFolder'], str(root))
+        self.assertEqual([item['path'] for item in listed['localImages']], [str(newer.resolve()), str(older.resolve())])
+        self.assertIsInstance(listed['localFolders'], list)
+
+    def test_import_with_tilde_and_apply_immediately_sets_wallpaper_and_palette(self):
+        try:
+            from PIL import Image
+        except ImportError:
+            self.skipTest("PIL is required for wallpaper import tests")
+        fake_home = self.paths.state / 'fake-home'
+        pictures = fake_home / 'Pictures'
+        pictures.mkdir(parents=True)
+        source = pictures / 'sunset.png'
+        Image.new('RGB', (48, 48), (200, 80, 50)).save(source)
+
+        with patch.dict(os.environ, {'HOME': str(fake_home)}):
+            result = themes.theme_control(self.paths, 'import', {'image': '~/Pictures/sunset.png', 'apply': True})
+
+        imported_id = result['imported']
+        self.assertTrue(imported_id.startswith('custom-'))
+        self.assertTrue(result['saved'])
+        self.assertEqual(result['selected'], imported_id)
+        self.wallpaper.assert_called()
+        snapshot = read_object(self.paths.session)
+        self.assertEqual(snapshot['appearance']['id'], imported_id)
+        self.assertEqual(snapshot['appearance']['palette'], themes.load_theme(self.paths, imported_id)['palette'])
+
+    def test_remove_custom_theme_deletes_files_and_resets_active_theme(self):
+        try:
+            from PIL import Image
+        except ImportError:
+            self.skipTest("PIL is required for wallpaper import tests")
+        source = self.paths.state / 'custom-remove.png'
+        Image.new('RGB', (48, 48), (50, 140, 90)).save(source)
+        imported = themes.theme_control(self.paths, 'import', {'image': str(source), 'apply': True})
+        imported_id = imported['imported']
+        json_path = self.paths.config / 'themes' / (imported_id + '.json')
+        image_files = list(themes.data_root(self.paths).glob(imported_id + '.*'))
+        self.assertTrue(json_path.is_file())
+        self.assertTrue(image_files)
+
+        after_remove = themes.theme_control(self.paths, 'remove', {'id': imported_id})
+        self.assertFalse(json_path.exists())
+        self.assertEqual(list(themes.data_root(self.paths).glob(imported_id + '.*')), [])
+        self.assertEqual(after_remove['selected'], 'alpine')
+        self.assertFalse(any(item['id'] == imported_id for item in after_remove['items']))
+
+        for bad_id in ('alpine', 'timeline', '../evil', 'custom-short', None):
+            with self.subTest(bad_id=bad_id), self.assertRaises(ConfigError):
+                themes.theme_control(self.paths, 'remove', {'id': bad_id})
 
 
 if __name__ == '__main__': unittest.main()

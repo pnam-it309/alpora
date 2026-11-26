@@ -35,7 +35,10 @@ ShellRoot {
         {group: "", key: "notifications", title: I18n.tr("settings.notifications"), icon: "bell", words: "notifications dnd alerts"},
         {group: "", key: "input", title: I18n.tr("shortcuts.title"), icon: "terminal", words: "keyboard shortcuts hotkeys bindings input"},
         {group: "", key: "touchpad", title: I18n.tr("settings.touchpad"), icon: "mouse", words: "touchpad pointer gestures tap speed sensitivity"},
-        {group: "", key: "language", title: I18n.tr("settings.language"), icon: "globe", words: "language locale vietnamese english tieng viet ngon ngu"}
+        {group: "", key: "language", title: I18n.tr("settings.language"), icon: "globe", words: "language locale vietnamese english tieng viet ngon ngu"},
+        {group: "", key: "storage", title: I18n.tr("settings.storage_memory"), icon: "performance", words: "storage memory ram zram clean cache snapshot btrfs disk"},
+        {group: "", key: "security", title: I18n.tr("settings.security_ecosystem"), icon: "shield", words: "security privacy firewall phone kdeconnect gamemode wine exe dev"},
+        {group: "", key: "about", title: I18n.tr("settings.update_about"), icon: "refresh", words: "update upgrade ota tui version about doctor diagnostics system"}
     ]
     readonly property string pageTitle: page === "modes" ? I18n.tr("settings.operating_mode") : page === "devices" ? I18n.tr("settings.devices") : (navigation.find(n => n.key === page) || {}).title || I18n.tr("settings.title")
     function navigate(next: string): void { if (root.page === "input" && next !== "input" && ShortcutsState.editingForm) {root.statusMessage=I18n.tr("settings.finish_editing_hint");return;} root.statusMessage=""; root.page = next; search.text = ""; root.statusMessage = ""; }
@@ -234,9 +237,12 @@ ShellRoot {
                 Loader { Layout.fillWidth: true; Layout.fillHeight: true; visible: root.page === "input"; active: visible; sourceComponent: SettingsShortcuts {} }
                 ThemePage { Layout.fillWidth: true; Layout.fillHeight: true; visible: root.page === "wallpaper"; onImportRequested: wallpaperDialog.open() }
                 Loader { Layout.fillWidth: true; Layout.fillHeight: true; visible: root.page === "language"; active: visible; sourceComponent: SettingsLanguage {} }
+                Loader { Layout.fillWidth: true; Layout.fillHeight: true; visible: root.page === "storage"; active: visible; sourceComponent: SettingsSystemCare {} }
+                Loader { Layout.fillWidth: true; Layout.fillHeight: true; visible: root.page === "security"; active: visible; sourceComponent: SettingsEcosystem {} }
+                Loader { Layout.fillWidth: true; Layout.fillHeight: true; visible: root.page === "about"; active: visible; sourceComponent: SettingsUpdateAbout { onNavigate: page => root.navigate(page) } }
                 SettingsDetails {
                     Layout.fillWidth: true; Layout.fillHeight: true
-                    visible: !["overview", "appearance", "wallpaper", "widgets", "input", "language"].includes(root.page)
+                    visible: !["overview", "appearance", "wallpaper", "widgets", "input", "language", "storage", "security", "about"].includes(root.page)
                     page: root.page; monitors: root.monitors; wallpaper: root.wallpaperUrl
                     onNavigate: page => root.navigate(page)
                     onChooseWallpaper: wallpaperDialog.open()

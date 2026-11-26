@@ -204,12 +204,19 @@ def build_parser(version: str) -> argparse.ArgumentParser:
 
     # System Update Center (Windows Update style OTA updater)
     update_parser = sub.add_parser("update", help="check, download, and apply ALPORA OS updates")
+    update_parser.add_argument("--json", action="store_true", help="output update info in JSON")
+    update_parser.add_argument("--tui", action="store_true", help="open interactive TrueColor TUI Update Center")
     update_sub = update_parser.add_subparsers(dest="update_action")
     update_check = update_sub.add_parser("check", help="check for new ALPORA OS releases on GitHub")
-    update_check.add_argument("--json", action="store_true", help="output update info in JSON")
+    update_check.add_argument("--json", action="store_true", default=argparse.SUPPRESS, help="output update info in JSON")
     update_apply = update_sub.add_parser("apply", help="download and apply latest ALPORA OS update")
     update_apply.add_argument("--branch", default="main", help="target git branch to update from")
-    update_sub.add_parser("status", help="show current ALPORA OS version and update state")
+    update_apply.add_argument("--hold", action="store_true", help="keep terminal window open after update completes")
+    update_status = update_sub.add_parser("status", help="show current ALPORA OS version and update state")
+    update_status.add_argument("--json", action="store_true", default=argparse.SUPPRESS, help="output update status in JSON")
+    update_tui = update_sub.add_parser("tui", help="open interactive TrueColor TUI Update Center")
+    update_tui.add_argument("--branch", default="main", help="target git branch to update from")
+    update_tui.add_argument("--auto-apply", action="store_true", help="automatically apply available update")
 
     # System Security and Hardening Audit
     sec_parser = sub.add_parser("security", help="audit Linux security posture and apply kernel hardening")

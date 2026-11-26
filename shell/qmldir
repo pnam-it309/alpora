@@ -162,10 +162,13 @@ WeatherScene 1.0 widgets/WeatherScene.qml
 AppearancePage 1.0 settings/AppearancePage.qml
 SettingsAppearance 1.0 settings/SettingsAppearance.qml
 SettingsDetails 1.0 settings/SettingsDetails.qml
+SettingsEcosystem 1.0 settings/SettingsEcosystem.qml
 SettingsLanguage 1.0 settings/SettingsLanguage.qml
 SettingsNav 1.0 settings/SettingsNav.qml
 SettingsOverview 1.0 settings/SettingsOverview.qml
 SettingsShortcuts 1.0 settings/SettingsShortcuts.qml
+SettingsSystemCare 1.0 settings/SettingsSystemCare.qml
 SettingsSystemInput 1.0 settings/SettingsSystemInput.qml
+SettingsUpdateAbout 1.0 settings/SettingsUpdateAbout.qml
 SettingsWidgets 1.0 settings/SettingsWidgets.qml
 ThemePage 1.0 settings/ThemePage.qml

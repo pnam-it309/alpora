@@ -349,6 +349,58 @@ ScrollView {
         }
         SettingsCard {
             Layout.fillWidth: true
+            visible: root.page === "monitors"
+            RowLayout {
+                Layout.fillWidth: true
+                SettingsBadge {
+                    symbol: "moon-warm"
+                    tint: PolyTheme.Theme.color("#edb493")
+                }
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    Text {
+                        text: I18n.tr("quick.night_light")
+                        color: PolyTheme.Theme.color("#eff1f4")
+                        font.family: Session.fontFamily
+                        font.pixelSize: 17
+                    }
+                    Text {
+                        Layout.fillWidth: true
+                        text: I18n.tr("settings.projection_modes")
+                        color: PolyTheme.Theme.color("#bec7ce")
+                        font.family: Session.fontFamily
+                        font.pixelSize: 12
+                        wrapMode: Text.Wrap
+                    }
+                }
+                SettingsToggle {
+                    checked: !!Desktop.data.nightLight
+                    enabled: Desktop.data.nightLightAvailable && !Desktop.changingSettings
+                    Accessible.name: I18n.tr("quick.night_light")
+                    onToggled: Desktop.request("nightlight", "")
+                }
+            }
+            Flow {
+                Layout.fillWidth: true
+                spacing: 8
+                Repeater {
+                    model: [
+                        {mode: "extend", label: I18n.tr("settings.proj_extend")},
+                        {mode: "mirror", label: I18n.tr("settings.proj_mirror")},
+                        {mode: "internal", label: I18n.tr("settings.proj_internal")},
+                        {mode: "external", label: I18n.tr("settings.proj_external")}
+                    ]
+                    AppearanceButton {
+                        required property var modelData
+                        text: modelData.label
+                        symbol: "monitor"
+                        onClicked: Quickshell.execDetached([Session.controller, "project", modelData.mode])
+                    }
+                }
+            }
+        }
+        SettingsCard {
+            Layout.fillWidth: true
             visible: root.page === "wallpaper"
             SettingsImage {
                 Layout.fillWidth: true
@@ -498,6 +550,72 @@ ScrollView {
         }
         SettingsCard {
             Layout.fillWidth: true
+            visible: root.page === "panel"
+            Text {
+                text: I18n.tr("settings.operating_mode")
+                color: PolyTheme.Theme.color("#eff1f4")
+                font.family: Session.fontFamily
+                font.pixelSize: 17
+            }
+            Text {
+                Layout.fillWidth: true
+                text: I18n.tr("settings.operating_mode_desc")
+                color: PolyTheme.Theme.color("#bec7ce")
+                font.family: Session.fontFamily
+                font.pixelSize: 12
+                wrapMode: Text.Wrap
+            }
+            RowLayout {
+                spacing: 10
+                AppearanceButton {
+                    text: "Work"
+                    symbol: "monitor"
+                    selected: Session.mode === "work"
+                    enabled: !Session.switching
+                    onClicked: Session.setMode("work")
+                }
+                AppearanceButton {
+                    text: "Vibe"
+                    symbol: "moon"
+                    selected: Session.mode === "vibe"
+                    enabled: !Session.switching
+                    onClicked: Session.setMode("vibe")
+                }
+            }
+            RowLayout {
+                Layout.fillWidth: true
+                Text {
+                    Layout.fillWidth: true
+                    text: I18n.tr("quick.night_light")
+                    color: PolyTheme.Theme.color("#eff1f4")
+                    font.family: Session.fontFamily
+                    font.pixelSize: 14
+                }
+                SettingsToggle {
+                    checked: !!Desktop.data.nightLight
+                    enabled: Desktop.data.nightLightAvailable && !Desktop.changingSettings
+                    Accessible.name: I18n.tr("quick.night_light")
+                    onToggled: Desktop.request("nightlight", "")
+                }
+            }
+            RowLayout {
+                Layout.fillWidth: true
+                Text {
+                    Layout.fillWidth: true
+                    text: I18n.tr("settings.caffeine_mode")
+                    color: PolyTheme.Theme.color("#eff1f4")
+                    font.family: Session.fontFamily
+                    font.pixelSize: 14
+                }
+                SettingsToggle {
+                    checked: !!Desktop.data.caffeine
+                    Accessible.name: I18n.tr("settings.caffeine_mode")
+                    onToggled: Desktop.request("caffeine", checked ? "on" : "off")
+                }
+            }
+        }
+        SettingsCard {
+            Layout.fillWidth: true
             visible: ["panel", "input", "devices"].includes(root.page)
             Text {
                 Layout.fillWidth: true
@@ -507,10 +625,21 @@ ScrollView {
                 font.pixelSize: 14
                 wrapMode: Text.Wrap
             }
-            AppearanceButton {
-                text: root.page === "panel" ? I18n.tr("settings.open_appearance") : "Bluetooth"
-                symbol: root.page === "panel" ? "palette" : "bluetooth"
-                onClicked: root.navigate(root.page === "panel" ? "appearance" : "bluetooth")
+            Flow {
+                Layout.fillWidth: true
+                spacing: 10
+                AppearanceButton {
+                    text: root.page === "panel" ? I18n.tr("settings.open_appearance") : "Bluetooth"
+                    symbol: root.page === "panel" ? "palette" : "bluetooth"
+                    primary: true
+                    onClicked: root.navigate(root.page === "panel" ? "appearance" : "bluetooth")
+                }
+                AppearanceButton {
+                    visible: root.page === "panel"
+                    text: I18n.tr("settings.widgets")
+                    symbol: "devices"
+                    onClicked: root.navigate("widgets")
+                }
             }
         }
         Text {

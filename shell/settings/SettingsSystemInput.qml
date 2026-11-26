@@ -54,6 +54,36 @@ ColumnLayout {
             font.family: Session.fontFamily
             font.pixelSize: 12
         }
+        RowLayout {
+            Layout.fillWidth: true
+            Text {
+                Layout.fillWidth: true
+                text: I18n.tr("settings.caffeine_mode")
+                color: PolyTheme.Theme.color("#eff1f4")
+                font.family: Session.fontFamily
+                font.pixelSize: 14
+            }
+            SettingsToggle {
+                checked: !!Desktop.data.caffeine
+                Accessible.name: I18n.tr("settings.caffeine_mode")
+                onToggled: Desktop.request("caffeine", checked ? "on" : "off")
+            }
+        }
+        RowLayout {
+            Layout.fillWidth: true
+            Text {
+                Layout.fillWidth: true
+                text: I18n.tr("settings.gamemode_tools_title")
+                color: PolyTheme.Theme.color("#eff1f4")
+                font.family: Session.fontFamily
+                font.pixelSize: 14
+            }
+            SettingsToggle {
+                checked: !!Desktop.data.gameMode
+                Accessible.name: I18n.tr("settings.gamemode_tools_title")
+                onToggled: Desktop.request("gamemode", checked ? "on" : "off")
+            }
+        }
     }
 
     SettingsCard {

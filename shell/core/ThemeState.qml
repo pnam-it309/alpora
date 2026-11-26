@@ -7,6 +7,9 @@ import Quickshell.Io
 Singleton {
     id: root
     property var items: []
+    property var localImages: []
+    property var localFolders: []
+    property string activeFolder: ""
     property string selectedId: "alpine"
     property string baseId: "alpine"
     property bool automatic: true
@@ -21,11 +24,25 @@ Singleton {
     readonly property bool busy: worker.running
     readonly property bool dirty: loaded && (selectedId !== baseId || automatic !== baseAutomatic)
     readonly property var selected: items.find(item => item.id === selectedId) || null
-    function refresh(): void { if (!busy) request("list", {}); }
+    function refresh(): void { if (!busy) request("list", activeFolder ? {folder: activeFolder} : {}); }
+    function browseFolder(folder: string): void {
+        if (busy) return;
+        activeFolder = folder;
+        request("list", folder ? {folder: folder} : {});
+    }
     function select(ident: string): void { if (!busy && items.some(item => item.id === ident)) { selectedId = ident; error = ""; message = ""; } }
     function cancel(): void { if (!busy) { selectedId = baseId; automatic = baseAutomatic; error = ""; message = ""; } }
     function apply(): void { if (!busy && selected && dirty) request("apply", {id: selectedId, colorsFromWallpaper: automatic}); }
-    function importImage(path: string): void { if (!busy) request("import", {image: path}); }
+    function importImage(path: string): void {
+        if (!busy && path.trim().length > 0) {
+            request("import", {image: path.trim(), apply: true, colorsFromWallpaper: automatic});
+        }
+    }
+    function removeCustom(ident: string): void {
+        if (!busy && ident.startsWith("custom-")) {
+            request("remove", {id: ident});
+        }
+    }
     function request(next: string, payload: var): void {
         if (next === "apply") {
             wallpaperHandoff.stop();
@@ -43,13 +60,16 @@ Singleton {
             if (exitCode !== 0 || !root.response) { root.wallpaperTransitioning = false; if (!root.error) root.error = I18n.tr("theme.error_action"); return; }
             if (root.wallpaperTransitioning) wallpaperHandoff.restart();
             const keepDraft = root.loaded && root.dirty && root.action === "list";
-            root.items = root.response.items;
+            root.items = root.response.items || [];
+            if (Array.isArray(root.response.localImages)) root.localImages = root.response.localImages;
+            if (Array.isArray(root.response.localFolders)) root.localFolders = root.response.localFolders;
+            if (typeof root.response.activeFolder === "string") root.activeFolder = root.response.activeFolder;
             root.baseId = root.response.selected;
             root.baseAutomatic = root.response.colorsFromWallpaper;
             if (!keepDraft) { root.selectedId = root.response.imported || root.baseId; root.automatic = root.baseAutomatic; }
             root.loaded = true;
             if (root.action === "apply") root.message = I18n.tr("theme.applied");
-            if (root.action === "import") root.message = I18n.tr("theme.imported");
+            if (root.action === "import") root.message = I18n.tr("theme.applied");
         }
     }
     Component.onCompleted: refresh()
@@ -59,6 +79,6 @@ Singleton {
         function apply(): void { root.apply(); }
         function cancel(): void { root.cancel(); }
         function refresh(): void { root.refresh(); }
-        function status(): string { return JSON.stringify({selected: root.selectedId, saved: root.baseId, automatic: root.automatic, dirty: root.dirty, busy: root.busy, count: root.items.length, error: root.error, message: root.message}); }
+        function status(): string { return JSON.stringify({selected: root.selectedId, saved: root.baseId, automatic: root.automatic, dirty: root.dirty, busy: root.busy, count: root.items.length, localCount: root.localImages.length, error: root.error, message: root.message}); }
     }
 }

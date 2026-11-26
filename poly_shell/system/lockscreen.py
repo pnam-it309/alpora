@@ -23,7 +23,7 @@ def lock_date(now=None, locale='ru'):
     return f'{days[now.weekday()]} · {now.day} {months[now.month - 1]}'
 
 
-def lock_style(snapshot):
+def lock_style(snapshot, paths=None):
     appearance = snapshot.get('appearance', {})
     palette = snapshot.get('appearance', {}).get('palette') or snapshot['profile']['palette']
     def color(name, alpha='ff'):
@@ -37,12 +37,23 @@ def lock_style(snapshot):
     for value in (font, title):
         if not value.strip() or any(char in value for char in '\n\r\0$#{}<>'):
             raise ConfigError('Invalid lockscreen typography')
+    active_config = (paths.config if paths is not None else Paths.current().config).resolve()
     def asset(name, fallback):
         value = appearance.get(name, fallback)
         if not isinstance(value, str):
             raise ConfigError('Invalid lockscreen asset')
         path = (ROOT / 'assets' / value).resolve()
-        allowed = path.is_relative_to((ROOT / 'assets').resolve()) or (name == 'wallpaper' and path.is_relative_to((Paths.current().config / 'wallpapers').resolve()))
+        is_custom_wallpaper = (
+            name == 'wallpaper'
+            and (
+                path.is_relative_to((active_config / 'wallpapers').resolve())
+                or (
+                    path.parent.name == 'wallpapers'
+                    and bool(re.fullmatch(r'custom-[0-9a-f]{12}\.(png|jpg|jpeg|webp)', path.name))
+                )
+            )
+        )
+        allowed = path.is_relative_to((ROOT / 'assets').resolve()) or is_custom_wallpaper
         if not allowed or not path.is_file():
             raise ConfigError('Lockscreen asset must be an existing theme asset')
         if any(char in str(path) for char in '\n\r\0$#'):
@@ -72,7 +83,7 @@ def lock_style(snapshot):
 
 
 def sync_lockscreen(paths):
-    text = lock_style(read_object(paths.session))
+    text = lock_style(read_object(paths.session), paths)
     destination = paths.state / 'hyprlock-theme.conf'
     if destination.exists() and destination.read_text() == text:
         return

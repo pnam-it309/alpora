@@ -30,6 +30,7 @@ from .toolkit_theme import (
 )
 
 IDS = ('alpine', 'moon-lake', 'forest-mist', 'warm-desert', 'northern-lights', 'rose-sunset', 'timeline')
+IMAGE_EXTENSIONS = ('.png', '.jpg', '.jpeg', '.webp')
 
 
 def data_root(paths):
@@ -45,7 +46,7 @@ def theme_image(paths, document):
     if not (path.is_relative_to((ROOT / 'assets/wallpapers').resolve()) or
             path.is_relative_to(data_root(paths).resolve())):
         raise ConfigError('Image must belong to collection')
-    if path.suffix.lower() not in ('.png', '.jpg', '.jpeg', '.webp') or not path.is_file():
+    if path.suffix.lower() not in IMAGE_EXTENSIONS or not path.is_file():
         raise ConfigError('Theme wallpaper image not found')
     return path
 
@@ -91,7 +92,90 @@ def resolve_appearance(paths):
         return base
 
 
-def catalog(paths):
+def discover_image_folders() -> list[dict]:
+    """Return existing user and system directories commonly containing wallpapers."""
+    home = Path.home()
+    candidates = (
+        (home / 'Pictures', 'Pictures'),
+        (home / 'Pictures/Wallpapers', 'Wallpapers'),
+        (home / 'Wallpapers', '~/Wallpapers'),
+        (home / 'Downloads', 'Downloads'),
+        (home / 'Pictures/Screenshots', 'Screenshots'),
+        (Path('/usr/share/backgrounds'), 'System Backgrounds'),
+        (Path('/usr/share/wallpapers'), 'System Wallpapers'),
+    )
+    folders = []
+    for path, label in candidates:
+        try:
+            if path.is_dir():
+                folders.append({'path': str(path), 'label': label})
+        except OSError:
+            continue
+    return folders
+
+
+def discover_local_images(folder=None, limit=60) -> list[dict]:
+    """Scan a specific path or common local directories for recent wallpaper images."""
+    if limit <= 0:
+        return []
+    folder_text = str(folder).strip() if folder is not None else ''
+    candidates = []
+    if folder_text:
+        try:
+            target = Path(folder_text).expanduser().resolve()
+            if target.is_file():
+                if target.suffix.lower() in IMAGE_EXTENSIONS:
+                    return [{'path': str(target), 'name': target.stem, 'folder': str(target.parent)}]
+                return []
+            if not target.is_dir():
+                return []
+            for pattern in ('*', '*/*'):
+                for path in target.glob(pattern):
+                    candidates.append((0, path))
+        except (OSError, ValueError):
+            return []
+    else:
+        folders = discover_image_folders()
+        screenshots_dir = (Path.home() / 'Pictures/Screenshots').resolve()
+        non_screenshots = [entry for entry in folders if entry['label'] != 'Screenshots']
+        screenshots = [entry for entry in folders if entry['label'] == 'Screenshots']
+        for group_priority, group in ((0, non_screenshots), (1, screenshots)):
+            for entry in group:
+                base = Path(entry['path'])
+                for pattern in ('*', '*/*'):
+                    try:
+                        for path in base.glob(pattern):
+                            try:
+                                is_ss = group_priority == 1 or path.resolve().is_relative_to(screenshots_dir)
+                            except OSError:
+                                is_ss = group_priority == 1
+                            candidates.append((1 if is_ss else 0, path))
+                    except OSError:
+                        continue
+
+    seen = set()
+    found = []
+    for priority, raw_path in candidates:
+        try:
+            if raw_path.suffix.lower() not in IMAGE_EXTENSIONS or not raw_path.is_file():
+                continue
+            resolved = raw_path.resolve()
+            if resolved in seen:
+                continue
+            seen.add(resolved)
+            mtime = resolved.stat().st_mtime
+        except OSError:
+            continue
+        found.append((priority, -mtime, resolved))
+
+    found.sort(key=lambda item: (item[0], item[1], str(item[2])))
+    return [
+        {'path': str(path), 'name': path.stem[:40], 'folder': path.parent.name}
+        for _, _, path in found[:limit]
+    ]
+
+
+def catalog(paths, folder=None):
     docs = []
     for ident in list(IDS) + sorted(p.stem for p in (paths.config / 'themes').glob('custom-*.json')):
         try:
@@ -102,14 +186,19 @@ def catalog(paths):
         except (ConfigError, OSError):
             continue
     saved = read_object(paths.config / 'appearance.json') if (paths.config / 'appearance.json').exists() else {}
+    folder_value = str(folder).strip() if folder is not None else ''
+    active_folder = str(Path(folder_value).expanduser()) if folder_value else ''
     return {'items': docs, 'selected': saved.get('theme', 'alpine'),
-            'colorsFromWallpaper': saved.get('colorsFromWallpaper', True)}
+            'colorsFromWallpaper': saved.get('colorsFromWallpaper', True),
+            'localFolders': discover_image_folders(),
+            'localImages': discover_local_images(folder),
+            'activeFolder': active_folder}
 
 
 
 def extract_palette_from_image(source_path):
     """Extract deterministic semantic palette from an image file using Pillow."""
-    source = Path(source_path).resolve()
+    source = Path(source_path).expanduser().resolve()
     if not source.is_file():
         raise ConfigError('Select an image file')
     try:
@@ -148,9 +237,11 @@ def extract_palette_from_image(source_path):
     }
 
 def import_wallpaper(paths, value):
-    if not isinstance(value, str) or not Path(value).is_file():
+    if not isinstance(value, str) or not value.strip():
         raise ConfigError('Select an image for wallpaper')
-    source = Path(value).resolve()
+    source = Path(value).expanduser().resolve()
+    if not source.is_file():
+        raise ConfigError('Select an image for wallpaper')
     palette = extract_palette_from_image(source)
     ident = 'custom-' + hashlib.sha256(source.read_bytes()).hexdigest()[:20]
     suffix = '.jpg' if source.suffix.lower() in ('.jpg', '.jpeg') else source.suffix.lower()
@@ -222,7 +313,7 @@ def apply_timeline_palette(paths, minute, palette, selection):
                 'visual': visual_for(paths), 'appearance': resolved}
     files = toolkit_files(paths, p, resolved.get('iconTheme', 'Poly-Alpine'))
     files[paths.state/'mako-theme.conf'] = mako_style(snapshot)
-    files[paths.state/'hyprlock-theme.conf'] = lock_style(snapshot)
+    files[paths.state/'hyprlock-theme.conf'] = lock_style(snapshot, paths)
     files[paths.config.parent/'hypr/poly-shell-theme.lua'] = border_lua(p)
     visuals, images = landscape_assets(paths, 'timeline', p)
     files.update(images); resolved.update(visuals)
@@ -304,7 +395,7 @@ def apply_theme(paths, ident, automatic=True, transition=None, *, activate=True)
         selection = {'schemaVersion': 1, 'theme': ident, 'palette': p, 'colorsFromWallpaper': automatic}
         files = toolkit_files(paths, p, resolved.get("iconTheme", "Poly-Alpine"))
         files[paths.state / 'mako-theme.conf'] = mako_style(snapshot)
-        files[paths.state / 'hyprlock-theme.conf'] = lock_style(snapshot)
+        files[paths.state / 'hyprlock-theme.conf'] = lock_style(snapshot, paths)
         files[paths.config.parent / 'hypr/poly-shell-theme.lua'] = border_lua(p)
         visuals, assets = landscape_assets(paths, ident, p)
         files.update(assets)
@@ -363,10 +454,45 @@ def apply_theme(paths, ident, automatic=True, transition=None, *, activate=True)
     return catalog(paths) | {'saved': True, 'warnings': warnings}
 
 
+def delete_custom_theme(paths, ident):
+    """Remove an imported custom wallpaper theme and revert to alpine if active."""
+    if not isinstance(ident, str) or not re.fullmatch(r'custom-[a-f0-9]{20}', ident):
+        raise ConfigError('Can only remove custom imported wallpapers')
+    with state_lock(paths):
+        selection = paths.config / 'appearance.json'
+        active = False
+        if selection.exists():
+            try:
+                active = read_object(selection).get('theme') == ident
+            except ConfigError:
+                active = False
+        (paths.config / 'themes' / (ident + '.json')).unlink(missing_ok=True)
+        for image_path in data_root(paths).glob(ident + '.*'):
+            if image_path.is_file():
+                image_path.unlink(missing_ok=True)
+        if active:
+            apply_theme(paths, 'alpine', True)
+    return catalog(paths)
+
+
 def theme_control(paths, action, payload):
     if not isinstance(payload, dict):
         raise ConfigError('Invalid theme request')
-    if action == 'list': return catalog(paths)
-    if action == 'import': return import_wallpaper(paths, payload.get('image'))
-    if action == 'apply': return apply_theme(paths, payload.get('id'), payload.get('colorsFromWallpaper', True), payload.get('transition'))
+    if action == 'list':
+        return catalog(paths, folder=payload.get('folder'))
+    if action == 'import':
+        imported_res = import_wallpaper(paths, payload.get('image'))
+        if payload.get('apply') is True:
+            applied_res = apply_theme(
+                paths,
+                imported_res['imported'],
+                payload.get('colorsFromWallpaper', True),
+                payload.get('transition'),
+            )
+            return applied_res | {'imported': imported_res['imported']}
+        return imported_res
+    if action == 'apply':
+        return apply_theme(paths, payload.get('id'), payload.get('colorsFromWallpaper', True), payload.get('transition'))
+    if action == 'remove':
+        return delete_custom_theme(paths, payload.get('id'))
     raise ConfigError('Unknown theme action')
