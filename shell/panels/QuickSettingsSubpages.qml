@@ -5,8 +5,6 @@ import "../logic/StatusLogic.js" as StatusLogic
 import "../theme" as PolyTheme
 import QtQuick.Controls
 import QtQuick.Layouts
-import Quickshell
-import Quickshell.Io
 import Quickshell.Networking
 
 ColumnLayout {
@@ -71,8 +69,8 @@ ColumnLayout {
                 width: parent.width
                 visible: root.popup.page === "bluetooth"
                 symbol: "bluetooth"
-                text: Session.bluetoothEnabled ? "Bluetooth enabled" : "Bluetooth disabled"
-                subtitle: "Click to toggle"
+                text: Session.bluetoothEnabled ? I18n.tr("bluetooth.on") : I18n.tr("bluetooth.off")
+                subtitle: I18n.tr("quick.click_to_toggle")
                 selected: Session.bluetoothEnabled
                 enabled: !!Session.bluetoothAdapter
                 onClicked: Session.toggleBluetooth()
@@ -128,7 +126,7 @@ ColumnLayout {
                         symbol: "bluetooth"
                         text: btDeviceRow.modelData.name || btDeviceRow.modelData.address
                         selected: btDeviceRow.modelData.connected
-                        subtitle: btDeviceRow.modelData.connected ? "Connected · click to disconnect" : "Paired · click to connect"
+                        subtitle: btDeviceRow.modelData.connected ? I18n.tr("bluetooth.connected_disconnect_hint") : I18n.tr("bluetooth.paired_connect_hint")
                         enabled: Session.bluetoothEnabled
                         onClicked: {
                             if (btDeviceRow.modelData.connected) btDeviceRow.modelData.disconnect();
@@ -137,7 +135,7 @@ ColumnLayout {
                     }
                     IconButton {
                         symbol: "delete"
-                        hint: "Forget device"
+                        hint: I18n.tr("bluetooth.unpair")
                         implicitWidth: 32
                         implicitHeight: 32
                         onClicked: btDeviceRow.modelData.forget()
@@ -152,7 +150,7 @@ ColumnLayout {
                     width: parent.width
                     symbol: root.popup.page === "input" ? "microphone" : "volume"
                     text: modelData.nickname || modelData.description || modelData.name
-                    subtitle: selected ? "Selected" : "Click to use this device"
+                    subtitle: selected ? I18n.tr("common.enabled") : I18n.tr("quick.select_device")
                     selected: modelData === (root.popup.page === "input" ? Session.source : Session.sink)
                     enabled: modelData.ready
                     onClicked: { if (root.popup.page === "input") Session.selectInput(modelData); else Session.selectOutput(modelData); }
@@ -291,7 +289,7 @@ ColumnLayout {
 
         Rectangle {
             Layout.fillWidth: true
-            height: 36
+            implicitHeight: 36
             radius: 8
             color: Glass.tint(Session.surface, 0.3)
             border.width: 1
@@ -301,8 +299,8 @@ ColumnLayout {
                 anchors.margins: 8
                 spacing: 8
                 Rectangle {
-                    width: 16
-                    height: 16
+                    implicitWidth: 16
+                    implicitHeight: 16
                     radius: 4
                     color: root.popup.isEnterprise ? Session.accent : "transparent"
                     border.width: 1.5
@@ -458,74 +456,9 @@ ColumnLayout {
     }
 
     // Devices subpage
-    ColumnLayout {
+    QuickDevicesSubpage {
         visible: root.popup.page === "settings"
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        spacing: 10
-
-        GridLayout {
-            Layout.fillWidth: true
-            columns: 2
-            rowSpacing: 8
-            columnSpacing: 8
-
-            HoverStatusTile {
-                Layout.fillWidth: true
-                title: "Wi-Fi"
-                symbol: "wifi"
-                detail: Desktop.data.wifiSsid || I18n.tr("common.disconnected")
-                active: Desktop.data.wifiEnabled
-                connected: !!Desktop.data.wifiSsid
-                statusKind: "wifi"
-                statusLevel: Desktop.data.wifiStrength || 0
-                onClicked: root.popup.page = "wifi"
-            }
-
-            HoverStatusTile {
-                Layout.fillWidth: true
-                title: "Bluetooth"
-                symbol: "bluetooth"
-                detail: Desktop.data.bluetoothConnectedDevice || (Desktop.data.bluetoothEnabled ? I18n.tr("bluetooth.on") : I18n.tr("common.off"))
-                active: Desktop.data.bluetoothEnabled
-                connected: !!Desktop.data.bluetoothConnectedDevice
-                statusKind: "bluetooth"
-                onClicked: root.popup.page = "bluetooth"
-            }
-
-            HoverStatusTile {
-                Layout.fillWidth: true
-                title: "Audio Out"
-                symbol: "volume"
-                detail: Desktop.data.audioOutputDescription || "Default Output"
-                active: !Desktop.data.audioMuted
-                connected: true
-                onClicked: root.popup.page = "output"
-            }
-
-            HoverStatusTile {
-                Layout.fillWidth: true
-                title: "Power Profile"
-                symbol: "performance"
-                detail: Desktop.data.powerProfile || "balanced"
-                active: Desktop.data.powerProfile === "performance"
-                connected: Desktop.data.powerProfilesAvailable
-                onClicked: root.popup.page = "profiles"
-            }
-        }
-
-        GlowSectionDivider { Layout.fillWidth: true }
-
-        SettingsRow { Layout.fillWidth: true; text: I18n.tr("quick.sound_output"); symbol: "volume"; onClicked: root.popup.page = "output" }
-        SettingsRow { Layout.fillWidth: true; text: I18n.tr("quick.microphone"); symbol: "microphone"; onClicked: root.popup.page = "input" }
-        SettingsRow { Layout.fillWidth: true; text: "Wi-Fi"; symbol: "wifi"; onClicked: root.popup.page = "wifi" }
-        SettingsRow { Layout.fillWidth: true; text: "Bluetooth"; symbol: "bluetooth"; onClicked: root.popup.page = "bluetooth" }
-        SettingsRow { Layout.fillWidth: true; text: I18n.tr("quick.mobile_hotspot"); symbol: "hotspot"; onClicked: root.popup.page = "hotspot" }
-        SettingsRow { Layout.fillWidth: true; text: I18n.tr("quick.power_mode"); symbol: "performance"; onClicked: root.popup.page = "profiles" }
-        SettingsRow { Layout.fillWidth: true; text: I18n.tr("quick.airplane_mode"); symbol: "airplane"; onClicked: root.popup.page = "airplane" }
-        SettingsRow { Layout.fillWidth: true; text: I18n.tr("quick.night_light"); symbol: "moon-warm"; onClicked: root.popup.page = "nightlight" }
-        SettingsRow { Layout.fillWidth: true; text: I18n.tr("quick.dnd"); symbol: "bell"; onClicked: root.popup.page = "dnd" }
-        Item { Layout.fillHeight: true }
+        popup: root.popup
     }
 
     // Power Profiles subpage
@@ -548,7 +481,7 @@ ColumnLayout {
         spacing: 16
         Text {
             Layout.fillWidth: true
-            text: root.popup.page === "nightlight" ? "Warmer screen colors at 4500 K reduce blue light. Your brightness stays unchanged." : "Pause notification banners while you focus. Turn off to resume notifications."
+            text: root.popup.page === "nightlight" ? I18n.tr("quick.night_light") : I18n.tr("settings.dnd_desc")
             color: Session.muted
             font.family: Session.fontFamily
             font.pixelSize: 13
@@ -559,7 +492,7 @@ ColumnLayout {
             symbol: root.popup.page === "nightlight" ? "moon-warm" : "bell"
             text: root.popup.title
             selected: root.popup.page === "nightlight" ? Desktop.data.nightLight : Desktop.data.dnd
-            subtitle: selected ? "On · click to disable" : "Off · click to enable"
+            subtitle: selected ? I18n.tr("quick.airplane_on_desc") : I18n.tr("quick.airplane_off_desc")
             enabled: root.popup.page === "nightlight" ? Desktop.data.nightLightAvailable : Desktop.data.dndAvailable
             onClicked: Desktop.request(root.popup.page === "nightlight" ? "nightlight" : "dnd", "")
         }
