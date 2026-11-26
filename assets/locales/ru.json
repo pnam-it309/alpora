@@ -998,5 +998,16 @@
   "theme.no_local_images": "В этой папке не найдено изображений PNG, JPG или WebP.",
   "theme.use_this_image": "Установить",
   "theme.custom_badge": "Своё",
-  "theme.remove_custom": "Удалить пользовательские обои"
+  "theme.remove_custom": "Удалить пользовательские обои",
+  "day.reminder_in": "через {minutes} мин",
+  "day.no_reminder": "Без напоминания",
+  "day.remind_at_time": "Вовремя",
+  "day.remind_1_day": "За 1 день",
+  "day.remind_minutes_before": "За {minutes} мин",
+  "theme.slideshow": "Слайдшоу обоев",
+  "theme.slideshow_hint": "Автоматически менять обои из папки",
+  "theme.slideshow_use_folder": "Текущая папка",
+  "theme.slideshow_min": "мин",
+  "theme.slideshow_shuffle": "Вперемешку",
+  "theme.slideshow_next": "Далее"
 }

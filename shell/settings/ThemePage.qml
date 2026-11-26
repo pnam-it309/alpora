@@ -14,6 +14,7 @@ ColumnLayout {
     readonly property color previewAccent: previewPalette.accent || Session.accent
     readonly property color previewSurface: previewPalette.surface || Session.surface
     readonly property color previewBackground: previewPalette.background || Session.background
+    Connections { target: ThemeState; function onPickUnavailable(): void { root.galleryTab = "local"; customPathInput.forceActiveFocus(); } }
     function fileUrl(path: string): string { return "file://" + encodeURI(path).replace(/#/g, "%23").replace(/\?/g, "%3F"); }
     spacing: 12
 
@@ -326,6 +327,7 @@ ColumnLayout {
                     }
                 }
             }
+            ThemeSlideshowCard { Layout.fillWidth: true }
         }
         SettingsCard {
             Layout.preferredWidth: 332; Layout.fillHeight: true; padding: 14

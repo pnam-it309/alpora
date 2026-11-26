@@ -44,6 +44,7 @@ def validate(data):
             day(item.get("date")); text(item.get("title"))
             if kind == "events":
                 clock_time(item.get("time"))
+                if "remind" in item: reminder(item["remind"])
             elif type(item.get("done")) is not bool:
                 raise ConfigError("Corrupt task status")
     timer = data.get("timer")
@@ -65,6 +66,15 @@ def clock_time(value):
     return value
 
 
+REMINDERS = (0, 5, 10, 15, 30, 60, 1440)
+
+
+def reminder(value):
+    if type(value) is not int or value not in REMINDERS:
+        raise ConfigError("Reminder must be 0, 5, 10, 15, 30, 60 minutes or 1 day before")
+    return value
+
+
 def organizer(paths, action="get", payload=None, *, now=None):
     now = time.time() if now is None else now
     payload = {} if payload is None else payload
@@ -81,7 +91,9 @@ def organizer(paths, action="get", payload=None, *, now=None):
             kind = "tasks" if action == "task-add" else "events"
             item = {"id": uuid.uuid4().hex, "date": day(payload.get("date")), "title": text(payload.get("title"))}
             if kind == "tasks": item["done"] = False
-            else: item["time"] = clock_time(payload.get("time"))
+            else:
+                item["time"] = clock_time(payload.get("time"))
+                if payload.get("remind") is not None: item["remind"] = reminder(payload["remind"])
             data[kind].append(item)
         elif action in ("task-toggle", "item-remove"):
             identifier = payload.get("id")

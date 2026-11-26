@@ -14,18 +14,19 @@ ColumnLayout {
     property string editing: ""
     property string localError: ""
     property bool waitingForAdd: false
+    property int remindMinutes: -1
     readonly property date selectedDate: calendar.selected
     readonly property var events: DayState.events(selectedDate)
     readonly property var tasks: DayState.tasks(selectedDate)
     function add(kind: string): void {
-        editing = kind; page = "add"; titleField.text = ""; timeField.text = "09:00"; localError = "";
+        editing = kind; page = "add"; titleField.text = ""; timeField.text = "09:00"; remindMinutes = -1; localError = "";
         Qt.callLater(() => titleField.forceActiveFocus());
     }
     function submit(): void {
         if (!titleField.text.trim()) { localError = I18n.tr("day.enter_title"); return; }
         if (editing === "event" && !/^([01][0-9]|2[0-3]):[0-5][0-9]$/.test(timeField.text)) { localError = I18n.tr("day.enter_time_format"); return; }
         waitingForAdd = true;
-        DayState.request(editing === "event" ? "event-add" : "task-add", {date: DayState.dateKey(selectedDate), title: titleField.text.trim(), time: timeField.text});
+        DayState.request(editing === "event" ? "event-add" : "task-add", {date: DayState.dateKey(selectedDate), title: titleField.text.trim(), time: timeField.text, remind: editing === "event" && remindMinutes >= 0 ? remindMinutes : null});
     }
     function openNote(): void { noteField.text = DayState.data.note; page = "note"; }
     Connections {
@@ -40,6 +41,13 @@ ColumnLayout {
         subtitle: root.selectedDate.toLocaleDateString(I18n.qtLocale, "dddd, d MMMM")
     }
     Text { visible: text.length > 0; Layout.fillWidth: true; text: root.localError || DayState.error; color: PolyTheme.Theme.color("#e2af95"); wrapMode: Text.Wrap; font.family: Session.fontFamily; font.pixelSize: 11 }
+    DayWeatherCard {
+        visible: root.page === "main" && root.expansion > 0.3
+        Layout.fillWidth: true; Layout.preferredHeight: 64 * Math.min(1, root.expansion); Layout.maximumHeight: 64
+        opacity: Math.min(1, root.expansion)
+        selectedDate: root.selectedDate
+        onDaySelected: day => { calendar.month = new Date(day.getFullYear(), day.getMonth(), 1); calendar.selected = day; }
+    }
     RowLayout {
         visible: root.page === "main"
         Layout.fillWidth: true; Layout.fillHeight: true
@@ -88,6 +96,7 @@ ColumnLayout {
                                     RowLayout {
                                         anchors.fill: parent; anchors.margins: 7; spacing: 7
                                         Text { text: event.modelData.time; color: PolyTheme.Theme.color("#d0b293"); font.family: Session.fontFamily; font.pixelSize: 11 }
+                                        Icon { visible: event.modelData.remind !== undefined; name: "bell"; Layout.preferredWidth: 12; Layout.preferredHeight: 12 }
                                         Rectangle { implicitWidth: 1; implicitHeight: 20; color: PolyTheme.Theme.color("#74634e") }
                                         Text { Layout.fillWidth: true; text: event.modelData.title; textFormat: Text.PlainText; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 11; elide: Text.ElideRight }
                                         BarButton { symbol: "close"; hint: I18n.tr("day.remove_event"); implicitWidth: 22; implicitHeight: 24; onClicked: DayState.request("item-remove", {id: event.modelData.id}) }
@@ -204,6 +213,19 @@ ColumnLayout {
         Text { text: I18n.tr("day.date_prefix") + " " + root.selectedDate.toLocaleDateString(I18n.qtLocale, "d MMMM yyyy"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 12 }
         DayField { id: titleField; Layout.fillWidth: true; placeholderText: root.editing === "event" ? I18n.tr("day.event_name_placeholder") : I18n.tr("day.task_name_placeholder"); maximumLength: 200; onAccepted: root.submit(); Accessible.name: I18n.tr("day.title_field") }
         DayField { id: timeField; visible: root.editing === "event"; Layout.preferredWidth: 120; placeholderText: "09:30"; maximumLength: 5; onAccepted: root.submit(); Accessible.name: I18n.tr("day.time_field") }
+        Flow {
+            visible: root.editing === "event"; Layout.fillWidth: true; spacing: 6
+            Repeater {
+                model: [-1, 0, 5, 15, 30, 60, 1440]
+                DayAction {
+                    required property int modelData
+                    implicitHeight: 28; implicitWidth: Math.max(48, contentItem.implicitWidth + 18)
+                    primary: root.remindMinutes === modelData
+                    text: modelData < 0 ? I18n.tr("day.no_reminder") : modelData === 0 ? I18n.tr("day.remind_at_time") : modelData === 1440 ? I18n.tr("day.remind_1_day") : I18n.trWith("day.remind_minutes_before", {minutes: modelData})
+                    onClicked: root.remindMinutes = modelData
+                }
+            }
+        }
         RowLayout {
             DayAction { text: I18n.tr("common.add"); primary: true; enabled: !root.waitingForAdd && DayState.loaded; onClicked: root.submit() }
             DayAction { text: I18n.tr("common.cancel"); onClicked: { root.page = "main"; root.localError = ""; } }

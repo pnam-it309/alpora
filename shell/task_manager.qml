@@ -232,128 +232,17 @@ ShellRoot {
                                 : root.activeTab === "users" ? 3
                                 : root.activeTab === "details" ? 4 : 5
 
-                    // TAB 1: Processes
-                    Item {
-                        ColumnLayout {
-                            anchors.fill: parent; anchors.margins: 14; spacing: 10
-                            // Table header
-                            Rectangle {
-                                Layout.fillWidth: true; Layout.preferredHeight: 28; radius: 4
-                                color: Glass.tint(Session.surface, 0.5)
-                                RowLayout {
-                                    anchors.fill: parent; anchors.leftMargin: 12; anchors.rightMargin: 12
-                                    Text { Layout.fillWidth: true; text: I18n.tr("tasks.col_name"); color: Session.muted; font.pixelSize: 11; font.weight: Font.DemiBold }
-                                    Text { Layout.preferredWidth: 70; text: I18n.tr("tasks.col_pid"); color: Session.muted; font.pixelSize: 11; font.weight: Font.DemiBold }
-                                    Text { Layout.preferredWidth: 90; text: I18n.tr("tasks.col_status"); color: Session.muted; font.pixelSize: 11; font.weight: Font.DemiBold }
-                                    Text { Layout.preferredWidth: 80; text: I18n.tr("tasks.col_cpu"); color: Session.muted; font.pixelSize: 11; font.weight: Font.DemiBold }
-                                    Text { Layout.preferredWidth: 90; text: I18n.tr("tasks.col_memory"); color: Session.muted; font.pixelSize: 11; font.weight: Font.DemiBold }
-                                    Text { Layout.preferredWidth: 90; text: I18n.tr("tasks.col_user"); color: Session.muted; font.pixelSize: 11; font.weight: Font.DemiBold }
-                                }
-                            }
-                            // Process List
-                            ListView {
-                                id: processList
-                                Layout.fillWidth: true; Layout.fillHeight: true; clip: true; spacing: 3
-                                model: root.processesData.filter(p => !root.searchText || p.name.toLowerCase().includes(root.searchText.toLowerCase()))
-                                delegate: Rectangle {
-                                    required property var modelData
-                                    width: processList.width; height: 34; radius: 5
-                                    color: root.selectedPid === modelData.pid ? Glass.tint(Session.accent, 0.22) : pMouse.containsMouse ? Glass.tint(Session.surface, 0.6) : "transparent"
-                                    border.width: root.selectedPid === modelData.pid ? 1 : 0
-                                    border.color: Glass.tint(Session.accent, 0.45)
-
-                                    RowLayout {
-                                        anchors.fill: parent; anchors.leftMargin: 12; anchors.rightMargin: 12
-                                        Text { Layout.fillWidth: true; text: parent.modelData.name; color: Session.foreground; font.pixelSize: 12; elide: Text.ElideRight }
-                                        Text { Layout.preferredWidth: 70; text: String(parent.modelData.pid); color: Session.muted; font.pixelSize: 11 }
-                                        Text { Layout.preferredWidth: 90; text: parent.modelData.status; color: Session.muted; font.pixelSize: 11 }
-                                        Text { Layout.preferredWidth: 80; text: parent.modelData.cpu_percent + "%"; color: parent.modelData.cpu_percent > 15 ? Session.accent : Session.foreground; font.pixelSize: 11 }
-                                        Text { Layout.preferredWidth: 90; text: parent.modelData.memory_mb + " MB"; color: Session.foreground; font.pixelSize: 11 }
-                                        Text { Layout.preferredWidth: 90; text: parent.modelData.user; color: Session.muted; font.pixelSize: 11 }
-                                    }
-                                    MouseArea {
-                                        id: pMouse
-                                        anchors.fill: parent; hoverEnabled: true
-                                        onClicked: { root.selectedPid = parent.modelData.pid; root.selectedProcessName = parent.modelData.name; }
-                                    }
-                                }
-                            }
-                        }
+                    TaskProcessesTab {
+                        processesData: root.processesData
+                        searchText: root.searchText
+                        selectedPid: root.selectedPid
+                        onSelected: (pid, name) => { root.selectedPid = pid; root.selectedProcessName = name; }
                     }
 
                     // TAB 2: Performance
-                    Item {
-                        RowLayout {
-                            anchors.fill: parent; anchors.margins: 16; spacing: 16
-                            // Left list cards
-                            ColumnLayout {
-                                Layout.preferredWidth: 260; Layout.fillHeight: true; spacing: 10
-                                // CPU Card
-                                Rectangle {
-                                    Layout.fillWidth: true; Layout.preferredHeight: 90; radius: 8
-                                    color: Glass.tint(Session.surface, 0.7); border.width: 1; border.color: Glass.tint(Session.accent, 0.3)
-                                    ColumnLayout {
-                                        anchors.fill: parent; anchors.margins: 12
-                                        RowLayout {
-                                            Text { text: "CPU"; color: Session.accent; font.pixelSize: 13; font.weight: Font.Bold }
-                                            Item { Layout.fillWidth: true }
-                                            Text { text: ((root.performanceData.cpu || {}).percent || 0) + "%"; color: Session.foreground; font.pixelSize: 15; font.weight: Font.Bold }
-                                        }
-                                        Text { text: (root.performanceData.cpu || {}).model || "Processor"; color: Session.muted; font.pixelSize: 10; elide: Text.ElideRight; Layout.fillWidth: true }
-                                    }
-                                }
-                                // Memory Card
-                                Rectangle {
-                                    Layout.fillWidth: true; Layout.preferredHeight: 90; radius: 8
-                                    color: Glass.tint(Session.surface, 0.7); border.width: 1; border.color: Glass.tint(Session.accent, 0.3)
-                                    ColumnLayout {
-                                        anchors.fill: parent; anchors.margins: 12
-                                        RowLayout {
-                                            Text { text: I18n.tr("tasks.col_memory"); color: Session.accent; font.pixelSize: 13; font.weight: Font.Bold }
-                                            Item { Layout.fillWidth: true }
-                                            Text { text: ((root.performanceData.memory || {}).percent || 0) + "%"; color: Session.foreground; font.pixelSize: 15; font.weight: Font.Bold }
-                                        }
-                                        Text { text: ((root.performanceData.memory || {}).used_mb || 0) + " / " + ((root.performanceData.memory || {}).total_mb || 0) + " MB"; color: Session.muted; font.pixelSize: 11 }
-                                    }
-                                }
-                                Item { Layout.fillHeight: true }
-                            }
-
-                            // Right live graph
-                            Rectangle {
-                                Layout.fillWidth: true; Layout.fillHeight: true; radius: 8
-                                color: Glass.tint(Session.surface, 0.4); border.width: 1; border.color: Glass.tint(Session.accent, 0.2)
-                                ColumnLayout {
-                                    anchors.fill: parent; anchors.margins: 16; spacing: 10
-                                    Text { text: I18n.tr("tasks.cpu_graph_title"); color: Session.foreground; font.pixelSize: 14; font.weight: Font.DemiBold }
-                                    Canvas {
-                                        id: perfCanvas
-                                        Layout.fillWidth: true; Layout.fillHeight: true
-                                        onPaint: {
-                                            const ctx = getContext("2d");
-                                            ctx.reset();
-                                            ctx.strokeStyle = Session.accent;
-                                            ctx.lineWidth = 2.5;
-                                            const data = root.cpuHistory;
-                                            if (data.length < 2) return;
-                                            const stepX = width / Math.max(1, data.length - 1);
-                                            ctx.beginPath();
-                                            for (let i = 0; i < data.length; i++) {
-                                                const x = i * stepX;
-                                                const y = height - (data[i] / 100.0) * height;
-                                                if (i === 0) ctx.moveTo(x, y);
-                                                else ctx.lineTo(x, y);
-                                            }
-                                            ctx.stroke();
-                                        }
-                                        Connections {
-                                            target: root
-                                            function onCpuHistoryChanged(): void { perfCanvas.requestPaint(); }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                    TaskPerformanceTab {
+                        performanceData: root.performanceData
+                        cpuHistory: root.cpuHistory
                     }
 
                     // TAB 3: Startup

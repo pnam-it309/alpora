@@ -107,9 +107,9 @@ def weather(paths):
         return cached | {'location': location['name'], 'stale': False, 'error': ''}
     try:
         data = request_json('https://api.open-meteo.com/v1/forecast', {
-            'latitude': key[0], 'longitude': key[1], 'timezone': 'auto', 'forecast_days': 3,
-            'current': 'temperature_2m,weather_code,is_day',
-            'daily': 'weather_code,temperature_2m_max,temperature_2m_min'})
+            'latitude': key[0], 'longitude': key[1], 'timezone': 'auto', 'forecast_days': 7,
+            'current': 'temperature_2m,weather_code,is_day,apparent_temperature,relative_humidity_2m,wind_speed_10m',
+            'daily': 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max'})
         current, daily = data['current'], data['daily']
         numbers = [current['temperature_2m'], current['weather_code'], current['is_day']]
         forecast = []
@@ -117,9 +117,15 @@ def weather(paths):
             high, low, code = (daily[k][index] for k in ('temperature_2m_max', 'temperature_2m_min', 'weather_code'))
             numbers.extend([high, low, code])
             forecast.append({'day': day, 'high': high, 'low': low, 'code': code})
+        outlook = []
+        for index, day in enumerate(daily['time'][:7]):
+            rain = (daily.get('precipitation_probability_max') or [None] * 7)[index] if index < 7 else None
+            outlook.append({'day': day, 'high': daily['temperature_2m_max'][index], 'low': daily['temperature_2m_min'][index],
+                            'code': daily['weather_code'][index],
+                            'rain': rain if type(rain) in (int, float) and math.isfinite(rain) else None})
         if len(forecast) != 3 or any(type(n) not in (int, float) or not math.isfinite(n) for n in numbers):
             raise ValueError('invalid weather')
-        result = {'coordinates': key, 'fetchedAt': now, 'current': current, 'forecast': forecast}
+        result = {'coordinates': key, 'fetchedAt': now, 'current': current, 'forecast': forecast, 'outlook': outlook}
         atomic_json(cache_path, result)
         return result | {'location': location['name'], 'stale': False, 'error': ''}
     except (ConfigError, KeyError, IndexError, TypeError, ValueError, OSError):

@@ -998,5 +998,16 @@
   "theme.no_local_images": "No PNG, JPG, or WebP images found in this folder.",
   "theme.use_this_image": "Use Wallpaper",
   "theme.custom_badge": "Custom",
-  "theme.remove_custom": "Remove custom wallpaper"
+  "theme.remove_custom": "Remove custom wallpaper",
+  "day.reminder_in": "in {minutes} min",
+  "day.no_reminder": "No reminder",
+  "day.remind_at_time": "At time",
+  "day.remind_1_day": "1 day before",
+  "day.remind_minutes_before": "{minutes} min before",
+  "theme.slideshow": "Slideshow",
+  "theme.slideshow_hint": "Change wallpaper automatically from a folder",
+  "theme.slideshow_use_folder": "Use current folder",
+  "theme.slideshow_min": "min",
+  "theme.slideshow_shuffle": "Shuffle",
+  "theme.slideshow_next": "Next"
 }

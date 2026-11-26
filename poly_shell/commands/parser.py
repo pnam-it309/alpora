@@ -76,7 +76,8 @@ def build_parser(version: str) -> argparse.ArgumentParser:
     )
     control_parser.add_argument("value", nargs="?")
     theme_parser = sub.add_parser("theme", help="wallpaper-derived color themes")
-    theme_parser.add_argument("action", choices=("list", "apply", "import"))
+    theme_parser.add_argument("action", choices=("list", "apply", "import", "remove", "pick",
+                              "slideshow-get", "slideshow-set", "slideshow-next"))
     theme_parser.add_argument("payload", nargs="?", default="{}")
     timeline_parser = sub.add_parser("timeline", help="saved time of day for the Timeline theme")
     timeline_parser.add_argument("action", choices=("get", "set", "ready", "sync-clock"))

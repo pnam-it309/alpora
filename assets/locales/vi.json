@@ -998,5 +998,16 @@
   "theme.no_local_images": "Không tìm thấy ảnh PNG, JPG hoặc WebP trong thư mục này.",
   "theme.use_this_image": "Đặt làm nền",
   "theme.custom_badge": "Ảnh riêng",
-  "theme.remove_custom": "Xóa ảnh tùy chỉnh"
+  "theme.remove_custom": "Xóa ảnh tùy chỉnh",
+  "day.reminder_in": "sau {minutes} phút",
+  "day.no_reminder": "Không nhắc",
+  "day.remind_at_time": "Đúng giờ",
+  "day.remind_1_day": "Trước 1 ngày",
+  "day.remind_minutes_before": "Trước {minutes} phút",
+  "theme.slideshow": "Trình chiếu hình nền",
+  "theme.slideshow_hint": "Tự đổi hình nền từ một thư mục",
+  "theme.slideshow_use_folder": "Dùng thư mục hiện tại",
+  "theme.slideshow_min": "phút",
+  "theme.slideshow_shuffle": "Ngẫu nhiên",
+  "theme.slideshow_next": "Kế tiếp"
 }

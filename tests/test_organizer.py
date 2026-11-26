@@ -64,5 +64,15 @@ class OrganizerTests(unittest.TestCase):
         self.assertEqual(saved["note"], note)
         self.assertEqual(saved["events"][0]["date"], "2026-10-20")
 
+    def test_event_reminder_is_optional_and_validated(self):
+        organizer(self.paths, "event-add", {"date": "2026-10-20", "title": "A", "time": "09:00", "remind": 15})
+        organizer(self.paths, "event-add", {"date": "2026-10-20", "title": "B", "time": "10:00", "remind": None})
+        events = organizer(self.paths)["events"]
+        self.assertEqual(events[0]["remind"], 15)
+        self.assertNotIn("remind", events[1])
+        for bad in (7, "5", True, -1):
+            with self.assertRaises(ConfigError):
+                organizer(self.paths, "event-add", {"date": "2026-10-20", "title": "C", "time": "11:00", "remind": bad})
+
 
 if __name__ == "__main__": unittest.main()

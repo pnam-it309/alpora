@@ -29,6 +29,7 @@ singleton RunningAppsState 1.0 core/RunningAppsState.qml
 singleton ScreenshotState 1.0 core/ScreenshotState.qml
 singleton ShortcutsState 1.0 core/ShortcutsState.qml
 singleton ThemeState 1.0 core/ThemeState.qml
+singleton SlideshowState 1.0 core/SlideshowState.qml
 singleton TimelineState 1.0 core/TimelineState.qml
 singleton VideoPipState 1.0 core/VideoPipState.qml
 singleton WeatherState 1.0 core/WeatherState.qml
@@ -78,6 +79,7 @@ CompanionSprite 1.0 components/CompanionSprite.qml
 CompanionTween 1.0 components/CompanionTween.qml
 DayAction 1.0 components/DayAction.qml
 DayField 1.0 components/DayField.qml
+DayWeatherCard 1.0 components/DayWeatherCard.qml
 FocusCard 1.0 components/FocusCard.qml
 HoverControl 1.0 components/HoverControl.qml
 HoverStatusTile 1.0 components/HoverStatusTile.qml
@@ -123,12 +125,15 @@ NotificationsPanel 1.0 panels/NotificationsPanel.qml
 NotificationsPreview 1.0 panels/NotificationsPreview.qml
 Osd 1.0 panels/Osd.qml
 PowerMenu 1.0 panels/PowerMenu.qml
+LauncherInstantCard 1.0 panels/LauncherInstantCard.qml
+LauncherMacroRow 1.0 panels/LauncherMacroRow.qml
 QuickHoverContent 1.0 panels/QuickHoverContent.qml
 QuickDevicesSubpage 1.0 panels/QuickDevicesSubpage.qml
 QuickHotspotSubpage 1.0 panels/QuickHotspotSubpage.qml
 QuickProfilesSubpage 1.0 panels/QuickProfilesSubpage.qml
 QuickAirplaneSubpage 1.0 panels/QuickAirplaneSubpage.qml
 QuickPowerActionsSubpage 1.0 panels/QuickPowerActionsSubpage.qml
+QuickPasswordSubpage 1.0 panels/QuickPasswordSubpage.qml
 QuickSettings 1.0 panels/QuickSettings.qml
 QuickSettingsSubpages 1.0 panels/QuickSettingsSubpages.qml
 ScreenshotOverlay 1.0 panels/ScreenshotOverlay.qml
@@ -162,6 +167,9 @@ WeatherScene 1.0 widgets/WeatherScene.qml
 AppearancePage 1.0 settings/AppearancePage.qml
 SettingsAppearance 1.0 settings/SettingsAppearance.qml
 SettingsDetails 1.0 settings/SettingsDetails.qml
+SettingsMonitorsPage 1.0 settings/SettingsMonitorsPage.qml
+SettingsPanelPage 1.0 settings/SettingsPanelPage.qml
+SettingsSoundPage 1.0 settings/SettingsSoundPage.qml
 SettingsEcosystem 1.0 settings/SettingsEcosystem.qml
 SettingsLanguage 1.0 settings/SettingsLanguage.qml
 SettingsNav 1.0 settings/SettingsNav.qml
@@ -172,3 +180,9 @@ SettingsSystemInput 1.0 settings/SettingsSystemInput.qml
 SettingsUpdateAbout 1.0 settings/SettingsUpdateAbout.qml
 SettingsWidgets 1.0 settings/SettingsWidgets.qml
 ThemePage 1.0 settings/ThemePage.qml
+WelcomeShortcutsTab 1.0 welcome/WelcomeShortcutsTab.qml
+WelcomeImeTab 1.0 welcome/WelcomeImeTab.qml
+WelcomeThemesTab 1.0 welcome/WelcomeThemesTab.qml
+WelcomeDoctorTab 1.0 welcome/WelcomeDoctorTab.qml
+TaskProcessesTab 1.0 taskmanager/TaskProcessesTab.qml
+TaskPerformanceTab 1.0 taskmanager/TaskPerformanceTab.qml

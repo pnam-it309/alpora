@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import ".."
 import "../theme" as PolyTheme
+import "../logic/LauncherQuery.js" as LauncherQuery
 import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
@@ -122,84 +123,8 @@ PanelWindow {
     readonly property string webEngine: webMatch ? webMatch[1].toLowerCase() : ""
     readonly property string webTerm: webMatch ? webMatch[2] : ""
 
-    function evaluateConversion(expr: string): string {
-        if (!expr) return "";
-        const m = expr.trim().match(/^([0-9]+(?:\.[0-9]+)?)\s*([a-zA-Z\$€£¥]+)\s*(?:in|to|=|as)\s*([a-zA-Z\$€£¥]+)$/i);
-        if (!m) return "";
-        const val = parseFloat(m[1]);
-        const fromU = m[2].toLowerCase();
-        const toU = m[3].toLowerCase();
-        if (isNaN(val)) return "";
-
-        // Currency rates (USD base)
-        const curRates = {
-            usd: 1.0, "$": 1.0,
-            eur: 0.92, "€": 0.92,
-            gbp: 0.79, "£": 0.79,
-            jpy: 152.0, "¥": 152.0,
-            vnd: 25400.0,
-            cny: 7.23,
-            cad: 1.39,
-            aud: 1.52
-        };
-        if (curRates[fromU] !== undefined && curRates[toU] !== undefined) {
-            const inUsd = val / curRates[fromU];
-            const converted = inUsd * curRates[toU];
-            const formatted = converted >= 100 ? converted.toFixed(2) : converted.toFixed(4).replace(/\.?0+$/, "");
-            return formatted + " " + toU.toUpperCase();
-        }
-
-        // Length
-        const lenMeters = {
-            km: 1000, m: 1, cm: 0.01, mm: 0.001,
-            mi: 1609.344, miles: 1609.344,
-            ft: 0.3048, feet: 0.3048,
-            in: 0.0254, inch: 0.0254, inches: 0.0254
-        };
-        if (lenMeters[fromU] !== undefined && lenMeters[toU] !== undefined) {
-            const inMeters = val * lenMeters[fromU];
-            const converted = inMeters / lenMeters[toU];
-            return (Math.abs(converted - Math.round(converted)) < 1e-6 ? Math.round(converted) : converted.toFixed(3).replace(/\.?0+$/, "")) + " " + toU;
-        }
-
-        // Mass
-        const massKg = {
-            kg: 1, g: 0.001, mg: 0.000001,
-            lb: 0.45359237, lbs: 0.45359237,
-            oz: 0.0283495
-        };
-        if (massKg[fromU] !== undefined && massKg[toU] !== undefined) {
-            const inKg = val * massKg[fromU];
-            const converted = inKg / massKg[toU];
-            return (Math.abs(converted - Math.round(converted)) < 1e-6 ? Math.round(converted) : converted.toFixed(3).replace(/\.?0+$/, "")) + " " + toU;
-        }
-
-        // Temperature
-        if ((fromU === "c" || fromU === "celsius") && (toU === "f" || toU === "fahrenheit")) {
-            return ((val * 9 / 5) + 32).toFixed(1).replace(/\.0$/, "") + " °F";
-        }
-        if ((fromU === "f" || fromU === "fahrenheit") && (toU === "c" || toU === "celsius")) {
-            return (((val - 32) * 5 / 9)).toFixed(1).replace(/\.0$/, "") + " °C";
-        }
-        return "";
-    }
-
-    function evaluateMath(expr: string): string {
-        if (!expr || expr.length < 2) return "";
-        const clean = expr.trim().replace(/\^/g, "**").replace(/\bpi\b/gi, "Math.PI").replace(/\be\b/gi, "Math.E");
-        if (!/^[0-9\s\+\-\*\/\%\.\(\)\,\*\*\s]|Math\.(sin|cos|tan|sqrt|pow|abs|round|floor|ceil|log|PI|E)/i.test(clean))
-            return "";
-        if (!/[\+\-\*\/\%\^]|(sin|cos|tan|sqrt|abs|log)/i.test(expr))
-            return "";
-        try {
-            const fn = new Function("Math", "return (" + clean + ");");
-            const res = fn(Math);
-            if (typeof res === "number" && isFinite(res)) {
-                return Math.abs(res - Math.round(res)) < 1e-9 ? Math.round(res).toString() : res.toFixed(4).replace(/\.?0+$/, "");
-            }
-        } catch (_) {}
-        return "";
-    }
+    function evaluateConversion(expr: string): string { return LauncherQuery.evaluateConversion(expr); }
+    function evaluateMath(expr: string): string { return LauncherQuery.evaluateMath(expr); }
     readonly property string conversionResult: isCommand || webMatch ? "" : evaluateConversion(trimmedQuery)
     readonly property string mathResult: isCommand || webMatch ? "" : (conversionResult.length > 0 ? conversionResult : evaluateMath(trimmedQuery))
 
@@ -361,167 +286,41 @@ PanelWindow {
             }
 
             // Quick Calculator Instant Card
-            Rectangle {
+            LauncherInstantCard {
                 visible: launcher.mathResult.length > 0
-                Layout.fillWidth: true
-                Layout.preferredHeight: 50
-                radius: 12
-                color: Glass.tint(Session.surface, 0.75)
-                border.color: Session.accent
-                border.width: 1
-
-                RowLayout {
-                    anchors.fill: parent
-                    anchors.margins: 10
-                    spacing: 12
-
-                    Icon { name: "calculator"; Layout.preferredWidth: 22; Layout.preferredHeight: 22 }
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: 2
-                        Text {
-                            text: "= " + launcher.mathResult
-                            color: Session.accent
-                            font.family: Session.fontFamily
-                            font.pixelSize: 15
-                            font.weight: Font.Bold
-                        }
-                        Text {
-                            text: I18n.tr("launcher.copy_clipboard")
-                            color: Session.muted
-                            font.family: Session.fontFamily
-                            font.pixelSize: 11
-                        }
-                    }
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: launcher.activateAction()
-                }
+                icon: "calculator"
+                title: "= " + launcher.mathResult
+                subtitle: I18n.tr("launcher.copy_clipboard")
+                emphasis: true
+                onActivated: launcher.activateAction()
             }
 
             // Quick Command Runner Instant Card
-            Rectangle {
+            LauncherInstantCard {
                 visible: launcher.isCommand && launcher.commandText.length > 0
-                Layout.fillWidth: true
-                Layout.preferredHeight: 50
-                radius: 12
-                color: Glass.tint(Session.surface, 0.75)
-                border.color: Session.accent
-                border.width: 1
-
-                RowLayout {
-                    anchors.fill: parent
-                    anchors.margins: 10
-                    spacing: 12
-
-                    Icon { name: "terminal"; Layout.preferredWidth: 22; Layout.preferredHeight: 22 }
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: 2
-                        Text {
-                            text: launcher.commandText
-                            color: Session.foreground
-                            font.family: Session.fontFamily
-                            font.pixelSize: 13
-                            font.weight: Font.DemiBold
-                            elide: Text.ElideRight
-                            Layout.fillWidth: true
-                        }
-                        Text {
-                            text: I18n.trWith("launcher.run_command", {cmd: launcher.commandText})
-                            color: Session.muted
-                            font.family: Session.fontFamily
-                            font.pixelSize: 11
-                        }
-                    }
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: launcher.activateAction()
-                }
+                icon: "terminal"
+                title: launcher.commandText
+                subtitle: I18n.trWith("launcher.run_command", {cmd: launcher.commandText})
+                onActivated: launcher.activateAction()
             }
 
             // Quick Web Search Instant Card
-            Rectangle {
+            LauncherInstantCard {
                 visible: !!launcher.webMatch
-                Layout.fillWidth: true
-                Layout.preferredHeight: 50
-                radius: 12
-                color: Glass.tint(Session.surface, 0.75)
-                border.color: Session.accent
-                border.width: 1
-
-                RowLayout {
-                    anchors.fill: parent
-                    anchors.margins: 10
-                    spacing: 12
-
-                    Icon { name: "globe"; Layout.preferredWidth: 22; Layout.preferredHeight: 22 }
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: 2
-                        Text {
-                            text: launcher.webTerm
-                            color: Session.foreground
-                            font.family: Session.fontFamily
-                            font.pixelSize: 13
-                            font.weight: Font.DemiBold
-                            elide: Text.ElideRight
-                            Layout.fillWidth: true
-                        }
-                        Text {
-                            text: I18n.trWith("launcher.search_web", {
-                                engine: ({g: "Google", gh: "GitHub", yt: "YouTube", w: "Wikipedia"})[launcher.webEngine] || "Web",
-                                term: launcher.webTerm
-                            })
-                            color: Session.muted
-                            font.family: Session.fontFamily
-                            font.pixelSize: 11
-                        }
-                    }
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: launcher.activateAction()
-                }
+                icon: "globe"
+                title: launcher.webTerm
+                subtitle: I18n.trWith("launcher.search_web", {
+                    engine: ({g: "Google", gh: "GitHub", yt: "YouTube", w: "Wikipedia"})[launcher.webEngine] || "Web",
+                    term: launcher.webTerm
+                })
+                onActivated: launcher.activateAction()
             }
 
             // Quick Macro Actions Row
-            RowLayout {
+            LauncherMacroRow {
                 visible: !launcher.query.trim() && !launcher.browsing
                 Layout.fillWidth: true
-                spacing: 8
-
-                MacroActionTile {
-                    Layout.fillWidth: true
-                    title: "Terminal"
-                    subtitle: "Super+Enter"
-                    symbol: "terminal"
-                    execCommand: "foot || alacritty || kitty"
-                    onActivated: launcher.close()
-                }
-
-                MacroActionTile {
-                    Layout.fillWidth: true
-                    title: "Task Mgr"
-                    subtitle: "Ctrl+Esc"
-                    symbol: "developer"
-                    execCommand: "poly-shell task-manager || btop"
-                    onActivated: launcher.close()
-                }
-
-                MacroActionTile {
-                    Layout.fillWidth: true
-                    title: "Lock"
-                    subtitle: "Super+L"
-                    symbol: "lock"
-                    execCommand: "loginctl lock-session"
-                    onActivated: launcher.close()
-                }
+                onActivated: launcher.close()
             }
 
             Item {

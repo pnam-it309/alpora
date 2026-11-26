@@ -21,6 +21,7 @@ Singleton {
     property string action: ""
     property bool wallpaperTransitioning: false
     Timer { id: wallpaperHandoff; interval: 1500; onTriggered: root.wallpaperTransitioning = false }
+    signal pickUnavailable()
     readonly property bool busy: worker.running
     readonly property bool dirty: loaded && (selectedId !== baseId || automatic !== baseAutomatic)
     readonly property var selected: items.find(item => item.id === selectedId) || null
@@ -38,6 +39,7 @@ Singleton {
             request("import", {image: path.trim(), apply: true, colorsFromWallpaper: automatic});
         }
     }
+    function pickImage(): void { if (!busy) request("pick", {}); }
     function removeCustom(ident: string): void {
         if (!busy && ident.startsWith("custom-")) {
             request("remove", {id: ident});
@@ -59,6 +61,12 @@ Singleton {
         onExited: exitCode => {
             if (exitCode !== 0 || !root.response) { root.wallpaperTransitioning = false; if (!root.error) root.error = I18n.tr("theme.error_action"); return; }
             if (root.wallpaperTransitioning) wallpaperHandoff.restart();
+            if (root.action === "pick") {
+                const picked = root.response.path || "";
+                if (root.response.unavailable) root.pickUnavailable();
+                else if (picked) Qt.callLater(() => root.importImage(picked));
+                return;
+            }
             const keepDraft = root.loaded && root.dirty && root.action === "list";
             root.items = root.response.items || [];
             if (Array.isArray(root.response.localImages)) root.localImages = root.response.localImages;

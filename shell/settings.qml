@@ -235,7 +235,7 @@ ShellRoot {
                 Loader { Layout.fillWidth: true; Layout.fillHeight: true; visible: root.page === "appearance"; active: visible; sourceComponent: SettingsAppearance { wallpaper: root.wallpaperUrl } }
                 Loader { Layout.fillWidth: true; Layout.fillHeight: true; visible: root.page === "widgets"; active: visible; sourceComponent: SettingsWidgets { wallpaper: root.wallpaperUrl } }
                 Loader { Layout.fillWidth: true; Layout.fillHeight: true; visible: root.page === "input"; active: visible; sourceComponent: SettingsShortcuts {} }
-                ThemePage { Layout.fillWidth: true; Layout.fillHeight: true; visible: root.page === "wallpaper"; onImportRequested: wallpaperDialog.open() }
+                ThemePage { Layout.fillWidth: true; Layout.fillHeight: true; visible: root.page === "wallpaper"; onImportRequested: ThemeState.pickImage() }
                 Loader { Layout.fillWidth: true; Layout.fillHeight: true; visible: root.page === "language"; active: visible; sourceComponent: SettingsLanguage {} }
                 Loader { Layout.fillWidth: true; Layout.fillHeight: true; visible: root.page === "storage"; active: visible; sourceComponent: SettingsSystemCare {} }
                 Loader { Layout.fillWidth: true; Layout.fillHeight: true; visible: root.page === "security"; active: visible; sourceComponent: SettingsEcosystem {} }

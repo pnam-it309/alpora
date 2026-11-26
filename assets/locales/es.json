@@ -998,5 +998,16 @@
   "theme.no_local_images": "No se encontraron imágenes PNG, JPG o WebP en esta carpeta.",
   "theme.use_this_image": "Usar fondo",
   "theme.custom_badge": "Propio",
-  "theme.remove_custom": "Eliminar fondo personalizado"
+  "theme.remove_custom": "Eliminar fondo personalizado",
+  "day.reminder_in": "en {minutes} min",
+  "day.no_reminder": "Sin recordatorio",
+  "day.remind_at_time": "A la hora",
+  "day.remind_1_day": "1 día antes",
+  "day.remind_minutes_before": "{minutes} min antes",
+  "theme.slideshow": "Presentación de fondos",
+  "theme.slideshow_hint": "Cambia el fondo automáticamente desde una carpeta",
+  "theme.slideshow_use_folder": "Usar carpeta actual",
+  "theme.slideshow_min": "min",
+  "theme.slideshow_shuffle": "Aleatorio",
+  "theme.slideshow_next": "Siguiente"
 }
