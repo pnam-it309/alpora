@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-import re
 import time
 from typing import List, Optional
 
@@ -42,16 +41,25 @@ class PhoneService(BaseService):
         devices: List[PhoneDeviceDTO] = []
 
         if res.returncode == 0 and res.stdout.strip():
-            for line in res.stdout.strip().splitlines():
-                line = line.strip()
+            for raw_line in res.stdout.strip().splitlines():
+                line = raw_line.strip()
                 # Format: "- DeviceName: 12345678abcdef (reachable)" or "- DeviceName: 123456 (paired and reachable)"
-                match = re.match(r"^-\s*(.*?):\s*([a-zA-Z0-9_-]+)\s*(?:\((.*?)\))?$", line)
-                if match:
-                    name = match.group(1).strip()
-                    dev_id = match.group(2).strip()
-                    status_str = (match.group(3) or "").lower()
+                if not line.startswith("-") or ":" not in line:
+                    continue
+                name_part, rest = line[1:].split(":", 1)
+                name = name_part.strip()
+                rest = rest.strip()
+                status_str = ""
+                if "(" in rest and rest.endswith(")"):
+                    dev_part, status_part = rest.split("(", 1)
+                    dev_id = dev_part.strip()
+                    status_str = status_part[:-1].strip().lower()
+                else:
+                    dev_id = rest
+
+                if name and dev_id:
                     is_reachable = "reachable" in status_str
-                    is_trusted = "paired" in status_str or True
+                    is_trusted = "paired" in status_str or is_reachable
 
                     devices.append(
                         PhoneDeviceDTO(

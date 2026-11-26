@@ -52,8 +52,8 @@ def handle_properties(args: argparse.Namespace) -> int:
         hashes = info["hashes"]
         if "sha256" in hashes:
             _safe_print(f"    - SHA-256 : {hashes['sha256']}")
-        if "md5" in hashes:
-            _safe_print(f"    - MD5     : {hashes['md5']}")
+        if "blake2b" in hashes:
+            _safe_print(f"    - BLAKE2b : {hashes['blake2b']}")
         if "note" in hashes:
             _safe_print(f"    - Ghi chú : {hashes['note']}")
 

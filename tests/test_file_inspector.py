@@ -13,7 +13,7 @@ class FileInspectorTests(unittest.TestCase):
     """Test suite for FileInspectorService metadata and checksums."""
 
     def test_compute_hashes(self):
-        """Streaming hash computation should produce valid SHA256 and MD5."""
+        """Streaming hash computation should produce valid SHA-256 and BLAKE2b-128."""
         with tempfile.NamedTemporaryFile(delete=False) as tf:
             tf.write(b"ALPORA OS File Integrity Test Payload")
             tmp_path = Path(tf.name)
@@ -21,9 +21,9 @@ class FileInspectorTests(unittest.TestCase):
         try:
             hashes = compute_file_hashes(tmp_path)
             self.assertIn("sha256", hashes)
-            self.assertIn("md5", hashes)
+            self.assertIn("blake2b", hashes)
             self.assertEqual(len(hashes["sha256"]), 64)
-            self.assertEqual(len(hashes["md5"]), 32)
+            self.assertEqual(len(hashes["blake2b"]), 32)
         finally:
             tmp_path.unlink(missing_ok=True)
 

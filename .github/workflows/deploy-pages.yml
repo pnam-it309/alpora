@@ -15,10 +15,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  build:
+    name: Build Static Site
     runs-on: ubuntu-latest
     steps:
       - name: Checkout ALPORA repository
@@ -29,20 +27,30 @@ jobs:
 
       - name: Assemble static site
         run: |
-          mkdir -p _site/assets _site/docs/media
+          mkdir -p _site/assets/fonts _site/assets/wallpapers _site/assets/icons _site/docs/media
           # Copy web simulator demo to root
           cp -r shell/demos/web/* _site/
-          # Copy assets (wallpapers, fonts, icons)
-          cp -r assets/* _site/assets/ || true
+          # Copy only web-facing assets (fonts, wallpapers, icons, media)
+          cp -r assets/fonts/* _site/assets/fonts/ || true
+          cp -r assets/wallpapers/* _site/assets/wallpapers/ || true
+          cp -r assets/icons/* _site/assets/icons/ || true
           cp -r docs/media/* _site/docs/media/ || true
           # Ensure .nojekyll is present
           touch _site/.nojekyll
 
-      - name: Upload artifact
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: '_site'
 
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

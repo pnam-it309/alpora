@@ -16,22 +16,22 @@ logger = logging.getLogger(__name__)
 
 
 def compute_file_hashes(path: Path, max_bytes: int = 500 * 1024 * 1024) -> Dict[str, str]:
-    """Calculate SHA256 and MD5 hashes in streaming 64KB blocks."""
+    """Calculate SHA-256 and BLAKE2b-128 hashes in streaming 64KB blocks."""
     if not path.is_file():
         return {}
     if path.stat().st_size > max_bytes:
         return {"note": f"File vượt quá {_format_bytes(max_bytes)}, bỏ qua tính hash tự động"}
 
     sha256 = hashlib.sha256()
-    md5 = hashlib.md5()
+    blake2b = hashlib.blake2b(digest_size=16)
     try:
         with open(path, "rb") as f:
             while chunk := f.read(65536):
                 sha256.update(chunk)
-                md5.update(chunk)
+                blake2b.update(chunk)
         return {
             "sha256": sha256.hexdigest(),
-            "md5": md5.hexdigest(),
+            "blake2b": blake2b.hexdigest(),
         }
     except OSError as exc:
         return {"error": str(exc)}
