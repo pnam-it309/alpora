@@ -164,8 +164,36 @@ class PolyShellDaemon:
             lambda p: self.privacy_service.set_permission(p.get("app", ""), p.get("permission", ""), bool(p.get("allowed", True))),
         )
 
-        # System health
+        # System health and status
         self.ipc_server.register_handler("system.health", lambda _p: self.registry.health_report())
+        self.ipc_server.register_handler(
+            "system.status",
+            lambda _p: {
+                "running": self._running,
+                "clients": self.ipc_server.client_count,
+                "services": list(self.registry.all().keys()),
+                "timestamp": time.time(),
+            },
+        )
+
+        # Window & Cascade endpoints
+        try:
+            from ..services.window_service import cascade_floating_windows, toggle_floating_smart
+            self.ipc_server.register_handler("window.cascade", lambda _p: {"cascaded": cascade_floating_windows()})
+            self.ipc_server.register_handler("window.float_toggle", lambda _p: {"toggled": toggle_floating_smart()})
+        except ImportError:
+            pass
+
+        # Arcade high-scores
+        try:
+            from ..services.arcade_service import get_scores, record_score
+            self.ipc_server.register_handler("arcade.scores", lambda _p: get_scores())
+            self.ipc_server.register_handler(
+                "arcade.record",
+                lambda p: record_score(str(p.get("game", "")), int(p.get("score", 0))),
+            )
+        except ImportError:
+            pass
 
     def start(self) -> None:
         """Start all services, IPC server, and compositor event watcher."""

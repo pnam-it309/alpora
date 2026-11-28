@@ -10,30 +10,97 @@ Singleton {
     property string lastError: ""
     property bool busy: queue.length > 0 || currentTask !== null
     property int queueLength: queue.length
+    readonly property bool socketConnected: ipcSocket.connected
 
     signal actionCompleted(string subcommand, string action, bool success, var result, string error)
     signal errorOccurred(string message)
+    signal eventReceived(string eventName, var eventData)
 
-    // Internal task queue
+    // Internal task queue for CLI fallback
     property var queue: []
     property var currentTask: null
 
-    function send(subcommand: string, args: var, callback: var): void {
-        const cmdArgs = Array.isArray(args) ? args : (args !== undefined && args !== null && String(args).length > 0 ? [String(args)] : []);
-        const task = {
-            subcommand: subcommand,
-            args: cmdArgs,
-            callback: (typeof callback === "function") ? callback : null,
+    // Socket RPC state
+    property var pendingRequests: ({})
+    property int nextReqId: 1
+
+    function request(action: string, params: var, callback: var): void {
+        const cb = (typeof callback === "function") ? callback : null;
+        if (!ipcSocket.connected) {
+            // Fallback via CLI ipc command
+            const pStr = (params !== undefined && params !== null) ? (typeof params === "string" ? params : JSON.stringify(params)) : "{}";
+            send("ipc", [action, pStr], cb);
+            return;
+        }
+
+        const reqId = root.nextReqId++;
+        root.pendingRequests[reqId] = {
+            action: action,
+            callback: cb,
             timestamp: Date.now()
         };
 
-        // Deduplication: if high-frequency control actions (brightness, status), drop redundant pending tasks
+        const payload = JSON.stringify({
+            id: reqId,
+            action: action,
+            params: params || {}
+        });
+
+        try {
+            ipcSocket.write(payload + "\n");
+            ipcSocket.flush();
+        } catch (sockErr) {
+            delete root.pendingRequests[reqId];
+            if (cb) cb(null, String(sockErr));
+        }
+    }
+
+    function send(subcommand: string, args: var, callback: var): void {
+        const cmdArgs = Array.isArray(args) ? args : (args !== undefined && args !== null && String(args).length > 0 ? [String(args)] : []);
+        const cb = (typeof callback === "function") ? callback : null;
+
+        // Route to socket RPC if connected and mapping exists
+        if (ipcSocket.connected) {
+            if (subcommand === "ipc" && cmdArgs.length > 0) {
+                let parsedParams = {};
+                if (cmdArgs.length > 1) {
+                    try { parsedParams = JSON.parse(cmdArgs[1]); } catch (_) { parsedParams = cmdArgs[1]; }
+                }
+                request(cmdArgs[0], parsedParams, cb);
+                return;
+            }
+            if (subcommand === "widgets" && cmdArgs[0] === "metrics") {
+                request("metrics.snapshot", {}, cb);
+                return;
+            }
+            if (subcommand === "arcade" && cmdArgs[0] === "scores") {
+                request("arcade.scores", {}, cb);
+                return;
+            }
+            if (subcommand === "control" && cmdArgs[0] === "cascade") {
+                request("window.cascade", {}, cb);
+                return;
+            }
+            if (subcommand === "control" && cmdArgs[0] === "float-toggle") {
+                request("window.float_toggle", {}, cb);
+                return;
+            }
+        }
+
+        // Deduplication for high-frequency control actions in CLI queue
         if (subcommand === "control" && cmdArgs.length > 0) {
             const act = cmdArgs[0];
             if (act === "brightness" || act === "status" || act === "ui-scale") {
                 queue = queue.filter(t => !(t.subcommand === "control" && t.args.length > 0 && t.args[0] === act));
             }
         }
+
+        const task = {
+            subcommand: subcommand,
+            args: cmdArgs,
+            callback: cb,
+            timestamp: Date.now()
+        };
 
         queue.push(task);
         if (!worker.running) {
@@ -50,6 +117,89 @@ Singleton {
             console.error("IpcClient.exec failed:", msg);
             root.lastError = msg;
             root.errorOccurred(msg);
+        }
+    }
+
+    function handleSocketMessage(line: string): void {
+        const trimmed = line.trim();
+        if (!trimmed) return;
+        try {
+            const msg = JSON.parse(trimmed);
+            if (msg.event) {
+                root.eventReceived(msg.event, msg.data || {});
+                return;
+            }
+            if (msg.id !== undefined && root.pendingRequests[msg.id]) {
+                const req = root.pendingRequests[msg.id];
+                delete root.pendingRequests[msg.id];
+                const success = !!msg.success;
+                const result = msg.data !== undefined ? msg.data : null;
+                const errText = success ? "" : (msg.error || "RPC error");
+
+                if (req.callback) {
+                    try {
+                        req.callback(result, errText);
+                    } catch (cbErr) {
+                        console.error("IpcClient socket callback error:", String(cbErr));
+                    }
+                }
+                root.actionCompleted("socket", req.action || "", success, result, errText);
+            }
+        } catch (err) {
+            console.error("IpcClient socket parse error:", String(err));
+        }
+    }
+
+    Socket {
+        id: ipcSocket
+        path: Session.socketPath
+        connected: false
+        parser: SplitParser {
+            splitMarker: "\n"
+            onRead: data => root.handleSocketMessage(data)
+        }
+        onConnectionStateChanged: {
+            if (!connected) {
+                reconnectTimer.restart();
+            }
+        }
+        onError: err => {
+            reconnectTimer.restart();
+        }
+    }
+
+    Timer {
+        id: reconnectTimer
+        interval: 2500
+        repeat: false
+        onTriggered: {
+            if (!ipcSocket.connected && Session.socketPath.length > 0) {
+                ipcSocket.connected = true;
+            }
+        }
+    }
+
+    Timer {
+        id: timeoutCleaner
+        interval: 5000
+        repeat: true
+        running: true
+        onTriggered: {
+            const now = Date.now();
+            const expiredIds = [];
+            for (const id in root.pendingRequests) {
+                if (now - root.pendingRequests[id].timestamp > 10000) {
+                    expiredIds.push(id);
+                }
+            }
+            for (let i = 0; i < expiredIds.length; i++) {
+                const id = expiredIds[i];
+                const req = root.pendingRequests[id];
+                delete root.pendingRequests[id];
+                if (req.callback) {
+                    try { req.callback(null, "Request timeout"); } catch (_) {}
+                }
+            }
         }
     }
 
@@ -115,5 +265,10 @@ Singleton {
             }
         }
     }
-}
 
+    Component.onCompleted: {
+        if (Session.socketPath.length > 0) {
+            ipcSocket.connected = true;
+        }
+    }
+}

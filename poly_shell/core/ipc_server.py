@@ -216,6 +216,11 @@ class IPCServer:
         req_id = None
         try:
             req = json.loads(raw_line)
+        except json.JSONDecodeError as err:
+            logger.debug("Invalid JSON request format: %s (%s)", raw_line, err)
+            return ResponseDTO(success=False, error="Invalid JSON request format").to_dict()
+
+        try:
             if not isinstance(req, dict):
                 return ResponseDTO(success=False, error="Invalid JSON request format").to_dict()
 
