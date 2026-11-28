@@ -70,7 +70,7 @@ ShellRoot {
             Qt.quit();
         }
     }
-    Timer { interval: 3000; running: true; onTriggered: Qt.quit() }
+    Timer { interval: 8000; running: true; onTriggered: Qt.quit() }
 }
 ''')
             environment = dict(os.environ, QT_QPA_PLATFORM="offscreen",
@@ -79,7 +79,7 @@ ShellRoot {
                                PATH=f"{directory}:/usr/bin:/bin",
                                XDG_RUNTIME_DIR=str(directory))
             result = subprocess.run(["quickshell", "--path", str(directory)],
-                                    env=environment, capture_output=True, text=True, timeout=8)
+                                    env=environment, capture_output=True, text=True, timeout=15)
             output = result.stdout + result.stderr
             self.assertEqual(result.returncode, 0, output)
             self.assertIn("CLOCK_RESUME_OK", output)

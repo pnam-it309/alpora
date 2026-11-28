@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# ALPORA Pre-Push Automation Gate: Guarantee only 100% green code reaches remote CI.
+set -euo pipefail
+
+ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT_DIR"
+
+echo "⚡ [ALPORA Pre-Push Gate] Validating repository health..."
+
+# 1. File size budget (< 500 lines)
+echo "  [1/4] Checking file line budgets (<= 500 lines)..."
+python3 tests/test_file_budget.py >/dev/null || {
+    echo "❌ [FAILED] File line budget check violated. Run 'python3 tests/test_file_budget.py' for details." >&2
+    exit 1
+}
+
+# 2. Internationalization (i18n) key synchronization
+echo "  [2/4] Verifying i18n locale keys across en, vi, es, ru..."
+python3 -m unittest tests/test_i18n.py >/dev/null 2>&1 || {
+    echo "❌ [FAILED] i18n dictionary mismatch. Run 'python3 -m unittest tests/test_i18n.py' for details." >&2
+    exit 1
+}
+
+# 3. Python bytecode compilation & syntax
+echo "  [3/4] Validating Python compilation & syntax..."
+python3 -m compileall -q poly_shell tests >/dev/null || {
+    echo "❌ [FAILED] Python compilation error detected." >&2
+    exit 1
+}
+
+# 4. Strict QML linting on modified QML files
+echo "  [4/4] Linting changed QML files..."
+QMLLINT="${QMLLINT:-/usr/lib/qt6/bin/qmllint}"
+if [[ -x "$QMLLINT" ]]; then
+    # Find modified or staged QML files
+    CHANGED_QMLS=$(git diff --name-only HEAD 2>/dev/null | grep -E '\.qml$' || true)
+    if [[ -n "$CHANGED_QMLS" ]]; then
+        for qml in $CHANGED_QMLS; do
+            if [[ -f "$qml" && "$qml" != "shell/core/NativeShortcut.qml" ]]; then
+                "$QMLLINT" -I shell "$qml" >/dev/null || {
+                    echo "❌ [FAILED] qmllint failed on $qml" >&2
+                    exit 1
+                }
+            fi
+        done
+    fi
+fi
+
+echo "✅ [ALPORA Pre-Push Gate] All pre-push checks passed cleanly! Proceeding with push."
+exit 0

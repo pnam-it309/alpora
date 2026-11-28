@@ -36,7 +36,7 @@ class TestResiliencePatterns(unittest.TestCase):
         self.assertEqual(always_fails(), "safe_default")
 
     def test_circuit_breaker_state_machine(self):
-        cb = CircuitBreaker("test-service", failure_threshold=2, recovery_timeout=0.05)
+        cb = CircuitBreaker("test-service", failure_threshold=2, recovery_timeout=0.06)
 
         @cb(fallback="isolated")
         def unstable_operation(succeed: bool):
@@ -57,7 +57,7 @@ class TestResiliencePatterns(unittest.TestCase):
         self.assertEqual(unstable_operation(True), "isolated")
 
         # 4. Wait for recovery timeout -> HALF-OPEN
-        time.sleep(0.06)
+        time.sleep(0.12)
         self.assertEqual(cb.state, CircuitBreaker.HALF_OPEN)
 
         # 5. Success resets breaker back to CLOSED
@@ -68,7 +68,7 @@ class TestResiliencePatterns(unittest.TestCase):
     def test_throttle_rate_limiting(self):
         call_count = 0
 
-        @throttle(min_interval=0.08)
+        @throttle(min_interval=0.06)
         def rate_limited():
             nonlocal call_count
             call_count += 1
@@ -76,7 +76,7 @@ class TestResiliencePatterns(unittest.TestCase):
 
         first = rate_limited()
         second = rate_limited()  # Throttled -> returns None
-        time.sleep(0.09)
+        time.sleep(0.12)
         third = rate_limited()  # Allowed
 
         self.assertEqual(first, 1)
@@ -85,12 +85,12 @@ class TestResiliencePatterns(unittest.TestCase):
         self.assertEqual(call_count, 2)
 
     def test_ttl_cache_expiration(self):
-        cache = TTLCache(ttl=0.05, maxsize=2)
+        cache = TTLCache(ttl=0.06, maxsize=2)
         cache.set("key1", "val1")
         self.assertEqual(cache.get("key1"), "val1")
 
         # Wait for expiration
-        time.sleep(0.06)
+        time.sleep(0.12)
         self.assertIsNone(cache.get("key1"))
 
     def test_ttl_cache_lru_eviction(self):

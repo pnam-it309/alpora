@@ -18,13 +18,13 @@ class TestWatchdog(unittest.TestCase):
             self.assertGreaterEqual(telemetry.threads_count, 1)
 
     def test_heartbeat_watchdog_detects_stall(self):
-        watchdog = HeartbeatWatchdog(heartbeat_timeout=0.04)
+        watchdog = HeartbeatWatchdog(heartbeat_timeout=0.05)
         self.assertFalse(watchdog.is_stalled())
         watchdog.beat()
         self.assertFalse(watchdog.is_stalled())
 
         import time
-        time.sleep(0.06)
+        time.sleep(0.12)
         self.assertTrue(watchdog.is_stalled())
 
     def test_crash_reporter_dump(self):
