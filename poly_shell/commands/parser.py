@@ -125,6 +125,8 @@ def build_parser(version: str) -> argparse.ArgumentParser:
             "timer-pause",
             "timer-reset",
             "timer-duration",
+            "import",
+            "export",
         ),
     )
     organizer_parser.add_argument("payload", nargs="?", default="{}")
@@ -179,7 +181,7 @@ def build_parser(version: str) -> argparse.ArgumentParser:
     game_status = game_sub.add_parser("status", help="check Game Mode status, CPU governor and applied tweaks")
     game_status.add_argument("--json", action="store_true", help="output status in JSON format")
     game_hoyo = game_sub.add_parser("hoyo", help="view Hoyoverse gaming profile and recommended env vars (ZZZ, Honkai Star Rail)")
-    game_hoyo.add_argument("target", nargs="?", default="zzz", choices=("zzz", "honkai", "genshin"), help="Hoyoverse game title (zzz, honkai, genshin)")
+    game_hoyo.add_argument("target", nargs="?", default="zzz", choices=("zzz", "honkai", "starrail", "genshin"), help="Hoyoverse game title (zzz, honkai, starrail, genshin)")
     game_launch = game_sub.add_parser("launch", help="launch a game wrapped inside ALPORA Game Mode")
     game_launch.add_argument("--game", help="game title preset to apply")
     game_launch.add_argument("command", nargs="+", help="command or executable path to execute")
@@ -304,5 +306,8 @@ def build_parser(version: str) -> argparse.ArgumentParser:
     running_apps_parser.add_argument("action", nargs="?", default="snapshot", choices=["snapshot", "signal"])
     running_apps_parser.add_argument("args", nargs="*", help="arguments for snapshot or signal")
     sub.add_parser("clipboard-serve", help="run clipboard history service")
+    monitor_parser = sub.add_parser("monitor", help="interactive display management and layout persistence")
+    monitor_parser.add_argument("action", nargs="?", default="list", choices=("list", "apply", "persist"))
+    monitor_parser.add_argument("payload", nargs="?", default="[]")
 
     return parser

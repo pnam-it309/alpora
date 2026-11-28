@@ -300,6 +300,7 @@ def main(argv=None):
         "snapshot": lambda: commands.handle_snapshot(args),
         "privacy": lambda: commands.handle_privacy(args),
         "welcome": lambda: commands.handle_welcome(paths, args, runtime_check),
+        "monitor": lambda: commands.handle_monitor(paths, args),
         "running-apps": lambda: commands.handle_running_apps(args),
         "clipboard-serve": lambda: commands.handle_clipboard_serve(),
     }

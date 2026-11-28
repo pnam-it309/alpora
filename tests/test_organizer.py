@@ -74,5 +74,29 @@ class OrganizerTests(unittest.TestCase):
             with self.assertRaises(ConfigError):
                 organizer(self.paths, "event-add", {"date": "2026-10-20", "title": "C", "time": "11:00", "remind": bad})
 
+    def test_icalendar_export_and_import(self):
+        organizer(self.paths, "event-add", {"date": "2026-11-28", "title": "Keynote Demo", "time": "14:00", "remind": 30})
+        organizer(self.paths, "task-add", {"date": "2026-11-28", "title": "Verify Display Layout"})
+
+        ics_path = self.paths.state / "export_test.ics"
+        organizer(self.paths, "export", {"file": str(ics_path)})
+        self.assertTrue(ics_path.exists())
+        content = ics_path.read_text(encoding="utf-8")
+        self.assertIn("BEGIN:VCALENDAR", content)
+        self.assertIn("Keynote Demo", content)
+        self.assertIn("Verify Display Layout", content)
+        self.assertIn("TRIGGER:-PT30M", content)
+
+        # Import into fresh paths
+        fresh_root = self.paths.state / "fresh"
+        fresh_paths = Paths(fresh_root / "config", fresh_root / "state", fresh_root / "runtime")
+        fresh_state = organizer(fresh_paths, "import", {"file": str(ics_path)})
+        self.assertEqual(len(fresh_state["events"]), 1)
+        self.assertEqual(len(fresh_state["tasks"]), 1)
+        self.assertEqual(fresh_state["events"][0]["title"], "Keynote Demo")
+        self.assertEqual(fresh_state["events"][0]["time"], "14:00")
+        self.assertEqual(fresh_state["events"][0]["remind"], 30)
+        self.assertEqual(fresh_state["tasks"][0]["title"], "Verify Display Layout")
+
 
 if __name__ == "__main__": unittest.main()

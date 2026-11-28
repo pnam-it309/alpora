@@ -86,6 +86,68 @@ class MultiMonitorTests(unittest.TestCase):
         self.assertGreater(b["width"], 0)
         self.assertGreater(b["height"], 0)
 
+    def test_monitor_spec_validation_and_persistence(self):
+        from unittest.mock import patch, MagicMock
+        from poly_shell.services.monitor_service import MonitorService, validate_monitor_spec
+        from poly_shell.core.state import ConfigError
+
+        # Valid spec
+        valid = validate_monitor_spec({
+            "name": "DP-1",
+            "width": 2560,
+            "height": 1440,
+            "refreshRate": 144.0,
+            "x": 1920,
+            "y": 0,
+            "scale": 1.25,
+        })
+        self.assertEqual(valid["name"], "DP-1")
+        self.assertEqual(valid["width"], 2560)
+        self.assertEqual(valid["refresh_rate"], 144.0)
+        self.assertEqual(valid["scale"], 1.25)
+
+        # Invalid spec
+        with self.assertRaises(ConfigError):
+            validate_monitor_spec({"name": "bad;injection", "width": 1920})
+        with self.assertRaises(ConfigError):
+            validate_monitor_spec({"name": "DP-1", "width": -100})
+        with self.assertRaises(ConfigError):
+            validate_monitor_spec({"name": "DP-1", "scale": 10.0})
+
+        # Apply and persist mock
+        srv = MonitorService()
+        with patch("poly_shell.services.monitor_service.SafeRunner.run") as mock_run:
+            mock_run.return_value = MagicMock(returncode=0)
+            with patch.object(srv, "persist_configs", return_value=["/fake/monitors.lua"]):
+                res = srv.apply_and_persist([{
+                    "name": "eDP-1",
+                    "width": 1920,
+                    "height": 1080,
+                    "refreshRate": 60.0,
+                    "x": 0,
+                    "y": 0,
+                    "scale": 1.0,
+                }])
+                self.assertTrue(res["success"])
+                self.assertEqual(res["applied_count"], 1)
+                mock_run.assert_called_once()
+                self.assertIn("eDP-1,1920x1080@60.0,0x0,1.0", mock_run.call_args[0][0][3])
+
+        # Test CLI handle_monitor
+        from poly_shell.commands.monitor_cmd import handle_monitor
+        import argparse
+        args_list = argparse.Namespace(action="list")
+        self.assertEqual(handle_monitor(self.paths if hasattr(self, "paths") else None, args_list), 0)
+
+        with patch("poly_shell.services.monitor_service.SafeRunner.run") as mock_run:
+            mock_run.return_value = MagicMock(returncode=0)
+            with patch.object(MonitorService, "persist_configs", return_value=["/fake/monitors.lua"]):
+                args_apply = argparse.Namespace(
+                    action="apply",
+                    payload='[{"name": "HDMI-A-1", "width": 1920, "height": 1080, "refreshRate": 60, "x": 1920, "y": 0, "scale": 1.0}]'
+                )
+                self.assertEqual(handle_monitor(None, args_apply), 0)
+
 
 if __name__ == "__main__":
     unittest.main()

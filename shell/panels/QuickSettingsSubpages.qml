@@ -2,7 +2,6 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import ".."
 import "../logic/StatusLogic.js" as StatusLogic
-import "../theme" as PolyTheme
 import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell.Networking
@@ -259,6 +258,11 @@ ColumnLayout {
     // Power Profiles subpage
     QuickProfilesSubpage {
         visible: root.popup.page === "profiles"
+        popup: root.popup
+    }
+
+    QuickGameModeSubpage {
+        visible: root.popup.page === "gamemode"
         popup: root.popup
     }
 

@@ -41,13 +41,14 @@ class TestIPCDaemon(unittest.TestCase):
 
         try:
             client = self._create_connected_client(server)
+            client_file = client.makefile("r")
             time.sleep(0.1)
             self.assertEqual(server.client_count, 1)
 
             # Test 1: ping
             ping_req = json.dumps({"id": "p-1", "action": "ping"}) + "\n"
             client.sendall(ping_req.encode("utf-8"))
-            resp_line = client.makefile("r").readline()
+            resp_line = client_file.readline()
             resp = json.loads(resp_line)
             self.assertTrue(resp.get("success"))
             self.assertEqual(resp.get("id"), "p-1")
@@ -56,7 +57,7 @@ class TestIPCDaemon(unittest.TestCase):
             # Test 2: custom handler
             echo_req = json.dumps({"id": "e-2", "action": "test.echo", "params": {"val": 42}}) + "\n"
             client.sendall(echo_req.encode("utf-8"))
-            resp_line = client.makefile("r").readline()
+            resp_line = client_file.readline()
             resp = json.loads(resp_line)
             self.assertTrue(resp.get("success"))
             self.assertEqual(resp.get("data", {}).get("echo"), 42)
@@ -64,11 +65,12 @@ class TestIPCDaemon(unittest.TestCase):
             # Test 3: unknown action
             bad_req = json.dumps({"id": "b-3", "action": "nonexistent"}) + "\n"
             client.sendall(bad_req.encode("utf-8"))
-            resp_line = client.makefile("r").readline()
+            resp_line = client_file.readline()
             resp = json.loads(resp_line)
             self.assertFalse(resp.get("success"))
             self.assertIn("Unknown action", resp.get("error", ""))
 
+            client_file.close()
             client.close()
         finally:
             server.stop()
@@ -146,10 +148,12 @@ class TestIPCDaemon(unittest.TestCase):
 
         try:
             client = self._create_connected_client(daemon.ipc_server)
+            client_file = client.makefile("r")
+            time.sleep(0.1)
             # Query system.health via IPC
             req = json.dumps({"id": "h-1", "action": "system.health"}) + "\n"
             client.sendall(req.encode("utf-8"))
-            resp_line = client.makefile("r").readline()
+            resp_line = client_file.readline()
             resp = json.loads(resp_line)
             self.assertTrue(resp.get("success"))
             self.assertIn("audio", resp.get("data", {}))
@@ -159,11 +163,12 @@ class TestIPCDaemon(unittest.TestCase):
             # Query apps.snapshot via IPC (zero-spawn)
             req = json.dumps({"id": "a-1", "action": "apps.snapshot", "params": {"windows": []}}) + "\n"
             client.sendall(req.encode("utf-8"))
-            resp_line = client.makefile("r").readline()
+            resp_line = client_file.readline()
             resp = json.loads(resp_line)
             self.assertTrue(resp.get("success"))
             self.assertIn("processes", resp.get("data", {}))
 
+            client_file.close()
             client.close()
         finally:
             daemon.stop()

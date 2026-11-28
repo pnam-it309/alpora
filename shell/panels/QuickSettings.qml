@@ -117,7 +117,7 @@ PanelWindow {
     property bool showPassword: false
     property string localError: ""
     readonly property var passwordInput: passwordLoader.item
-    readonly property string title: ({wifi: "Wi‑Fi", bluetooth: "Bluetooth", output: I18n.tr("settings.sound_output"), input: I18n.tr("settings.microphone"), settings: I18n.tr("settings.devices"), power: I18n.tr("settings.power"), password: I18n.tr("wifi.connecting_title"), nightlight: I18n.tr("quick.night_light"), dnd: I18n.tr("notification.dnd"), profiles: I18n.tr("quick.power_mode"), airplane: I18n.tr("quick.airplane_mode"), hotspot: I18n.tr("quick.mobile_hotspot")})[page] || I18n.tr("quick.control_center")
+    readonly property string title: ({wifi: "Wi‑Fi", bluetooth: "Bluetooth", output: I18n.tr("settings.sound_output"), input: I18n.tr("settings.microphone"), settings: I18n.tr("settings.devices"), power: I18n.tr("settings.power"), password: I18n.tr("wifi.connecting_title"), nightlight: I18n.tr("quick.night_light"), dnd: I18n.tr("notification.dnd"), profiles: I18n.tr("quick.power_mode"), airplane: I18n.tr("quick.airplane_mode"), hotspot: I18n.tr("quick.mobile_hotspot"), gamemode: I18n.tr("gamemode.title")})[page] || I18n.tr("quick.control_center")
     readonly property string profileLabel: ({"power-saver": I18n.tr("quick.power_saver_short"), balanced: I18n.tr("quick.balanced_short"), performance: I18n.tr("quick.performance_short")})[Desktop.data.powerProfile] || I18n.tr("quick.power_unavailable")
     function launchTerminal(args: var): void {
         Session.closeQuickSettings();
@@ -385,6 +385,13 @@ PanelWindow {
                                 symbol: "coffee"; Accessible.name: "Caffeine"
                                 ToolTip.visible: hovered; ToolTip.text: (Desktop.data.caffeine ? "Caffeine: Active" : "Caffeine: Inactive")
                                 onClicked: Desktop.request("caffeine", Desktop.data.caffeine ? "off" : "on")
+                            }
+                            QuickActionButton {
+                                Layout.preferredWidth: 40; Layout.minimumWidth: 40
+                                symbol: "performance"; Accessible.name: I18n.tr("gamemode.title")
+                                selected: !!Desktop.data.gameMode
+                                ToolTip.visible: hovered; ToolTip.text: I18n.tr("gamemode.title") + ": " + (Desktop.data.gameMode ? I18n.tr("common.active") : I18n.tr("common.inactive"))
+                                onClicked: popup.page = "gamemode"
                             }
                         }
                     }

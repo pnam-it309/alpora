@@ -5,10 +5,15 @@ from ..core.state import ConfigError
 
 
 def handle_organizer(paths, args) -> int:
-    try:
-        payload = json.loads(args.payload)
-    except ValueError as exc:
-        raise ConfigError("Invalid organizer JSON") from exc
-    print(json.dumps(organizer(paths, args.action, payload), ensure_ascii=False))
+    raw = getattr(args, "payload", "{}") or "{}"
+    if args.action in ("import", "export") and not raw.strip().startswith("{"):
+        payload = {"file": raw.strip()}
+    else:
+        try:
+            payload = json.loads(raw)
+        except ValueError as exc:
+            raise ConfigError("Invalid organizer JSON") from exc
+    result = organizer(paths, args.action, payload)
+    print(json.dumps(result, ensure_ascii=False))
     return 0
 

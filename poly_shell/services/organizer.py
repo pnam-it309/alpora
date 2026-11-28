@@ -1,5 +1,6 @@
 """Local day planner and restart-safe focus timer; no external calendar account."""
 from datetime import date, datetime
+from pathlib import Path
 from copy import deepcopy
 import time
 import uuid
@@ -122,6 +123,35 @@ def organizer(paths, action="get", payload=None, *, now=None):
             if type(minutes) is not int or not 1 <= minutes <= 120:
                 raise ConfigError("Duration must be between 1 and 120 minutes")
             timer.update(duration=minutes * 60, remaining=minutes * 60, endsAt=0)
+        elif action == "import":
+            file_path = payload.get("file")
+            if not file_path:
+                raise ConfigError("Specify iCalendar file path to import")
+            src_file = Path(file_path).expanduser().resolve()
+            if not src_file.exists():
+                raise ConfigError(f"File not found: {file_path}")
+            content = src_file.read_text(encoding="utf-8", errors="replace")
+            from .ical_sync import import_from_ics
+            imp_events, imp_tasks = import_from_ics(content)
+            existing_ids = {e["id"] for e in data["events"]} | {t["id"] for t in data["tasks"]}
+            for e in imp_events:
+                if e["id"] in existing_ids:
+                    e["id"] = uuid.uuid4().hex
+                existing_ids.add(e["id"])
+                data["events"].append(e)
+            for t in imp_tasks:
+                if t["id"] in existing_ids:
+                    t["id"] = uuid.uuid4().hex
+                existing_ids.add(t["id"])
+                data["tasks"].append(t)
+            validate(data)
+        elif action == "export":
+            file_path = payload.get("file") or str(Path.home() / "alpora-planner.ics")
+            dst_file = Path(file_path).expanduser().resolve()
+            dst_file.parent.mkdir(parents=True, exist_ok=True)
+            from .ical_sync import export_to_ics
+            ics_text = export_to_ics(data["events"], data["tasks"])
+            dst_file.write_text(ics_text, encoding="utf-8")
         elif action != "get": raise ConfigError("Unknown planner action")
         if data != previous or not target.exists(): atomic_json(target, data)
         return data

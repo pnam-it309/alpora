@@ -1,5 +1,26 @@
 # Changelog
 
+## [v1.2.0] — 2026-11-28 — Interactive Displays, iCal Sync & Gaming Performance Release
+
+### Key Highlights & Superpowers
+
+#### Interactive Display Management (Settings Monitors Page)
+- **Interactive Spatial Arrangement**: Real-time canvas in `SettingsMonitorsPage.qml` allowing drag-and-drop repositioning of displays with edge snapping.
+- **Quick Alignment Presets**: One-click spatial arrangements (Primary Left/Right, Secondary Top/Bottom).
+- **Per-Monitor Controls**: Dedicated display scaling (1.0x, 1.25x, 1.5x, 1.75x, 2.0x) and refresh rate mode selectors per connected monitor.
+- **Safe Persistence Engine**: `poly-shell monitor apply` dispatches sanitized `hyprctl keyword monitor` commands and atomically writes persistent configs to `~/.config/hypr/config/monitors.lua` and `dotfiles/hypr/.config/hypr/hyprland.conf`.
+
+#### CalDAV / iCalendar (.ics) Sync & Export for My Day Planner
+- **RFC 5545 iCalendar Engine**: Self-contained parser and generator in `poly_shell/services/ical_sync.py` with zero external dependencies.
+- **Planner Import & Export**: Import external calendar `.ics` files and export daily tasks and scheduled events via `poly-shell organizer import <file>` and `poly-shell organizer export <file>`.
+- **UI Integration**: Action buttons in `shell/panels/DayPanel.qml` with native desktop notifications via `notify-send`.
+
+#### GameMode & Gaming Performance HUD/Tuning
+- **Governor & Sysfs Control**: Automatic CPU governor elevation (`cpupower`, `powerprofilesctl`, or sysfs `scaling_governor`) to `performance` on game launch with reliable state restoration on exit.
+- **Process Renicing**: Automatic detection and priority elevation (nice -5) for game processes and Wine/Proton render threads.
+- **Distraction-Free Gaming**: Automatic notification suppression via DND during gameplay with seamless restoration.
+- **Quick Settings HUD**: Dedicated `QuickGameModeSubpage.qml` and quick action tile in the control center with live optimization status feedback.
+
 ## [v1.1.0] — 2026-11-28 — Feature & Architecture Release
 
 ### Key Highlights & Superpowers

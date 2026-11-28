@@ -75,11 +75,20 @@ class StorageCommandTests(unittest.TestCase):
         self.assertEqual(code, 0)
 
     @patch("sys.stdout")
-    def test_handle_storage_clean(self, _mock_stdout):
+    @patch.object(StorageService, "clean")
+    def test_handle_storage_clean(self, mock_clean, _mock_stdout):
         """`poly-shell storage clean` should execute and reclaim space."""
+        from poly_shell.contracts.hardware import StorageCleanResultDTO
+        mock_clean.return_value = StorageCleanResultDTO(
+            freed_bytes=1048576,
+            freed_human="1.0 MB",
+            cleaned_targets=["Thumbnails Cache (1.0 MB)"],
+            success=True,
+        )
         args = argparse.Namespace(storage_action="clean")
         code = handle_storage(args)
         self.assertEqual(code, 0)
+        mock_clean.assert_called_once()
 
 
 if __name__ == "__main__":

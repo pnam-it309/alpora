@@ -6,14 +6,15 @@ import QtQuick.Layouts
 Button {
     id: control
     required property string symbol
+    property bool selected: false
     implicitHeight: 40
     hoverEnabled: true; padding: 8
     Accessible.name: text
     background: Rectangle {
         radius: 10
-        color: control.down ? Glass.tint(Session.accent, 0.28) : (control.hovered ? Glass.tint(Session.accent, 0.18) : Glass.tint(Session.surface, 0.35))
-        border.width: control.visualFocus ? 1.5 : 1
-        border.color: control.visualFocus ? Session.accent : (control.hovered ? Glass.tint(Session.accent, 0.55) : Glass.tint(Session.accent, 0.22))
+        color: control.down ? Glass.tint(Session.accent, 0.28) : (control.selected ? Glass.tint(Session.accent, 0.24) : (control.hovered ? Glass.tint(Session.accent, 0.18) : Glass.tint(Session.surface, 0.35)))
+        border.width: control.visualFocus || control.selected ? 1.5 : 1
+        border.color: control.visualFocus || control.selected ? Session.accent : (control.hovered ? Glass.tint(Session.accent, 0.55) : Glass.tint(Session.accent, 0.22))
         Behavior on color { ColorAnimation { duration: Motion.responseMs } }
     }
     contentItem: Item {

@@ -80,6 +80,8 @@ ColumnLayout {
                         Layout.fillWidth: true
                         Rectangle { implicitWidth: 3; implicitHeight: 14; radius: 2; color: PolyTheme.Theme.color("#c4a282") }
                         Text { Layout.fillWidth: true; text: Qt.formatDateTime(root.selectedDate, "yyyy-MM-dd") === Qt.formatDateTime(ClockState.date, "yyyy-MM-dd") ? I18n.tr("day.today") : root.selectedDate.toLocaleDateString(I18n.qtLocale, "d MMMM"); color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 12 }
+                        BarButton { symbol: "download"; hint: I18n.tr("day.import_ics"); implicitWidth: 24; implicitHeight: 24; onClicked: DayState.importIcs("") }
+                        BarButton { symbol: "share"; hint: I18n.tr("day.export_ics"); implicitWidth: 24; implicitHeight: 24; onClicked: DayState.exportIcs("") }
                         BarButton { symbol: "plus"; hint: I18n.tr("day.add_event"); implicitWidth: 24; implicitHeight: 24; onClicked: root.add("event") }
                     }
                     ScrollView {

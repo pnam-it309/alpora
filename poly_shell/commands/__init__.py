@@ -26,6 +26,7 @@ from .storage_cmd import handle_storage
 from .memory_cmd import handle_memory
 from .dev_cmd import handle_dev
 from .properties_cmd import handle_properties
+from .monitor_cmd import handle_monitor
 from .snapshot_cmd import handle_snapshot
 from .privacy_cmd import handle_privacy
 from .running_apps_cmd import handle_running_apps, handle_clipboard_serve
@@ -87,6 +88,7 @@ __all__ = [
     "handle_memory",
     "handle_dev",
     "handle_properties",
+    "handle_monitor",
     "handle_snapshot",
     "handle_privacy",
     "handle_running_apps",

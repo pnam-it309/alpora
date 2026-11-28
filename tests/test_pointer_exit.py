@@ -16,7 +16,7 @@ class PointerExitTests(unittest.TestCase):
             d=Path(temporary)
             shutil.copy(ROOT/'shell/core/PointerExitGuard.qml',d/'PointerExitGuard.qml')
             (d/'qmldir').write_text('PointerExitGuard 1.0 PointerExitGuard.qml\n')
-            (d/'hyprctl').write_text('#!/usr/bin/python3\nimport time\ntime.sleep(.15)\nprint(\'{"x":0,"y":0}\')\n')
+            (d/'hyprctl').write_text('#!/usr/bin/python3\nimport time\ntime.sleep(.08)\nprint(\'{"x":0,"y":0}\')\n')
             (d/'hyprctl').chmod(0o755)
             (d/'shell.qml').write_text('''import QtQuick
 import Quickshell

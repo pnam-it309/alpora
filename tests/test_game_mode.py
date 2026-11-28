@@ -98,6 +98,34 @@ class GameModeServiceTests(unittest.TestCase):
         args_off = MagicMock(game_action="off")
         self.assertEqual(handle_game(args_off), 0)
 
+    @patch.object(SafeRunner, "run")
+    @patch.object(SafeRunner, "is_available", return_value=True)
+    def test_governor_and_dnd_lifecycle(self, mock_avail, mock_run):
+        # Initial state: balanced governor, makoctl has no DND
+        def fake_run(cmd, timeout=2.0):
+            if cmd[:2] == ["powerprofilesctl", "get"]:
+                return MagicMock(returncode=0, stdout="balanced", stderr="")
+            if cmd[:2] == ["makoctl", "mode"]:
+                return MagicMock(returncode=0, stdout="default", stderr="")
+            return MagicMock(returncode=0, stdout="", stderr="")
+        mock_run.side_effect = fake_run
+
+        self.service.enable("TestGame", silence_notifications=True)
+        state_on = self.service.get_state()
+        self.assertTrue(state_on.enabled)
+        self.assertIn("notifications_silenced_dnd", state_on.optimizations)
+
+        # Disable must restore previous states
+        calls = []
+        mock_run.side_effect = lambda cmd, **kw: calls.append(cmd) or MagicMock(returncode=0, stdout="", stderr="")
+        self.service.disable()
+        state_off = self.service.get_state()
+        self.assertFalse(state_off.enabled)
+        # Check that hyprctl restore keywords were called
+        flat_calls = [" ".join(c) for c in calls]
+        self.assertTrue(any("hyprctl keyword animations:enabled" in fc for fc in flat_calls))
+        self.assertTrue(any("hyprctl keyword decoration:blur:enabled" in fc for fc in flat_calls))
+
 
 if __name__ == "__main__":
     unittest.main()

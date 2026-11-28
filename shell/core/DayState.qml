@@ -45,6 +45,21 @@ Singleton {
         return data.events.filter(item => item.date === dateKey(date)).sort((a, b) => a.time.localeCompare(b.time));
     }
     function tasks(date: date): var { return data.tasks.filter(item => item.date === dateKey(date)); }
+    function exportIcs(filePath: string): void {
+        const path = filePath || (Quickshell.env("HOME") + "/alpora-planner.ics");
+        request("export", { file: path });
+    }
+    function importIcs(filePath: string): void {
+        const path = filePath || (Quickshell.env("HOME") + "/alpora-planner.ics");
+        request("import", { file: path });
+    }
+    onSaved: action => {
+        if (action === "export") {
+            Quickshell.execDetached(["notify-send", "-a", "ALPORA", "-i", "document-export", I18n.tr("day.export_ics"), I18n.tr("day.ics_exported")]);
+        } else if (action === "import") {
+            Quickshell.execDetached(["notify-send", "-a", "ALPORA", "-i", "document-import", I18n.tr("day.import_ics"), I18n.tr("day.ics_imported")]);
+        }
+    }
     Timer {
         id: pump
         interval: 0

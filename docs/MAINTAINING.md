@@ -50,5 +50,5 @@ Luồng chính: QML -> `poly-shell <lệnh>` (hoặc `bin/poly-ipc-fast`) -> `co
 
 ## 7. Lộ trình gợi ý
 - Ngắn hạn: giữ CI xanh, đưa `shell/demos/web/app.js` (771 dòng) xuống dưới 500.
-- Trung hạn: thêm ảnh chụp tự động (`scripts/screenshot.sh`) vào CI cho các panel chính; mở rộng lịch (đồng bộ ICS).
+- Trung hạn: thêm ảnh chụp tự động (`scripts/screenshot.sh`) vào CI cho các panel chính; CalDAV remote sync adapter cho iCalendar (`ical_sync.py`).
 - Dài hạn: bên thứ hai review mọi PR (cập nhật `CODEOWNERS`), tách `poly_shell` thành package pip phát hành riêng.

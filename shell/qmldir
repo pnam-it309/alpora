@@ -132,6 +132,7 @@ QuickHoverContent 1.0 panels/QuickHoverContent.qml
 QuickDevicesSubpage 1.0 panels/QuickDevicesSubpage.qml
 QuickHotspotSubpage 1.0 panels/QuickHotspotSubpage.qml
 QuickProfilesSubpage 1.0 panels/QuickProfilesSubpage.qml
+QuickGameModeSubpage 1.0 panels/QuickGameModeSubpage.qml
 QuickAirplaneSubpage 1.0 panels/QuickAirplaneSubpage.qml
 QuickPowerActionsSubpage 1.0 panels/QuickPowerActionsSubpage.qml
 QuickPasswordSubpage 1.0 panels/QuickPasswordSubpage.qml
