@@ -1,4 +1,4 @@
-# Python bytecode & environments
+# Python bytecode, caches & environments
 __pycache__/
 *.py[cod]
 *$py.class
@@ -8,6 +8,11 @@ venv/
 build/
 dist/
 *.egg-info/
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
 
 # Logs & debugging traces
 *.log
@@ -25,6 +30,10 @@ desktop.ini
 *.swp
 *.swo
 *~
+*.orig
+*.rej
+*.sublime-project
+*.sublime-workspace
 .idea/
 .vscode/
 
@@ -67,13 +76,15 @@ hotspot.json
 wifi-credentials.json
 airplane-restore.json
 
-# Local runtime state, sockets & backups
+# Local runtime state, sockets, caches & backups
 .local/
 *.sock
 instance.lock
 alpora-backups/
 backups/
 bin/poly-ipc-fast
+icon-theme.cache
+*.cache
 
 # Fcitx5 runtime caches
 **/fcitx5/conf/cached_layouts
