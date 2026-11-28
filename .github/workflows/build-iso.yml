@@ -81,7 +81,13 @@ jobs:
             -e OUT_DIR="/workspace/packaging/iso/out" \
             archlinux:base-devel bash -c "
               echo 'ParallelDownloads = 10' >> /etc/pacman.conf &&
-              pacman -Syu --noconfirm archiso git python sudo &&
+              for attempt in 1 2 3; do
+                echo "Synchronizing pacman packages (attempt $attempt/3)..."
+                pacman -Sy --noconfirm --needed --disable-download-timeout archiso git python sudo && break || {
+                  echo "Pacman sync failed. Retrying in 5 seconds..."
+                  sleep 5
+                }
+              done &&
               cd /workspace &&
               ./packaging/iso/build-iso.sh
             "
