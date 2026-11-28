@@ -72,8 +72,13 @@ def cascade_floating_windows(workspace_id: int | None = None) -> int:
         addr = client.get("address", "")
         if not addr:
             continue
-        cx = start_x + (idx * offset_step)
-        cy = start_y + (idx * offset_step)
+        cycle = idx % 8
+        set_num = idx // 8
+        cx = start_x + (cycle * offset_step) + (set_num * 100)
+        cy = start_y + (cycle * offset_step)
+
+        if client.get("fullscreen"):
+            _run_hyprctl(["dispatch", "fullscreen", f"0,address:{addr}"])
 
         # Dispatch resize and move
         _run_hyprctl(["dispatch", "resizewindowpixel", f"exact {default_w} {default_h},address:{addr}"])
@@ -95,6 +100,8 @@ def toggle_floating_smart() -> bool:
     is_floating = active.get("floating", False)
 
     if not is_floating:
+        if active.get("fullscreen"):
+            _run_hyprctl(["dispatch", "fullscreen", f"0,address:{addr}"])
         # Switch to floating and apply comfortable default dimensions
         _run_hyprctl(["dispatch", "togglefloating", f"address:{addr}"])
         _run_hyprctl(["dispatch", "resizewindowpixel", f"exact 1080 700,address:{addr}"])

@@ -106,6 +106,7 @@ TrayButton 1.0 components/TrayButton.qml
 UnfoldPanel 1.0 components/UnfoldPanel.qml
 WidgetAnimatedText 1.0 components/WidgetAnimatedText.qml
 WorkspaceButton 1.0 components/WorkspaceButton.qml
+VideoPipPlaybackBar 1.0 components/VideoPipPlaybackBar.qml
 
 # Panels
 AppTile 1.0 panels/AppTile.qml
@@ -130,6 +131,7 @@ NotificationsPreview 1.0 panels/NotificationsPreview.qml
 Osd 1.0 panels/Osd.qml
 PowerMenu 1.0 panels/PowerMenu.qml
 LauncherInstantCard 1.0 panels/LauncherInstantCard.qml
+LauncherInstantSection 1.0 panels/LauncherInstantSection.qml
 LauncherMacroRow 1.0 panels/LauncherMacroRow.qml
 QuickHoverContent 1.0 panels/QuickHoverContent.qml
 QuickDevicesSubpage 1.0 panels/QuickDevicesSubpage.qml

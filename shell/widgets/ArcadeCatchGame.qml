@@ -2,8 +2,8 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import ".."
 import "../theme" as PolyTheme
+import "../logic/ArcadePhysics.js" as ArcadePhysics
 import QtQuick.Shapes
-import Quickshell
 import Quickshell.Hyprland
 
 Item {
@@ -54,9 +54,9 @@ Item {
             } else {
                 const dx = mouse.x - ball.x;
                 const dy = mouse.y - ball.y;
-                const len = Math.max(1, Math.hypot(dx, dy));
-                ball.vx = (dx / len) * 18;
-                ball.vy = Math.min(-6, (dy / len) * 18);
+                const pVel = ArcadePhysics.calculatePointVelocity(dx, dy, 18);
+                ball.vx = pVel.vx;
+                ball.vy = pVel.vy;
                 physicsTimer.restart();
             }
         }
@@ -73,8 +73,9 @@ Item {
                 isAiming = false;
                 const pullX = dragStartX - mouse.x;
                 const pullY = dragStartY - mouse.y;
-                ball.vx = Math.max(-28, Math.min(28, pullX * 0.18));
-                ball.vy = Math.max(-28, Math.min(28, pullY * 0.18));
+                const tVel = ArcadePhysics.calculateThrowVelocity(pullX, pullY);
+                ball.vx = tVel.vx;
+                ball.vy = tVel.vy;
                 physicsTimer.restart();
             }
         }
@@ -209,15 +210,19 @@ Item {
         }
 
         // Squash & stretch recovery animations
-        NumberAnimation on squashX {
+        NumberAnimation {
             id: recoveryX
+            target: ball
+            property: "squashX"
             to: 1.0
             duration: 240
             easing.type: Easing.OutBack
         }
 
-        NumberAnimation on squashY {
+        NumberAnimation {
             id: recoveryY
+            target: ball
+            property: "squashY"
             to: 1.0
             duration: 240
             easing.type: Easing.OutBack
@@ -256,9 +261,9 @@ Item {
 
     function stepPhysics(): void {
         const r = ball.radius;
-        const g = 0.44;
-        const friction = 0.995;
-        const restitution = 0.78;
+        const g = ArcadePhysics.GRAVITY;
+        const friction = ArcadePhysics.FRICTION;
+        const restitution = ArcadePhysics.RESTITUTION;
 
         ball.vy += g;
         ball.vx *= friction;

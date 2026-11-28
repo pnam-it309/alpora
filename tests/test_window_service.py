@@ -50,6 +50,26 @@ class WindowServiceTests(unittest.TestCase):
         # Should call togglefloating, resizewindowpixel, centerwindow
         self.assertEqual(mock_hyprctl.call_count, 3)
 
+    @patch("poly_shell.services.window_service.get_active_window")
+    @patch("poly_shell.services.window_service._run_hyprctl")
+    def test_toggle_floating_smart_already_floating_or_fullscreen(self, mock_hyprctl, mock_active):
+        # Already floating -> tile
+        mock_active.return_value = {"address": "0xabc", "floating": True}
+        self.assertTrue(toggle_floating_smart())
+        self.assertEqual(mock_hyprctl.call_count, 1)
+
+        # Fullscreen -> unfullscreen then float
+        mock_hyprctl.reset_mock()
+        mock_active.return_value = {"address": "0xabc", "floating": False, "fullscreen": True}
+        self.assertTrue(toggle_floating_smart())
+        self.assertEqual(mock_hyprctl.call_count, 4)
+
+        # No active window -> fallback
+        mock_hyprctl.reset_mock()
+        mock_active.return_value = None
+        self.assertTrue(toggle_floating_smart())
+        self.assertEqual(mock_hyprctl.call_count, 1)
+
 
 if __name__ == "__main__":
     unittest.main()

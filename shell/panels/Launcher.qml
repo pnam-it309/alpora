@@ -289,44 +289,16 @@ PanelWindow {
                 Keys.onEnterPressed: launcher.activateAction()
             }
 
-            // Quick Calculator Instant Card
-            LauncherInstantCard {
-                visible: launcher.mathResult.length > 0
-                icon: "calculator"
-                title: "= " + launcher.mathResult
-                subtitle: I18n.tr("launcher.copy_clipboard")
-                emphasis: true
-                onActivated: launcher.activateAction()
-            }
-
-            // Quick Command Runner Instant Card
-            LauncherInstantCard {
-                visible: launcher.isCommand && launcher.commandText.length > 0
-                icon: "terminal"
-                title: launcher.commandText
-                subtitle: I18n.trWith("launcher.run_command", {cmd: launcher.commandText})
-                onActivated: launcher.activateAction()
-            }
-
-            // Quick Web Search Instant Card
-            LauncherInstantCard {
-                visible: !!launcher.webMatch
-                icon: "globe"
-                title: launcher.webTerm
-                subtitle: I18n.trWith("launcher.search_web", {
-                    engine: ({g: "Google", gh: "GitHub", yt: "YouTube", w: "Wikipedia"})[launcher.webEngine] || "Web",
-                    term: launcher.webTerm
-                })
-                onActivated: launcher.activateAction()
-            }
-
-            // Quick Folder Location Instant Card
-            LauncherInstantCard {
-                visible: launcher.isPath && launcher.resolvedPath.length > 0
-                icon: "folder"
-                title: launcher.trimmedQuery
-                subtitle: I18n.tr("launcher.open_location")
-                emphasis: true
+            LauncherInstantSection {
+                mathResult: launcher.mathResult
+                isCommand: launcher.isCommand
+                commandText: launcher.commandText
+                webMatch: launcher.webMatch
+                webEngine: launcher.webEngine
+                webTerm: launcher.webTerm
+                isPath: launcher.isPath
+                resolvedPath: launcher.resolvedPath
+                trimmedQuery: launcher.trimmedQuery
                 onActivated: launcher.activateAction()
             }
 

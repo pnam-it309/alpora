@@ -65,13 +65,18 @@ function evaluateConversion(expr) {
 function evaluateMath(expr) {
     if (!expr) return "";
     let clean = expr.trim();
-    if (clean.startsWith("=")) clean = clean.substring(1).trim();
-    if (clean.length < 2) return "";
+    const isExplicit = clean.startsWith("=");
+    if (isExplicit) clean = clean.substring(1).trim();
+    if (!clean) return "";
+
     clean = clean.replace(/\^/g, "**").replace(/\bpi\b/gi, "Math.PI").replace(/\be\b/gi, "Math.E");
-    if (!/^[0-9\s\+\-\*\/\%\.\(\)\,\*\*\s]|Math\.(sin|cos|tan|sqrt|pow|abs|round|floor|ceil|log|PI|E)/i.test(clean))
-        return "";
-    if (!/[\+\-\*\/\%\^]|(sin|cos|tan|sqrt|abs|log)/i.test(expr))
-        return "";
+    clean = clean.replace(/\b(sin|cos|tan|sqrt|pow|abs|round|floor|ceil|log|min|max)\b/gi, "Math.$1");
+
+    const sanitized = clean.replace(/\bMath\.(sin|cos|tan|sqrt|pow|abs|round|floor|ceil|log|min|max|PI|E)\b/g, "");
+    if (!/^[0-9\s\+\-\*\/\%\.\(\)\,]+$/.test(sanitized)) return "";
+    if (!isExplicit && !/[\+\-\*\/\%]|Math\./.test(clean)) return "";
+    if (!/[0-9]|Math\.(PI|E)/.test(clean)) return "";
+
     try {
         const fn = new Function("Math", "return (" + clean + ");");
         const res = fn(Math);
