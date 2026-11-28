@@ -81,6 +81,7 @@ CompanionTween 1.0 components/CompanionTween.qml
 DayAction 1.0 components/DayAction.qml
 DayField 1.0 components/DayField.qml
 DayWeatherCard 1.0 components/DayWeatherCard.qml
+DesktopProcessRow 1.0 components/DesktopProcessRow.qml
 FocusCard 1.0 components/FocusCard.qml
 HoverControl 1.0 components/HoverControl.qml
 HoverStatusTile 1.0 components/HoverStatusTile.qml

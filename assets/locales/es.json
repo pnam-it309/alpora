@@ -795,6 +795,7 @@
   "launcher.quick_calc": "Resultado del cálculo",
   "launcher.copy_clipboard": "Presione Enter para copiar al portapapeles",
   "launcher.run_command": "Ejecutar en terminal: {cmd}",
+  "launcher.open_location": "Abrir ubicación en el administrador de archivos",
   "launcher.search_web": "Buscar en {engine}: '{term}'",
   "bluetooth.unpair": "Desemparejar",
   "settings.touchpad": "Panel táctil",
@@ -1042,15 +1043,17 @@
   "arcade.blitz_mode": "Modo Blitz (60s)",
   "arcade.blitz_time": "Tiempo: {time}s",
   "arcade.blitz_over": "¡Tiempo agotado!",
-  "arcade.fishing_cast_hint": "Haz clic en el estanque para lanzar el anzuelo",
+  "arcade.fishing_cast_hint": "Haz clic o arrastra para lanzar el anzuelo",
   "arcade.fishing_wait_hint": "Observando el agua... esperando que piquen",
   "arcade.fishing_bite_hint": "¡Picó! ¡Tira de la caña!",
   "arcade.fishing_reel_hint": "¡Mantén presionado para mantener la tensión en la zona verde!",
   "arcade.fishing_caught": "¡Pescaste {name}!",
+  "arcade.fishing_escaped": "¡El pez se escapó! Lanza de nuevo.",
   "arcade.fish_ro": "Pez trepador",
   "arcade.fish_chep": "Carpa común",
   "arcade.fish_hoi": "Salmón arcoíris",
   "arcade.fish_than_thoai": "Pez dragón mítico",
   "arcade.fish_specs": "{weight} kg · {length} cm",
-  "arcade.fish_again": "Haz clic para volver a pescar"
+  "arcade.fish_again": "Haz clic para volver a pescar",
+  "arcade.play_again": "Jugar de nuevo"
 }

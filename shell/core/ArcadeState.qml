@@ -48,7 +48,7 @@ Singleton {
 
     function open(game: string, screen: string): void {
         if (game) currentGame = game;
-        if (screen) targetScreen = screen;
+        targetScreen = screen || (Quickshell.screens.length ? Quickshell.screens[0].name : "");
         score = 0;
         combo = 0;
         highScore = (highScores && highScores[currentGame] !== undefined) ? highScores[currentGame] : 0;
@@ -57,6 +57,14 @@ Singleton {
             blitzActive = true;
         }
         active = true;
+    }
+
+    Timer {
+        id: blitzTimer
+        interval: 1000
+        running: root.active && root.blitzMode && root.blitzActive
+        repeat: true
+        onTriggered: root.tickBlitz()
     }
 
     function close(): void {

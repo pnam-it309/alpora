@@ -1,7 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import ".."
-import "../theme" as PolyTheme
 import "../logic/LauncherQuery.js" as LauncherQuery
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -113,10 +112,12 @@ PanelWindow {
     readonly property var shown: browsing ? results : AppCatalog.favorites
     readonly property Flickable viewport: scroll.contentItem as Flickable
 
-    // Power-user instant parsing (Calculator, Terminal, Web search)
+    // Power-user instant parsing (Calculator, Terminal, Web search, Folder path)
     readonly property string trimmedQuery: query.trim()
     readonly property bool isCommand: trimmedQuery.startsWith(">") || trimmedQuery.startsWith("$")
     readonly property string commandText: isCommand ? trimmedQuery.replace(/^[>\$]\s*/, "") : ""
+    readonly property bool isPath: trimmedQuery.startsWith("~/") || trimmedQuery.startsWith("/")
+    readonly property string resolvedPath: isPath ? (trimmedQuery.startsWith("~/") ? (Quickshell.env("HOME") + trimmedQuery.slice(1)) : trimmedQuery) : ""
     readonly property var directWebMatch: trimmedQuery.match(/^\?\s*(.+)$/)
     readonly property var keywordWebMatch: trimmedQuery.match(/^(g|gh|yt|w)\s+(.+)$/i)
     readonly property var webMatch: directWebMatch ? ["? " + directWebMatch[1], "g", directWebMatch[1]] : keywordWebMatch
@@ -134,6 +135,9 @@ PanelWindow {
             close();
         } else if (isCommand && commandText.length > 0) {
             Quickshell.execDetached(Session.settings.apps.terminal.concat(["-e", "bash", "-c", commandText + "; echo; read -p 'Press Enter to exit...'"]));
+            close();
+        } else if (isPath && resolvedPath.length > 0) {
+            Quickshell.execDetached(["xdg-open", resolvedPath]);
             close();
         } else if (webMatch) {
             const urls = {
@@ -313,6 +317,16 @@ PanelWindow {
                     engine: ({g: "Google", gh: "GitHub", yt: "YouTube", w: "Wikipedia"})[launcher.webEngine] || "Web",
                     term: launcher.webTerm
                 })
+                onActivated: launcher.activateAction()
+            }
+
+            // Quick Folder Location Instant Card
+            LauncherInstantCard {
+                visible: launcher.isPath && launcher.resolvedPath.length > 0
+                icon: "folder"
+                title: launcher.trimmedQuery
+                subtitle: I18n.tr("launcher.open_location")
+                emphasis: true
                 onActivated: launcher.activateAction()
             }
 

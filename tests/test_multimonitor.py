@@ -148,6 +148,14 @@ class MultiMonitorTests(unittest.TestCase):
                 )
                 self.assertEqual(handle_monitor(None, args_apply), 0)
 
+        # Test apply_workspace_rules for multi-monitor setup
+        with patch("poly_shell.services.monitor_service.SafeRunner.run") as mock_run:
+            mock_run.return_value = MagicMock(returncode=0)
+            ws_cmds = srv.apply_workspace_rules([{"name": "DP-1"}, {"name": "HDMI-A-1"}])
+            self.assertEqual(len(ws_cmds), 10)
+            self.assertIn("1,monitor:DP-1", ws_cmds[0])
+            self.assertIn("6,monitor:HDMI-A-1", ws_cmds[5])
+
 
 if __name__ == "__main__":
     unittest.main()

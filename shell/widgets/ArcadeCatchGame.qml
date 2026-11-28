@@ -16,6 +16,24 @@ Item {
     readonly property var monitor: screenModel ? Hyprland.monitorFor(screenModel) : null
     readonly property int activeWorkspace: monitor && monitor.activeWorkspace ? monitor.activeWorkspace.id : 1
 
+    onVisibleChanged: {
+        if (!visible) {
+            playArea.isAiming = false;
+            ball.vx = 4.5;
+            ball.vy = -2.0;
+            ball.x = catchGame.screenWidth / 2;
+            ball.y = catchGame.screenHeight / 3;
+        }
+    }
+
+    Connections {
+        target: ArcadeState
+        function onBlitzEnded(): void {
+            playArea.isAiming = false;
+            physicsTimer.stop();
+        }
+    }
+
     // Background click & drag catcher
     MouseArea {
         id: playArea
@@ -175,7 +193,7 @@ Item {
                 x: 6; y: 6
                 width: 7; height: 7
                 radius: 3.5
-                color: "white"
+                color: PolyTheme.Theme.withAlpha(Session.foreground, 0.85)
                 opacity: 0.8
             }
         }
@@ -278,7 +296,7 @@ Item {
         const clients = Hyprland.toplevels.values;
         for (let i = 0; i < clients.length; ++i) {
             const w = clients[i].lastIpcObject;
-            if (!w || !w.workspace || w.workspace.id !== activeWorkspace) continue;
+            if (!w || !w.workspace || w.workspace.id !== activeWorkspace || w.hidden || !w.at || !w.size) continue;
             const wx = w.at[0] - (screenModel ? screenModel.x : 0);
             const wy = w.at[1] - (screenModel ? screenModel.y : 0);
             const ww = w.size[0];

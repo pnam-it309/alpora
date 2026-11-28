@@ -68,13 +68,13 @@ Singleton {
         command: [Session.controller, "widgets", "get"]
         stdout: StdioCollector { onStreamFinished: {
             try { root.values = JSON.parse(text).values; root.loaded = true; if (root.editing && !root.dirty && !root.busy) root.begin(); }
-            catch (_) { root.error = I18n.tr("widgets.error_read"); }
+            catch (e) { root.error = I18n.tr("widgets.error_read"); console.warn("[WidgetState] Read error:", e); }
         } }
         stderr: StdioCollector { onStreamFinished: if (text.trim()) root.error = text.trim().replace(/^poly-shell: /, "") }
     }
     Process {
         id: writer
-        stdout: StdioCollector { onStreamFinished: { try { root.result = JSON.parse(text); } catch (_) {} } }
+        stdout: StdioCollector { onStreamFinished: { try { root.result = JSON.parse(text); } catch (e) { console.warn("[WidgetState] Parse writer result error:", e); } } }
         stderr: StdioCollector { onStreamFinished: if (text.trim()) root.error = text.trim().replace(/^poly-shell: /, "") }
         onExited: (exitCode, exitStatus) => {
             if (exitCode === 0 && exitStatus === 0 && root.result && root.result.saved) {

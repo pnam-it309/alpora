@@ -3,7 +3,6 @@ import QtQuick
 import ".."
 import QtQuick.Controls
 import QtQuick.Layouts
-import Quickshell
 import Quickshell.Io
 import Quickshell.Hyprland
 import "../theme" as PolyTheme
@@ -23,6 +22,7 @@ DesktopWidgetCard {
     property string forceProcessKey: ""
     property string requestedSignal: ""
     property bool terminationGraceElapsed: false
+    readonly property bool terminatorRunning: terminator.running
     readonly property bool expanded: RunningAppsState.expanded
     readonly property var windows: clients.filter(client => client && client.address && client.mapped
         && !client.hidden && Number(client.pid) > 1
@@ -460,38 +460,9 @@ DesktopWidgetCard {
                     Layout.fillWidth: true; Layout.fillHeight: true; clip: true; spacing: 6
                     model: root.filteredProcesses
                     ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
-                    delegate: Rectangle {
-                        id: processRow
-                        required property var modelData
-                        x: processRow.modelData.appName ? Math.min(Number(processRow.modelData.depth || 0) * 10, 28) : 0
-                        width: processList.width - x; height: processBody.implicitHeight + 14
-                        radius: 8; color: Glass.tint(Session.surface, 0.68)
-                        border.width: 1; border.color: Glass.tint(Session.accent, 0.12)
-                        ColumnLayout {
-                            id: processBody
-                            anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
-                            anchors.margins: 7; spacing: 3
-                            RowLayout {
-                                Layout.fillWidth: true; spacing: 5
-                                Text { Layout.fillWidth: true; text: (processRow.modelData.appName ? (Number(processRow.modelData.depth) > 0 ? "↳ " : "● ") : "• ") + processRow.modelData.name; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 11; font.weight: Font.DemiBold; elide: Text.ElideRight }
-                                Text { text: root.tr("pid") + " " + processRow.modelData.pid; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 9 }
-                            }
-                            Text { Layout.fillWidth: true; text: root.tr("ppid") + " " + (processRow.modelData.parentName || "PID") + " (" + processRow.modelData.ppid + ") · " + root.processRoleLabel(processRow.modelData); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 9; wrapMode: Text.Wrap }
-                            Text { Layout.fillWidth: true; text: processRow.modelData.command; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 9; elide: Text.ElideMiddle; maximumLineCount: 1 }
-                            Text { Layout.fillWidth: true; text: root.associationLabel(processRow.modelData); color: processRow.modelData.appName ? Session.accent : Session.muted; font.family: Session.fontFamily; font.pixelSize: 9; wrapMode: Text.Wrap }
-                            RowLayout {
-                                Layout.fillWidth: true; spacing: 5
-                                Text { Layout.fillWidth: true; visible: !processRow.modelData.canSignal; text: root.tr("protected"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 9; wrapMode: Text.Wrap }
-                                Text { Layout.fillWidth: true; visible: processRow.modelData.canSignal && root.forceProcessKey !== root.processKey(processRow.modelData); text: "" }
-                                Text { Layout.fillWidth: true; visible: root.forceProcessKey === root.processKey(processRow.modelData); text: root.tr("forceWarning"); color: PolyTheme.Theme.color("#e5b878"); font.family: Session.fontFamily; font.pixelSize: 9; wrapMode: Text.Wrap }
-                                Button {
-                                    visible: processRow.modelData.canSignal
-                                    enabled: !terminator.running && root.pendingProcessKey !== root.processKey(processRow.modelData)
-                                    text: root.forceProcessKey === root.processKey(processRow.modelData) ? root.tr("forceKill") : root.pendingProcessKey === root.processKey(processRow.modelData) ? "…" : root.tr("endProcess")
-                                    onClicked: root.requestSignal(processRow.modelData, root.forceProcessKey === root.processKey(processRow.modelData))
-                                }
-                            }
-                        }
+                    delegate: DesktopProcessRow {
+                        widgetRoot: root
+                        listWidth: processList.width
                     }
                 }
             }

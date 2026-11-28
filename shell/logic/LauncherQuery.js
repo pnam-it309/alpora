@@ -63,8 +63,11 @@ function evaluateConversion(expr) {
 }
 
 function evaluateMath(expr) {
-    if (!expr || expr.length < 2) return "";
-    const clean = expr.trim().replace(/\^/g, "**").replace(/\bpi\b/gi, "Math.PI").replace(/\be\b/gi, "Math.E");
+    if (!expr) return "";
+    let clean = expr.trim();
+    if (clean.startsWith("=")) clean = clean.substring(1).trim();
+    if (clean.length < 2) return "";
+    clean = clean.replace(/\^/g, "**").replace(/\bpi\b/gi, "Math.PI").replace(/\be\b/gi, "Math.E");
     if (!/^[0-9\s\+\-\*\/\%\.\(\)\,\*\*\s]|Math\.(sin|cos|tan|sqrt|pow|abs|round|floor|ceil|log|PI|E)/i.test(clean))
         return "";
     if (!/[\+\-\*\/\%\^]|(sin|cos|tan|sqrt|abs|log)/i.test(expr))

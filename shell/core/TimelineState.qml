@@ -56,7 +56,7 @@ Singleton {
     Process {
         id: takeover
         command: [Session.controller, "timeline", "ready"]
-        stdout: StdioCollector { onStreamFinished: { try { root.presented = !!JSON.parse(text).presented; } catch (_) {} } }
+        stdout: StdioCollector { onStreamFinished: { try { root.presented = !!JSON.parse(text).presented; } catch (e) { console.warn("[TimelineState] Takeover parse error:", e); } } }
         stderr: StdioCollector { onStreamFinished: if (text.trim()) root.error = text.trim().replace(/^poly-shell: /, "") }
     }
     Process {
@@ -71,13 +71,13 @@ Singleton {
                 root.savedMinute = data.minute;
                 if (follow) root.minute = data.minute;
                 root.loaded = true;
-            } catch (_) { root.error = I18n.tr("timeline.error_read"); }
+            } catch (e) { root.error = I18n.tr("timeline.error_read"); console.warn("[TimelineState] Read error:", e); }
         } }
         stderr: StdioCollector { onStreamFinished: if (text.trim()) root.error = text.trim().replace(/^poly-shell: /, "") }
     }
     Process {
         id: writer
-        stdout: StdioCollector { onStreamFinished: { try { root.response = JSON.parse(text); } catch (_) {} } }
+        stdout: StdioCollector { onStreamFinished: { try { root.response = JSON.parse(text); } catch (e) { console.warn("[TimelineState] Writer parse error:", e); } } }
         stderr: StdioCollector { onStreamFinished: if (text.trim()) root.error = text.trim().replace(/^poly-shell: /, "") }
         onExited: exitCode => {
             if (exitCode === 0 && root.response && root.response.saved) root.savedMinute = root.response.minute;

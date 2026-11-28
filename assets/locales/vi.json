@@ -795,6 +795,7 @@
   "launcher.quick_calc": "Kết quả tính toán",
   "launcher.copy_clipboard": "Nhấn Enter để sao chép vào bộ nhớ tạm",
   "launcher.run_command": "Chạy trong terminal: {cmd}",
+  "launcher.open_location": "Mở thư mục trong trình quản lý tệp",
   "launcher.search_web": "Tìm trên {engine}: '{term}'",
   "bluetooth.unpair": "Hủy ghép nối",
   "settings.touchpad": "Bàn di chuột",
@@ -1042,15 +1043,17 @@
   "arcade.blitz_mode": "Chế độ Blitz (60s)",
   "arcade.blitz_time": "Thời gian: {time}s",
   "arcade.blitz_over": "Hết giờ!",
-  "arcade.fishing_cast_hint": "Nhấp vào mặt hồ để quăng cần câu",
+  "arcade.fishing_cast_hint": "Nhấp hoặc kéo thả để quăng cần câu",
   "arcade.fishing_wait_hint": "Đang thả câu... chờ cá cắn mồi",
   "arcade.fishing_bite_hint": "Cắn câu rồi! Giật cần ngay!",
   "arcade.fishing_reel_hint": "Nhấp / giữ để giữ độ căng trong vùng xanh lá!",
   "arcade.fishing_caught": "Bắt được {name}!",
+  "arcade.fishing_escaped": "Cá đã trốn thoát! Hãy quăng câu lại.",
   "arcade.fish_ro": "Cá rô đồng",
   "arcade.fish_chep": "Cá chép",
   "arcade.fish_hoi": "Cá hồi vân",
   "arcade.fish_than_thoai": "Cá rồng Thần thoại",
   "arcade.fish_specs": "{weight} kg · {length} cm",
-  "arcade.fish_again": "Nhấp để tiếp tục câu"
+  "arcade.fish_again": "Nhấp để tiếp tục câu",
+  "arcade.play_again": "Chơi lại"
 }

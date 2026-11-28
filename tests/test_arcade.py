@@ -93,6 +93,68 @@ class ArcadeServiceTests(unittest.TestCase):
         data = get_arcade_data(self.paths)
         self.assertEqual(data["high_scores"]["fishing"], 850)
 
+    def test_blitz_mode_persistence(self):
+        data = get_arcade_data(self.paths)
+        self.assertFalse(data.get("blitz_mode", False))
+        data["blitz_mode"] = True
+        save_arcade_data(self.paths, data)
+        reloaded = get_arcade_data(self.paths)
+        self.assertTrue(reloaded["blitz_mode"])
+
+    def test_cli_scores_and_status(self):
+        from types import SimpleNamespace
+        from unittest.mock import patch
+        import io
+        from poly_shell.commands.arcade_cmd import handle_arcade
+
+        record_score(self.paths, "fishing", 1200)
+        record_score(self.paths, "catch", 800)
+
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            args = SimpleNamespace(action="scores")
+            ret = handle_arcade(self.paths, args)
+            self.assertEqual(ret, 0)
+            out = mock_out.getvalue()
+            self.assertIn("Fishing: 1200 pts", out)
+            self.assertIn("Catch: 800 pts", out)
+
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            args = SimpleNamespace(action="status")
+            ret = handle_arcade(self.paths, args)
+            self.assertEqual(ret, 0)
+            out_json = json.loads(mock_out.getvalue())
+            self.assertEqual(out_json["high_scores"]["fishing"], 1200)
+
+    def test_required_i18n_fishing_keys(self):
+        locales_dir = Path(__file__).resolve().parents[1] / "assets" / "locales"
+        required_keys = [
+            "arcade.game_catch",
+            "arcade.game_fishing",
+            "arcade.blitz_mode",
+            "arcade.blitz_time",
+            "arcade.blitz_over",
+            "arcade.fishing_cast_hint",
+            "arcade.fishing_wait_hint",
+            "arcade.fishing_bite_hint",
+            "arcade.fishing_reel_hint",
+            "arcade.fishing_caught",
+            "arcade.fishing_escaped",
+            "arcade.fish_ro",
+            "arcade.fish_chep",
+            "arcade.fish_hoi",
+            "arcade.fish_than_thoai",
+            "arcade.fish_specs",
+            "arcade.fish_again",
+            "arcade.play_again",
+        ]
+        for lang in ("en", "vi", "es", "ru"):
+            file_path = locales_dir / f"{lang}.json"
+            self.assertTrue(file_path.exists(), f"Missing locale file {lang}.json")
+            data = json.loads(file_path.read_text(encoding="utf-8"))
+            for k in required_keys:
+                self.assertIn(k, data, f"Missing key '{k}' in {lang}.json")
+                self.assertTrue(len(data[k].strip()) > 0, f"Empty translation for '{k}' in {lang}.json")
+
 
 if __name__ == "__main__":
     unittest.main()

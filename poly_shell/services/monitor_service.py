@@ -90,6 +90,12 @@ class MonitorService:
             SafeRunner.run(cmd, timeout=3.0)
             commands_run.append(f"hyprctl keyword monitor {arg}")
 
+        # 1b. Apply workspace affinity if multiple active monitors exist
+        active_monitors = [m for m in validated if not m["disabled"]]
+        if len(active_monitors) >= 2:
+            ws_commands = self.apply_workspace_rules(active_monitors)
+            commands_run.extend(ws_commands)
+
         # 2. Persist to files
         persisted_files = self.persist_configs(validated)
 
@@ -100,6 +106,24 @@ class MonitorService:
             "persisted_files": persisted_files,
             "message": f"Successfully applied and persisted {len(validated)} display(s).",
         }
+
+    def apply_workspace_rules(self, active_monitors: List[Dict[str, Any]]) -> List[str]:
+        """Apply workspace to monitor bindings for multi-monitor setups."""
+        commands: List[str] = []
+        if len(active_monitors) < 2:
+            return commands
+        m1 = active_monitors[0]["name"]
+        m2 = active_monitors[1]["name"]
+
+        for ws in range(1, 6):
+            SafeRunner.run(["hyprctl", "keyword", "workspace", f"{ws},monitor:{m1}"], timeout=2.0)
+            commands.append(f"hyprctl keyword workspace {ws},monitor:{m1}")
+
+        for ws in range(6, 11):
+            SafeRunner.run(["hyprctl", "keyword", "workspace", f"{ws},monitor:{m2}"], timeout=2.0)
+            commands.append(f"hyprctl keyword workspace {ws},monitor:{m2}")
+
+        return commands
 
     def persist_configs(self, monitors: List[Dict[str, Any]]) -> List[str]:
         """Write monitor configurations to Lua and Hyprland config files."""

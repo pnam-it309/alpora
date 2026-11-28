@@ -21,11 +21,25 @@
 - **Distraction-Free Gaming**: Automatic notification suppression via DND during gameplay with seamless restoration.
 - **Quick Settings HUD**: Dedicated `QuickGameModeSubpage.qml` and quick action tile in the control center with live optimization status feedback.
 
-#### ALPORA Desktop Arcade Engine & Pet Catch Mini-Game
-- **Native Arcade Overlay**: Immersive retro overlay (`shell/widgets/ArcadeOverlay.qml`) accessible via `Super + G`, dedicated TopBar gamepad button (`shell/components/TopBarArcadeButton.qml`), Desktop Companion right-click / direct launch, or CLI `poly-shell arcade toggle`.
-- **Pet Catch Interactive Mini-Game**: Interactive ball toss mini-game directly linked with Desktop Companion (`DesktopCompanion.qml`), featuring real-time collision detection, dynamic catch animations, physics trajectories, and combo scoring.
-- **Persistent High Scores & CLI Hub**: High scores saved to `~/.config/alpora/arcade_scores.json`, queryable and manageable via `poly-shell arcade status/scores/reset-scores/record`.
-- **Theme-Adaptive Retro HUD**: Themed CRT scanlines, glass badges, combo multipliers, and multi-language localization (EN, VI, RU, ES) adhering to the theme design contract.
+#### ALPORA Desktop Arcade Engine, Pet Catch & Fishing Mini-Games
+- **Native Arcade Overlay & Multi-Game Hub**: Immersive overlay (`shell/widgets/ArcadeOverlay.qml`) accessible via `Super + G`, dedicated TopBar gamepad button (`shell/components/TopBarArcadeButton.qml`), or CLI `poly-shell arcade toggle`.
+- **Pet Catch Interactive Mini-Game**: Interactive ball toss mini-game (`shell/widgets/ArcadeCatchGame.qml`) directly linked with Desktop Companion (`DesktopCompanion.qml`), featuring real-time collision detection, dynamic catch animations, physics trajectories, squash-and-stretch, and combo scoring.
+- **Desktop Fishing Mini-Game**: Relaxing pond fishing simulation (`shell/widgets/ArcadeFishingGame.qml`, `FishingPondView.qml`) with rod casting, bobber ripples, fish bite detection, reel tension gauge mini-game, species catalog (Carp, Salmon, Mythic Golden Koi), length/weight measurements, and score celebration.
+- **Persistent High Scores & CLI Hub**: High scores saved to `~/.config/poly-shell/arcade.json`, queryable and manageable via `poly-shell arcade status/scores/reset-scores/record`.
+
+#### Windows-Style Free-Float Mode & Cascade Window Placement
+- **Smart Free-Float Toggle**: New `poly-shell control float-toggle` and keybinding `Super + Shift + F` to easily toggle floating with comfortable 1080x700 window sizing.
+- **Cascade Window Arrangement**: New `poly-shell control cascade` and keybinding `Super + Shift + C` to arrange all floating windows on the workspace in a clean staircase cascade.
+
+#### Omni-Search in Application Launcher
+- **Instant Calculator & Math Evaluation**: Instant calculation for math formulas (`= 1024 * 768 / 60`, sqrt, sin, cos) with one-click copy to clipboard.
+- **Direct Terminal Runner**: Prefix `>` or `$` to execute commands directly in terminal.
+- **Direct Folder Location Opening**: Typing `~/` or `/` presents an instant card to open the path directly in file manager.
+
+#### Core Clarity, Reliability & Code Modularization
+- **Modularized Running Apps Widget**: Extracted `DesktopProcessRow.qml` from `DesktopRunningApps.qml`, safely bringing line count down from 500 to 472 lines.
+- **Transparent Logging**: Replaced silent error swallowing (`catch (_) {}`) with structured logging across core state singletons.
+- **Multi-Monitor Workspace Affinity**: Automatically binds workspaces 1-5 to primary display and 6-10 to secondary display in `MonitorService`.
 
 ## [v1.1.0] — 2026-11-28 — Feature & Architecture Release
 

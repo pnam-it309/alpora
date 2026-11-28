@@ -14,7 +14,7 @@ PanelWindow {
     screen: modelData
     anchors { top: true; bottom: true; left: true; right: true }
 
-    readonly property bool isCurrentScreen: !ArcadeState.targetScreen || ArcadeState.targetScreen === (modelData ? modelData.name : "")
+    readonly property bool isCurrentScreen: ArcadeState.targetScreen === (modelData ? modelData.name : "")
     visible: ArcadeState.active && isCurrentScreen
     color: "transparent"
 
@@ -68,7 +68,7 @@ PanelWindow {
                 }
 
                 Text {
-                    text: "ALPORA ARCADE"
+                    text: I18n.tr("arcade.play_mode")
                     font.family: Session.fontFamily
                     font.pixelSize: 12
                     font.weight: Font.Bold
@@ -262,14 +262,6 @@ PanelWindow {
             }
         }
 
-        // Blitz 1-second Countdown Loop
-        Timer {
-            interval: 1000
-            running: overlay.visible && ArcadeState.blitzMode && ArcadeState.blitzActive
-            repeat: true
-            onTriggered: ArcadeState.tickBlitz()
-        }
-
         // Blitz Game Over Banner
         Rectangle {
             anchors.centerIn: parent
@@ -314,7 +306,7 @@ PanelWindow {
                     Text {
                         id: replayText
                         anchors.centerIn: parent
-                        text: "Play Again"
+                        text: I18n.tr("arcade.play_again")
                         font.family: Session.fontFamily
                         font.pixelSize: 12
                         font.weight: Font.Bold

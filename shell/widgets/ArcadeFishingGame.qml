@@ -27,6 +27,11 @@ Item {
     property real bobberTargetX: 400
     property real bobberTargetY: pondTop + 120
 
+    // Cast aiming coordinates
+    property bool isAiming: false
+    property real aimX: 400
+    property real aimY: pondTop + 120
+
     // Reeling mechanics
     property real tension: 50.0
     property real reelProgress: 0.0
@@ -37,6 +42,21 @@ Item {
 
     // Caught fish details
     property var currentFish: null
+
+    onVisibleChanged: {
+        if (!visible) {
+            fishingGame.isAiming = false;
+            fishingGame.resetToIdle();
+        }
+    }
+
+    Connections {
+        target: ArcadeState
+        function onBlitzEnded(): void {
+            fishingGame.isAiming = false;
+            fishingGame.resetToIdle();
+        }
+    }
 
     // Pond Scene Presentation
     FishingPondView {
@@ -50,6 +70,9 @@ Item {
         rodTipY: fishingGame.rodTipY
         bobberX: fishingGame.bobberX
         bobberY: fishingGame.bobberY
+        isAiming: fishingGame.isAiming
+        aimX: fishingGame.aimX
+        aimY: fishingGame.aimY
         onStalkerArrived: fishingGame.startNibbling()
     }
 
@@ -61,9 +84,9 @@ Item {
 
         onPressed: function(mouse) {
             if (fishingGame.gameState === "idle") {
-                const clampedX = Math.max(220, Math.min(fishingGame.screenWidth - 100, mouse.x));
-                const clampedY = Math.max(fishingGame.pondTop + 40, Math.min(fishingGame.screenHeight - 60, mouse.y));
-                fishingGame.castLine(clampedX, clampedY);
+                fishingGame.isAiming = true;
+                fishingGame.aimX = Math.max(220, Math.min(fishingGame.screenWidth - 100, mouse.x));
+                fishingGame.aimY = Math.max(fishingGame.pondTop + 40, Math.min(fishingGame.screenHeight - 60, mouse.y));
             } else if (fishingGame.gameState === "biting") {
                 fishingGame.startReeling();
             } else if (fishingGame.gameState === "reeling") {
@@ -73,8 +96,20 @@ Item {
             }
         }
 
-        onReleased: function() {
-            if (fishingGame.gameState === "reeling") {
+        onPositionChanged: function(mouse) {
+            if (fishingGame.gameState === "idle" && fishingGame.isAiming) {
+                fishingGame.aimX = Math.max(220, Math.min(fishingGame.screenWidth - 100, mouse.x));
+                fishingGame.aimY = Math.max(fishingGame.pondTop + 40, Math.min(fishingGame.screenHeight - 60, mouse.y));
+            }
+        }
+
+        onReleased: function(mouse) {
+            if (fishingGame.gameState === "idle" && fishingGame.isAiming) {
+                fishingGame.isAiming = false;
+                const clampedX = Math.max(220, Math.min(fishingGame.screenWidth - 100, mouse.x));
+                const clampedY = Math.max(fishingGame.pondTop + 40, Math.min(fishingGame.screenHeight - 60, mouse.y));
+                fishingGame.castLine(clampedX, clampedY);
+            } else if (fishingGame.gameState === "reeling") {
                 fishingGame.isReelingInput = false;
             }
         }
@@ -113,109 +148,45 @@ Item {
                 height: 22
 
                 Rectangle {
-                    anchors.fill: parent
-                    radius: 11
-                    color: Glass.tint(Session.surface, 0.6)
-                    border.width: 1
-                    border.color: Glass.tint(Session.foreground, 0.15)
+                    anchors.fill: parent; radius: 11
+                    color: Glass.tint(Session.surface, 0.6); border.width: 1; border.color: Glass.tint(Session.foreground, 0.15)
                 }
 
                 Rectangle {
                     x: (parent.width * fishingGame.sweetSpotMin / 100)
                     width: (parent.width * (fishingGame.sweetSpotMax - fishingGame.sweetSpotMin) / 100)
-                    height: parent.height
-                    radius: 11
-                    color: Glass.tint(Session.accent, 0.40)
-                    border.width: 1
-                    border.color: Session.accent
+                    height: parent.height; radius: 11
+                    color: Glass.tint(Session.accent, 0.40); border.width: 1; border.color: Session.accent
                 }
 
                 Rectangle {
                     x: Math.max(0, Math.min(parent.width - width, (parent.width * fishingGame.tension / 100) - width / 2))
                     anchors.verticalCenter: parent.verticalCenter
-                    width: 14
-                    height: 26
-                    radius: 7
-                    color: (fishingGame.tension >= fishingGame.sweetSpotMin && fishingGame.tension <= fishingGame.sweetSpotMax)
-                        ? PolyTheme.Theme.secondary : Session.foreground
-                    border.width: 1.5
-                    border.color: Session.background
+                    width: 14; height: 26; radius: 7
+                    color: (fishingGame.tension >= fishingGame.sweetSpotMin && fishingGame.tension <= fishingGame.sweetSpotMax) ? PolyTheme.Theme.secondary : Session.foreground
+                    border.width: 1.5; border.color: Session.background
                 }
             }
 
             Row {
-                spacing: 8
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: parent.width
-
-                Icon {
-                    name: "trophy"
-                    width: 14; height: 14
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
+                spacing: 8; anchors.horizontalCenter: parent.horizontalCenter; width: parent.width
+                Icon { name: "trophy"; width: 14; height: 14; anchors.verticalCenter: parent.verticalCenter }
                 Rectangle {
-                    width: parent.width - 24
-                    height: 8
-                    radius: 4
-                    color: Glass.tint(Session.surface, 0.6)
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    Rectangle {
-                        height: parent.height
-                        width: parent.width * (fishingGame.reelProgress / 100)
-                        radius: 4
-                        color: Session.accent
-                    }
+                    width: parent.width - 24; height: 8; radius: 4
+                    color: Glass.tint(Session.surface, 0.6); anchors.verticalCenter: parent.verticalCenter
+                    Rectangle { height: parent.height; width: parent.width * (fishingGame.reelProgress / 100); radius: 4; color: Session.accent }
                 }
             }
         }
     }
 
+    Timer { id: reelTimer; interval: 32; running: fishingGame.gameState === "reeling"; repeat: true; onTriggered: fishingGame.stepReelPhysics() }
     Timer {
-        id: reelTimer
-        interval: 32
-        running: fishingGame.gameState === "reeling"
-        repeat: true
-        onTriggered: fishingGame.stepReelPhysics()
+        id: biteWindowTimer; interval: 2800; running: false; repeat: false
+        onTriggered: if (fishingGame.gameState === "biting") { pondView.triggerSplash(fishingGame.bobberX, fishingGame.bobberY); fishingGame.resetToIdle(); }
     }
-
-    Timer {
-        id: biteWindowTimer
-        interval: 2800
-        running: false
-        repeat: false
-        onTriggered: {
-            if (fishingGame.gameState === "biting") {
-                pondView.triggerSplash(fishingGame.bobberX, fishingGame.bobberY);
-                fishingGame.resetToIdle();
-            }
-        }
-    }
-
-    Timer {
-        id: waitTimer
-        interval: 2400
-        running: false
-        repeat: false
-        onTriggered: {
-            if (fishingGame.gameState === "waiting") {
-                fishingGame.startNibbling();
-            }
-        }
-    }
-
-    Timer {
-        id: nibbleTimer
-        interval: 1400
-        running: false
-        repeat: false
-        onTriggered: {
-            if (fishingGame.gameState === "nibbling") {
-                fishingGame.startBiting();
-            }
-        }
-    }
+    Timer { id: waitTimer; interval: 2400; running: false; repeat: false; onTriggered: if (fishingGame.gameState === "waiting") fishingGame.startNibbling(); }
+    Timer { id: nibbleTimer; interval: 1400; running: false; repeat: false; onTriggered: if (fishingGame.gameState === "nibbling") fishingGame.startBiting(); }
 
     // Catch Celebration Dialog / Banner
     Rectangle {
@@ -267,7 +238,8 @@ Item {
                 Text {
                     id: scorePillText
                     anchors.centerIn: parent
-                    text: "+" + (fishingGame.currentFish ? fishingGame.currentFish.points : 0) + " PTS"
+                    text: "+" + (fishingGame.currentFish ? (fishingGame.currentFish.awardedPoints || fishingGame.currentFish.points) : 0) + " PTS"
+                        + ((fishingGame.currentFish && fishingGame.currentFish.multiplier > 1) ? (" (x" + fishingGame.currentFish.multiplier + ")") : "")
                     font.family: Session.fontFamily
                     font.pixelSize: 13
                     font.weight: Font.Bold
@@ -390,6 +362,7 @@ Item {
 
     function startNibbling(): void {
         if (gameState !== "waiting") return;
+        waitTimer.stop();
         gameState = "nibbling";
         if (ArcadeState.soundFx) AudioFeedback.playTock();
         nibbleTimer.restart();
@@ -407,16 +380,18 @@ Item {
         biteWindowTimer.stop();
         gameState = "reeling";
         tension = 50.0;
-        reelProgress = 15.0;
+        reelProgress = 30.0;
+        isReelingInput = true;
+    }
+
+    function fishEscaped(): void {
+        reelTimer.stop();
+        pondView.triggerSplash(bobberX, bobberY);
+        resetToIdle();
     }
 
     function stepReelPhysics(): void {
-        if (isReelingInput) {
-            tension = Math.min(100.0, tension + 2.8);
-        } else {
-            tension = Math.max(0.0, tension - 1.4);
-        }
-
+        tension = isReelingInput ? Math.min(100.0, tension + 2.8) : Math.max(0.0, tension - 1.4);
         fishStruggleAngle += 0.18;
         tension = Math.max(0.0, Math.min(100.0, tension + Math.sin(fishStruggleAngle) * 1.2));
 
@@ -427,7 +402,9 @@ Item {
                 successfulCatch();
             }
         } else {
-            reelProgress = Math.max(0.0, reelProgress - 0.4);
+            reelProgress -= 0.5;
+            if (tension > 95.0 || tension < 10.0) reelProgress -= 0.7;
+            if (reelProgress <= 0.0) fishEscaped();
         }
     }
 
@@ -443,11 +420,16 @@ Item {
             { maxR: 1.00, nameKey: "arcade.fish_than_thoai", wMin: 14.0, wSpan: 10.0, lMin: 98, lSpan: 38, pMin: 1600, pSpan: 800 }
         ];
         const s = speciesList.find(x => r < x.maxR) || speciesList[0];
+        const curCombo = ArcadeState.combo;
+        const multiplier = Math.min(5, Math.max(1, Math.floor((curCombo + 1) / 2) + 1));
+        const pts = Math.floor(s.pMin + Math.random() * s.pSpan);
         const species = {
             nameKey: s.nameKey,
             weight: Number(s.wMin + Math.random() * s.wSpan).toFixed(2),
             length: Math.floor(s.lMin + Math.random() * s.lSpan),
-            points: Math.floor(s.pMin + Math.random() * s.pSpan)
+            points: pts,
+            awardedPoints: pts * multiplier,
+            multiplier: multiplier
         };
 
         currentFish = species;
@@ -456,6 +438,7 @@ Item {
     }
 
     function resetToIdle(): void {
+        isAiming = false;
         waitTimer.stop();
         nibbleTimer.stop();
         biteWindowTimer.stop();
@@ -466,5 +449,6 @@ Item {
         currentFish = null;
         tension = 50.0;
         reelProgress = 0.0;
+        isReelingInput = false;
     }
 }

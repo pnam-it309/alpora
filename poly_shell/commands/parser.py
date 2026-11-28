@@ -72,6 +72,8 @@ def build_parser(version: str) -> argparse.ArgumentParser:
             "gamemode",
             "phone",
             "locale",
+            "cascade",
+            "float-toggle",
         ),
     )
     control_parser.add_argument("value", nargs="?")

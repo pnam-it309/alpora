@@ -23,6 +23,10 @@ Item {
     property real bobberY: rodTipY + 40
     property real bobberWaveOffset: 0
 
+    property bool isAiming: false
+    property real aimX: 0
+    property real aimY: 0
+
     signal stalkerArrived()
 
     // Water Surface / Pond area
@@ -125,13 +129,6 @@ Item {
                     fishItem.heading = Math.atan2(fishItem.targetFy - fishItem.fy, fishItem.targetFx - fishItem.fx) * 180 / Math.PI;
                     fishAnimX.restart();
                     fishAnimY.restart();
-
-                    if (pondView.gameState === "waiting" && fishItem.index === 0) {
-                        const d = Math.hypot(fishItem.targetFx - pondView.bobberX, fishItem.targetFy - pondView.bobberY);
-                        if (d < 45) {
-                            pondView.stalkerArrived();
-                        }
-                    }
                 }
             }
 
@@ -139,6 +136,11 @@ Item {
                 id: fishAnimX
                 duration: 2200
                 easing.type: Easing.InOutQuad
+                onFinished: {
+                    if (pondView.gameState === "waiting" && fishItem.index === 0) {
+                        pondView.stalkerArrived();
+                    }
+                }
             }
             NumberAnimation on fy {
                 id: fishAnimY
@@ -180,6 +182,41 @@ Item {
                 y: pondView.rodTipY
             }
         }
+    }
+
+    // Cast Trajectory Indicator when dragging/aiming
+    Shape {
+        anchors.fill: parent
+        visible: pondView.isAiming
+        ShapePath {
+            strokeColor: Session.accent
+            strokeWidth: 2
+            strokeStyle: ShapePath.DashLine
+            dashPattern: [5, 4]
+            fillColor: "transparent"
+            startX: pondView.rodTipX
+            startY: pondView.rodTipY
+            PathQuad {
+                controlX: (pondView.rodTipX + pondView.aimX) / 2
+                controlY: Math.min(pondView.rodTipY, pondView.aimY) - 50
+                x: pondView.aimX
+                y: pondView.aimY
+            }
+        }
+    }
+
+    // Landing Target Marker
+    Rectangle {
+        visible: pondView.isAiming
+        x: pondView.aimX - width / 2
+        y: pondView.aimY - height / 2
+        width: 34
+        height: 18
+        radius: 9
+        color: "transparent"
+        border.width: 1.5
+        border.color: Session.accent
+        opacity: 0.85
     }
 
     // Fishing Line

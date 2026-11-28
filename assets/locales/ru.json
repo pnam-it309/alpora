@@ -795,6 +795,7 @@
   "launcher.quick_calc": "Результат вычисления",
   "launcher.copy_clipboard": "Нажмите Enter для копирования",
   "launcher.run_command": "Запустить в терминале: {cmd}",
+  "launcher.open_location": "Открыть расположение в диспетчере файлов",
   "launcher.search_web": "Искать в {engine}: '{term}'",
   "bluetooth.unpair": "Забыть устройство",
   "settings.touchpad": "Тачпад",
@@ -1042,15 +1043,17 @@
   "arcade.blitz_mode": "Режим Блиц (60с)",
   "arcade.blitz_time": "Время: {time}с",
   "arcade.blitz_over": "Время вышло!",
-  "arcade.fishing_cast_hint": "Нажмите на воду, чтобы забросить удочку",
+  "arcade.fishing_cast_hint": "Нажмите или потяните, чтобы забросить удочку",
   "arcade.fishing_wait_hint": "Следим за поплавком... ждем поклевку",
   "arcade.fishing_bite_hint": "Клюет! Подсекай!",
   "arcade.fishing_reel_hint": "Удерживайте, чтобы держать натяжение в зеленой зоне!",
   "arcade.fishing_caught": "Пойман {name}!",
+  "arcade.fishing_escaped": "Рыба сорвалась! Забросьте снова.",
   "arcade.fish_ro": "Анабас",
   "arcade.fish_chep": "Сазан",
   "arcade.fish_hoi": "Радужная форель",
   "arcade.fish_than_thoai": "Мифическая рыба-дракон",
   "arcade.fish_specs": "{weight} кг · {length} см",
-  "arcade.fish_again": "Нажмите, чтобы забросить снова"
+  "arcade.fish_again": "Нажмите, чтобы забросить снова",
+  "arcade.play_again": "Играть снова"
 }

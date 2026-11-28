@@ -9,6 +9,18 @@ from ..core.state import ConfigError, ROOT
 
 
 def handle_control(paths, args) -> int:
+    if getattr(args, "action", "") == "cascade":
+        from ..services.window_service import cascade_floating_windows
+        count = cascade_floating_windows()
+        print(json.dumps({"success": True, "action": "cascade", "cascaded": count}))
+        return 0
+
+    if getattr(args, "action", "") == "float-toggle":
+        from ..services.window_service import toggle_floating_smart
+        toggle_floating_smart()
+        print(json.dumps({"success": True, "action": "float-toggle"}))
+        return 0
+
     CONTROL_ACTIONS = {
         "status": "status", "brightness": "brightness", "dnd": "dnd",
         "nightlight": "nightlight", "bluetooth": "bluetooth",
