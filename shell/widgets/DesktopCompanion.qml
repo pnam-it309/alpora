@@ -79,6 +79,32 @@ PanelWindow {
     readonly property bool allowed: CompanionState.enabled && CompanionState.loaded && Session.loaded && !!modelData
         && modelData.name === targetScreen && fits && !ClockState.sleeping && screenAwake && !fullscreen
         && Session.mode !== "work" && !OverviewState.opened
+
+    Connections {
+        target: ArcadeState
+        function onPetCatch(): void {
+            pet.behavior = Logic.react(pet.behavior, "catch");
+        }
+    }
+
+    Binding {
+        target: ArcadeState
+        property: "companionX"
+        value: pet.sceneX
+        when: ArcadeState.active && pet.allowed
+    }
+    Binding {
+        target: ArcadeState
+        property: "companionY"
+        value: pet.sceneY
+        when: ArcadeState.active && pet.allowed
+    }
+    Binding {
+        target: ArcadeState
+        property: "companionPresent"
+        value: pet.allowed
+        when: ArcadeState.active
+    }
     visible: allowed
     readonly property bool interactive: allowed
     onInteractiveChanged: if (!interactive) {cancelGesture();lastTick=0;}

@@ -1031,5 +1031,10 @@
   "gamemode.optimizations": "Active Optimizations",
   "gamemode.cpu_performance": "CPU Governor: Performance (cpupower/sysfs)",
   "gamemode.hyprland_boost": "Compositor Animations & Blur: Disabled (Zero Latency)",
-  "gamemode.dnd_active": "Do Not Disturb: Active (Distraction-free)"
+  "gamemode.dnd_active": "Do Not Disturb: Active (Distraction-free)",
+  "arcade.play_mode": "ALPORA Arcade",
+  "arcade.score": "Score",
+  "arcade.high_score": "Best",
+  "arcade.throw_ball": "Drag or click to toss the ball for Companion",
+  "arcade.exit_hint": "Press Esc or Super+G to exit"
 }

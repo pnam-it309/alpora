@@ -7,6 +7,7 @@ from .pip_cmd import handle_pip
 from .tasks_cmd import handle_tasks, handle_task_manager, open_task_manager
 from .shortcuts_cmd import handle_shortcuts
 from .organizer_cmd import handle_organizer
+from .arcade_cmd import handle_arcade
 from .desktop_cmd import (
     handle_control,
     handle_wallpaper,
@@ -64,6 +65,7 @@ __all__ = [
     "open_task_manager",
     "handle_shortcuts",
     "handle_organizer",
+    "handle_arcade",
     "handle_control",
     "handle_wallpaper",
     "handle_project",

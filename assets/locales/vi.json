@@ -1031,5 +1031,10 @@
   "gamemode.optimizations": "Tối ưu đang kích hoạt",
   "gamemode.cpu_performance": "Điều tốc CPU: Hiệu năng cao (Performance)",
   "gamemode.hyprland_boost": "Hiệu ứng hoạt ảnh & Làm mờ: Tắt (Giảm tải GPU)",
-  "gamemode.dnd_active": "Không làm phiền: Bật (Tập trung chiến game)"
+  "gamemode.dnd_active": "Không làm phiền: Bật (Tập trung chiến game)",
+  "arcade.play_mode": "ALPORA Arcade",
+  "arcade.score": "Điểm",
+  "arcade.high_score": "Kỷ lục",
+  "arcade.throw_ball": "Kéo hoặc nhấp để ném bóng cho Companion bắt",
+  "arcade.exit_hint": "Nhấn Esc hoặc Super+G để thoát"
 }

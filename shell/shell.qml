@@ -38,6 +38,7 @@ ShellRoot {
     Variants { model: Quickshell.screens; DisplayProjectMenu {} }
     Variants { model: Quickshell.screens; BrightnessOverlay {} }
     Variants { model: Quickshell.screens; VideoPipOverlay {} }
+    Variants { model: Quickshell.screens; ArcadeOverlay {} }
 
     // Native Wayland shortcuts avoid spawning an IPC client before input can
     // reach the launcher. Keep registration once per shell, not per monitor.
@@ -91,6 +92,10 @@ ShellRoot {
     NativeShortcut {
         appid: "poly-shell"; name: "video-pip"; description: "Video PiP (TikTok / Shorts / YouTube)"
         onActivated: VideoPipState.toggle(root.focusedScreen())
+    }
+    NativeShortcut {
+        appid: "poly-shell"; name: "arcade"; description: "ALPORA Desktop Arcade"
+        onActivated: ArcadeState.toggle(root.focusedScreen())
     }
 
     FileView {
@@ -159,6 +164,9 @@ ShellRoot {
         function powerMenu(): void { PowerState.toggle(root.focusedScreen()); }
         function toggleOverview(): void { OverviewState.toggle(root.focusedScreen()); }
         function toggleDisplayProject(): void { DisplayProjectState.toggle(root.focusedScreen()); }
+        function toggleArcade(): void { ArcadeState.toggle(root.focusedScreen()); }
+        function openArcade(game: string): void { ArcadeState.open(game, root.focusedScreen()); }
+        function closeArcade(): void { ArcadeState.close(); }
     }
 
 

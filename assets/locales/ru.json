@@ -1031,5 +1031,10 @@
   "gamemode.optimizations": "Активные оптимизации",
   "gamemode.cpu_performance": "Регулятор ЦП: Производительность (cpupower/sysfs)",
   "gamemode.hyprland_boost": "Анимации и размытие: Отключены (минимальная задержка)",
-  "gamemode.dnd_active": "Не беспокоить: Включено (без уведомлений)"
+  "gamemode.dnd_active": "Не беспокоить: Включено (без уведомлений)",
+  "arcade.play_mode": "ALPORA Arcade",
+  "arcade.score": "Счёт",
+  "arcade.high_score": "Рекорд",
+  "arcade.throw_ball": "Перетащите или нажмите, чтобы бросить мяч питомцу",
+  "arcade.exit_hint": "Нажмите Esc или Super+G для выхода"
 }

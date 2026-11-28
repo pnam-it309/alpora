@@ -1031,5 +1031,10 @@
   "gamemode.optimizations": "Optimizaciones activas",
   "gamemode.cpu_performance": "Gobernador de CPU: Rendimiento (cpupower/sysfs)",
   "gamemode.hyprland_boost": "Animaciones y desenfoque: Desactivados (cero latencia)",
-  "gamemode.dnd_active": "No molestar: Activo (sin distracciones)"
+  "gamemode.dnd_active": "No molestar: Activo (sin distracciones)",
+  "arcade.play_mode": "ALPORA Arcade",
+  "arcade.score": "Puntuación",
+  "arcade.high_score": "Récord",
+  "arcade.throw_ball": "Arrastra o haz clic para lanzar la pelota a Companion",
+  "arcade.exit_hint": "Presiona Esc o Super+G para salir"
 }

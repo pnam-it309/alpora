@@ -310,4 +310,9 @@ def build_parser(version: str) -> argparse.ArgumentParser:
     monitor_parser.add_argument("action", nargs="?", default="list", choices=("list", "apply", "persist"))
     monitor_parser.add_argument("payload", nargs="?", default="[]")
 
+    arcade_parser = sub.add_parser("arcade", help="ALPORA Desktop Arcade Engine mini-games")
+    arcade_parser.add_argument("action", nargs="?", default="toggle", choices=("toggle", "open", "close", "play", "status", "scores", "reset-scores", "record"))
+    arcade_parser.add_argument("game", nargs="?", default="catch", help="game identifier (e.g. catch)")
+    arcade_parser.add_argument("score", type=int, nargs="?", default=0, help="score value to record")
+
     return parser

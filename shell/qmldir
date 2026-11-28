@@ -34,6 +34,7 @@ singleton TimelineState 1.0 core/TimelineState.qml
 singleton VideoPipState 1.0 core/VideoPipState.qml
 singleton WeatherState 1.0 core/WeatherState.qml
 singleton WidgetState 1.0 core/WidgetState.qml
+singleton ArcadeState 1.0 core/ArcadeState.qml
 singleton AppCatalog 1.0 panels/AppCatalog.qml
 
 # Core Controls & Helpers
@@ -99,6 +100,7 @@ SettingsRow 1.0 components/SettingsRow.qml
 SettingsTile 1.0 components/SettingsTile.qml
 SettingsToggle 1.0 components/SettingsToggle.qml
 TopBarVideoPipButton 1.0 components/TopBarVideoPipButton.qml
+TopBarArcadeButton 1.0 components/TopBarArcadeButton.qml
 TrayButton 1.0 components/TrayButton.qml
 UnfoldPanel 1.0 components/UnfoldPanel.qml
 WidgetAnimatedText 1.0 components/WidgetAnimatedText.qml
@@ -158,6 +160,7 @@ DesktopMusic 1.0 widgets/DesktopMusic.qml
 DesktopNotificationTicker 1.0 widgets/DesktopNotificationTicker.qml
 DesktopRunningApps 1.0 widgets/DesktopRunningApps.qml
 DesktopWeather 1.0 widgets/DesktopWeather.qml
+ArcadeOverlay 1.0 widgets/ArcadeOverlay.qml
 DesktopWidgetCard 1.0 widgets/DesktopWidgetCard.qml
 DesktopWidgets 1.0 widgets/DesktopWidgets.qml
 LivingLandscape 1.0 widgets/LivingLandscape.qml

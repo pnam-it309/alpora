@@ -1,6 +1,6 @@
 # Changelog
 
-## [v1.2.0] — 2026-11-28 — Interactive Displays, iCal Sync & Gaming Performance Release
+## [v1.2.0] — 2026-11-28 — Interactive Displays, iCal Sync, GameMode & Desktop Arcade Release
 
 ### Key Highlights & Superpowers
 
@@ -16,10 +16,16 @@
 - **UI Integration**: Action buttons in `shell/panels/DayPanel.qml` with native desktop notifications via `notify-send`.
 
 #### GameMode & Gaming Performance HUD/Tuning
-- **Governor & Sysfs Control**: Automatic CPU governor elevation (`cpupower`, `powerprofilesctl`, or sysfs `scaling_governor`) to `performance` on game launch with reliable state restoration on exit.
+- **Governor & Sysfs Control with Restore Hooks**: Automatic CPU governor elevation (`cpupower`, `powerprofilesctl`, or sysfs `scaling_governor`) to `performance` on game launch with reliable state restoration hooks ensuring pre-game governor and power profiles are restored on process termination or exit.
 - **Process Renicing**: Automatic detection and priority elevation (nice -5) for game processes and Wine/Proton render threads.
 - **Distraction-Free Gaming**: Automatic notification suppression via DND during gameplay with seamless restoration.
 - **Quick Settings HUD**: Dedicated `QuickGameModeSubpage.qml` and quick action tile in the control center with live optimization status feedback.
+
+#### ALPORA Desktop Arcade Engine & Pet Catch Mini-Game
+- **Native Arcade Overlay**: Immersive retro overlay (`shell/widgets/ArcadeOverlay.qml`) accessible via `Super + G`, dedicated TopBar gamepad button (`shell/components/TopBarArcadeButton.qml`), Desktop Companion right-click / direct launch, or CLI `poly-shell arcade toggle`.
+- **Pet Catch Interactive Mini-Game**: Interactive ball toss mini-game directly linked with Desktop Companion (`DesktopCompanion.qml`), featuring real-time collision detection, dynamic catch animations, physics trajectories, and combo scoring.
+- **Persistent High Scores & CLI Hub**: High scores saved to `~/.config/alpora/arcade_scores.json`, queryable and manageable via `poly-shell arcade status/scores/reset-scores/record`.
+- **Theme-Adaptive Retro HUD**: Themed CRT scanlines, glass badges, combo multipliers, and multi-language localization (EN, VI, RU, ES) adhering to the theme design contract.
 
 ## [v1.1.0] — 2026-11-28 — Feature & Architecture Release
 

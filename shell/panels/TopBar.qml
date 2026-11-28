@@ -175,6 +175,11 @@ PanelWindow {
                 screenName: bar.screenName
                 anchors.verticalCenter: parent.verticalCenter
             }
+            TopBarArcadeButton {
+                id: arcadeBtn
+                screenName: bar.screenName
+                anchors.verticalCenter: parent.verticalCenter
+            }
         }
         Button {
             id: clockButton

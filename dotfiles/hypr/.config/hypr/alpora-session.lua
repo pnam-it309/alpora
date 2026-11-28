@@ -88,6 +88,7 @@ hl.bind("SUPER + P", hl.dsp.global("poly-shell:display-project"))
 hl.bind(", XF86Display", hl.dsp.global("poly-shell:display-project"))
 hl.bind("CTRL + SHIFT + Escape", hl.dsp.global("poly-shell:task-manager"))
 hl.bind("SUPER + Y", hl.dsp.global("poly-shell:video-pip"))
+hl.bind("SUPER + G", hl.dsp.global("poly-shell:arcade"))
 
 -- Window operations
 hl.bind("SUPER + Q", hl.dsp.window.close())
