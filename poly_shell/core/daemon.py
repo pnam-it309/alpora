@@ -275,6 +275,19 @@ class PolyShellDaemon:
         except Exception as exc:
             logger.debug("NotificationHistory initialization skipped: %s", exc)
 
+        # Bluetooth management endpoints
+        try:
+            from ..services.bluetooth_service import BluetoothService
+
+            self.ipc_server.register_handler("bluetooth.status", lambda _p: BluetoothService.get_status())
+            self.ipc_server.register_handler("bluetooth.devices", lambda _p: BluetoothService.list_devices())
+            self.ipc_server.register_handler("bluetooth.scan", lambda p: BluetoothService.scan(bool(p.get("enable", True))))
+            self.ipc_server.register_handler("bluetooth.pair", lambda p: BluetoothService.pair(str(p.get("mac", "")), p.get("pin")))
+            self.ipc_server.register_handler("bluetooth.connect", lambda p: BluetoothService.connect(str(p.get("mac", ""))))
+            self.ipc_server.register_handler("bluetooth.disconnect", lambda p: BluetoothService.disconnect(str(p.get("mac", ""))))
+        except Exception as exc:
+            logger.debug("BluetoothService initialization skipped: %s", exc)
+
     def start(self) -> None:
         """Start all services, IPC server, and compositor event watcher."""
         if self._running:

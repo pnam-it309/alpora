@@ -200,4 +200,5 @@ TaskPerformanceTab 1.0 taskmanager/TaskPerformanceTab.qml
 
 # QuickSettings
 NotificationCenter 1.0 quicksettings/NotificationCenter.qml
+BluetoothPairingDialog 1.0 quicksettings/BluetoothPairingDialog.qml
 

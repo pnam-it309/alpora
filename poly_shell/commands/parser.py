@@ -355,4 +355,14 @@ def build_parser(version: str) -> argparse.ArgumentParser:
     w_create.add_argument("--name", default="", help="human readable display name")
     w_create.add_argument("--dir", default=None, help="target directory for widget")
 
+    rice_parser = sub.add_parser("rice", help="1-click ALPORA desktop rice export and import (.alpora-rice)")
+    rice_parser.add_argument("action", nargs="?", default="export", choices=("export", "import", "apply", "inspect"), help="rice action")
+    rice_parser.add_argument("file", nargs="?", default="", help="target archive file or output path")
+    rice_parser.add_argument("-o", "--output", default="", help="destination .alpora-rice bundle path")
+    rice_parser.add_argument("--name", default="", help="package display name")
+    rice_parser.add_argument("--author", default="", help="author name")
+    rice_parser.add_argument("--desc", default="", help="rice description")
+    rice_parser.add_argument("--preview", action="store_true", help="preview package without applying")
+    rice_parser.add_argument("--json", action="store_true", help="output inspection results as JSON")
+
     return parser

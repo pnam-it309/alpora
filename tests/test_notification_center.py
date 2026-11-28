@@ -215,6 +215,9 @@ class TestNotificationHistoryIpc(unittest.TestCase):
         sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         sock.settimeout(2.0)
         sock.connect(str(self.socket_path))
+        deadline = time.monotonic() + 1.0
+        while self.ipc_server.client_count == 0 and time.monotonic() < deadline:
+            time.sleep(0.01)
         return sock
 
     def _send_request(self, client: socket.socket, action: str, params: dict, req_id: int = 1) -> dict:

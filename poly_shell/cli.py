@@ -314,6 +314,7 @@ def main(argv=None):
         "service": lambda: commands.handle_service(paths, args),
         "watchdog": lambda: commands.handle_watchdog(paths, args),
         "widget": lambda: commands.handle_widget(paths, args),
+        "rice": lambda: commands.handle_rice(paths, args),
     }
 
     try:
