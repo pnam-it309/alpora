@@ -1009,5 +1009,6 @@
   "theme.slideshow_use_folder": "Use current folder",
   "theme.slideshow_min": "min",
   "theme.slideshow_shuffle": "Shuffle",
-  "theme.slideshow_next": "Next"
+  "theme.slideshow_next": "Next",
+  "monitors.interactive_desc": "Visual spatial arrangement of displays currently connected to the system."
 }

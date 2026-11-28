@@ -47,6 +47,20 @@ Item {
         color: Session.surface; border.width: 1; border.color: PolyTheme.Theme.withAlpha(Session.accent, 0.5)
         Text { anchors.centerIn: parent; text: root.group.windows.length; color: Session.foreground; font.family: Session.fontFamily; font.pixelSize: 9 }
     }
+    // Minimized Indicator: amber/accent ring indicator when window is in special:minimized
+    Rectangle {
+        visible: !!root.group.hasMinimized
+        anchors.left: parent.left; anchors.leftMargin: 2; y: 2
+        width: 14; height: 14; radius: 7
+        color: Glass.tint(Session.background, 0.8)
+        border.width: 1.2
+        border.color: PolyTheme.Theme.color("#d4a373")
+        Icon {
+            anchors.centerIn: parent
+            name: "chevron-down"
+            width: 9; height: 9
+        }
+    }
     Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter; y: 58
         width: root.group.active ? 16 : 5; height: 3; radius: 1.5

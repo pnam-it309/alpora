@@ -4,8 +4,8 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 LIMIT = 500
-# Existing exceptions only; shrink this list, never grow it.
-ALLOWED = {'shell/demos/web/app.js'}
+# Zero exceptions: every source file strictly under 500 lines.
+ALLOWED = set()
 
 
 class FileBudgetTests(unittest.TestCase):

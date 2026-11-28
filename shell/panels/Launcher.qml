@@ -346,6 +346,27 @@ PanelWindow {
                     background: Rectangle { radius: 6; color: Glass.tint(Session.surface, 0.75) }
                 }
             }
+            LauncherCategoryBar {
+                id: categoryBar
+                visible: launcher.expansionCurve > 0.4 && !launcher.query.trim()
+                opacity: launcher.expansionCurve
+                Layout.fillWidth: true
+                Layout.preferredHeight: 30
+                activeCategory: launcher.category
+                allApps: launcher.allApps
+                onCategorySelected: catId => {
+                    BarState.expandLauncher();
+                    launcher.allApps = false;
+                    launcher.category = catId;
+                    search.forceActiveFocus();
+                }
+                onAllAppsSelected: {
+                    BarState.expandLauncher();
+                    launcher.allApps = true;
+                    launcher.category = "";
+                    search.forceActiveFocus();
+                }
+            }
             ScrollView {
                 id: scroll
                 Layout.fillWidth: true; Layout.fillHeight: true

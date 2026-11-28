@@ -51,7 +51,7 @@ Singleton {
 
     function computeGroups(): var {
         const favorites = AppCatalog.pinnedIds.map(id => AppCatalog.entries.find(e => e.id === id)).filter(e => !!e);
-        const groups = favorites.map(e => ({id: e.id, entry: e, name: e.name, pinned: true, windows: [], active: false, urgent: false}));
+        const groups = favorites.map(e => ({id: e.id, entry: e, name: e.name, pinned: true, windows: [], active: false, urgent: false, hasMinimized: false}));
         
         if (compositor === "hyprland" && Hyprland.toplevels) {
             Hyprland.toplevels.values.forEach(t => {
@@ -59,25 +59,28 @@ Singleton {
                 if (!data) return;
                 const workspace = t.workspace ? {id: t.workspace.id, name: t.workspace.name || String(t.workspace.id)}
                     : {id: Number(data.workspace?.id || 0), name: String(data.workspace?.name || data.workspace?.id || "")};
-                if (data.mapped === false || data.hidden || workspace.name.startsWith("special:")) return;
+                const isMinimized = workspace.name === "special:minimized";
+                if (data.mapped === false || data.hidden || (workspace.name.startsWith("special:") && !isMinimized)) return;
                 const app = data.class || (t.wayland ? t.wayland.appId : "") || data.initialClass || "";
                 const entry = favorites.find(e => matches(e, app)) || AppCatalog.entries.find(e => matches(e, app));
                 const id = entry ? entry.id : "window:" + (app || t.address);
                 let group = groups.find(g => g.id === id);
                 if (!group) {
-                    group = {id: id, entry: entry || null, name: entry ? entry.name : app || t.title || I18n.tr("dock.app_fallback"), pinned: false, windows: [], active: false, urgent: false};
+                    group = {id: id, entry: entry || null, name: entry ? entry.name : app || t.title || I18n.tr("dock.app_fallback"), pinned: false, windows: [], active: false, urgent: false, hasMinimized: false};
                     groups.push(group);
                 }
                 group.windows.push({
                     address: "0x" + t.address.replace(/^0x/, ""),
                     title: t.title || group.name,
                     workspace: workspace,
+                    minimized: isMinimized,
                     active: t.activated,
                     urgent: t.urgent,
                     order: Number(data.focusHistoryID ?? 999)
                 });
                 group.active = group.active || t.activated;
                 group.urgent = group.urgent || t.urgent;
+                group.hasMinimized = group.hasMinimized || isMinimized;
             });
         }
 

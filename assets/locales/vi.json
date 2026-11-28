@@ -1009,5 +1009,6 @@
   "theme.slideshow_use_folder": "Dùng thư mục hiện tại",
   "theme.slideshow_min": "phút",
   "theme.slideshow_shuffle": "Ngẫu nhiên",
-  "theme.slideshow_next": "Kế tiếp"
+  "theme.slideshow_next": "Kế tiếp",
+  "monitors.interactive_desc": "Sơ đồ bố cục không gian hiển thị của các màn hình đang kết nối với hệ thống."
 }

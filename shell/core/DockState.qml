@@ -43,7 +43,23 @@ Singleton {
         const item = group(id);
         if (!item) return;
         if (!item.windows.length) { launch(id); return; }
+        // If window is minimized, bring it back to active workspace and focus
+        const minWin = item.windows.find(w => w.minimized);
+        if (minWin) {
+            restore(minWin);
+            return;
+        }
         cycle(id, 1);
+    }
+    function restore(window: var): void {
+        if (!window) return;
+        // Move window from special:minimized to current workspace and focus
+        if (Hyprland.usingLua) {
+            Hyprland.dispatch('hl.dsp.window.move({ workspace = "current", silent = false })');
+        } else {
+            Hyprland.dispatch("movetoworkspace current,address:" + window.address);
+        }
+        focus(window);
     }
     function cycle(id: string, direction: int): void {
         const item = group(id);

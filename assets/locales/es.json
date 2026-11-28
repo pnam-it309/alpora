@@ -1009,5 +1009,6 @@
   "theme.slideshow_use_folder": "Usar carpeta actual",
   "theme.slideshow_min": "min",
   "theme.slideshow_shuffle": "Aleatorio",
-  "theme.slideshow_next": "Siguiente"
+  "theme.slideshow_next": "Siguiente",
+  "monitors.interactive_desc": "Disposición espacial visual de las pantallas conectadas actualmente al sistema."
 }

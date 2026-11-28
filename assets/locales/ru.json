@@ -1009,5 +1009,6 @@
   "theme.slideshow_use_folder": "Текущая папка",
   "theme.slideshow_min": "мин",
   "theme.slideshow_shuffle": "Вперемешку",
-  "theme.slideshow_next": "Далее"
+  "theme.slideshow_next": "Далее",
+  "monitors.interactive_desc": "Визуальное пространственное расположение мониторов, подключенных к системе."
 }

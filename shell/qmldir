@@ -120,6 +120,7 @@ DisplayProjectMenu 1.0 panels/DisplayProjectMenu.qml
 Dock 1.0 panels/Dock.qml
 DockButton 1.0 panels/DockButton.qml
 Launcher 1.0 panels/Launcher.qml
+LauncherCategoryBar 1.0 panels/LauncherCategoryBar.qml
 MusicPanel 1.0 panels/MusicPanel.qml
 NotificationsPanel 1.0 panels/NotificationsPanel.qml
 NotificationsPreview 1.0 panels/NotificationsPreview.qml
