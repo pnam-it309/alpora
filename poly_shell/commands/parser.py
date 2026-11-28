@@ -341,4 +341,18 @@ def build_parser(version: str) -> argparse.ArgumentParser:
     watchdog_parser.add_argument("--timeout", type=float, default=15.0, help="heartbeat stall timeout in seconds")
     watchdog_parser.add_argument("--once", action="store_true", help="run single check and exit")
 
+    widget_parser = sub.add_parser("widget", help="ALPORA Desktop Widget SDK commands")
+    widget_sub = widget_parser.add_subparsers(dest="widget_action", required=False)
+    w_list = widget_sub.add_parser("list", help="list installed desktop widgets")
+    w_list.add_argument("--json", action="store_true", help="output widget list as JSON")
+    w_install = widget_sub.add_parser("install", help="install a widget from directory or archive")
+    w_install.add_argument("path", help="path to widget directory or .zip archive")
+    w_install.add_argument("-f", "--force", action="store_true", help="overwrite existing widget")
+    w_remove = widget_sub.add_parser("remove", help="remove an installed user widget")
+    w_remove.add_argument("id", help="widget identifier")
+    w_create = widget_sub.add_parser("create", help="create a new desktop widget template")
+    w_create.add_argument("id", help="new widget identifier")
+    w_create.add_argument("--name", default="", help="human readable display name")
+    w_create.add_argument("--dir", default=None, help="target directory for widget")
+
     return parser

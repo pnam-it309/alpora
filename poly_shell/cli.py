@@ -313,6 +313,7 @@ def main(argv=None):
         "clipboard-serve": lambda: commands.handle_clipboard_serve(),
         "service": lambda: commands.handle_service(paths, args),
         "watchdog": lambda: commands.handle_watchdog(paths, args),
+        "widget": lambda: commands.handle_widget(paths, args),
     }
 
     try:

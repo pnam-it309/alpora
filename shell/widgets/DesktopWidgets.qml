@@ -15,7 +15,9 @@ Scope {
     readonly property real safeTop: Session.visual.barTop + Session.visual.barHeight + Math.max(20, Session.visual.barBottom + 12)
     readonly property var config: WidgetState.values
     readonly property string targetScreen: Quickshell.screens.find(s => s.name === config.screen)?.name || (Quickshell.screens.length ? Quickshell.screens[0].name : "")
-    readonly property bool visible: !!modelData && Session.loaded && WidgetState.loaded && modelData.name === targetScreen && (config.clock.enabled || config.weather.enabled || config.music.enabled || (config.developer && config.developer.enabled) || (config.apps && config.apps.enabled))
+    readonly property bool visible: !!modelData && Session.loaded && WidgetState.loaded && modelData.name === targetScreen && (config.clock.enabled || config.weather.enabled || config.music.enabled || (config.developer && config.developer.enabled) || (config.apps && config.apps.enabled) || (root.externalWidgets && root.externalWidgets.length > 0))
+    property var externalWidgets: []
+
     function bounds(kind: string): var {
         if (kind === "apps" && RunningAppsState.expanded)
             return Geometry.boundsForSize(config[kind], width, height, safeTop, {width: 540, height: 620});
@@ -48,6 +50,9 @@ Scope {
         } catch (_) {}
         if (!clientReader.running) clientReader.running = true;
     }
+    function refreshExternalWidgets(): void {
+        if (!externalReader.running) externalReader.running = true;
+    }
     // Query only after compositor events, never on an animation-frame timer.
     Connections {
         target: Hyprland
@@ -60,7 +65,29 @@ Scope {
         id: clientReader; command: ["hyprctl", "-j", "clients"]
         stdout: StdioCollector { onStreamFinished: { try { root.clients = JSON.parse(text); } catch (_) {} } }
     }
-    Component.onCompleted: root.refreshClients()
+    Process {
+        id: externalReader
+        command: [Session.controller, "widget", "list", "--json"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    const list = JSON.parse(text);
+                    root.externalWidgets = Array.isArray(list) ? list.filter(w => w.valid && w.enabled !== false) : [];
+                } catch (_) {
+                    root.externalWidgets = [];
+                }
+            }
+        }
+    }
+    FileView {
+        path: (Quickshell.env("XDG_CONFIG_HOME") || Quickshell.env("HOME") + "/.config") + "/poly-shell/widgets"
+        watchChanges: true; printErrors: false
+        onFileChanged: root.refreshExternalWidgets()
+    }
+    Component.onCompleted: {
+        root.refreshClients();
+        root.refreshExternalWidgets();
+    }
     Variants {
         model: ["clock", "weather", "music", "developer", "apps", "day", "notifications"]
         // Each card has its own small surface: animating a cloud must not
@@ -125,8 +152,53 @@ Scope {
             }
         }
     }
+    // Dynamic loader for external manifest-based widgets
+    Instantiator {
+        model: root.externalWidgets
+        // qmllint disable uncreatable-type
+        delegate: PanelWindow {
+            // qmllint enable uncreatable-type
+            id: extCard
+            required property var modelData
+            readonly property var widgetSetting: (root.config && root.config[modelData.id]) || modelData.defaultPosition || ({x: 50, y: 50})
+            readonly property var naturalSize: ({width: (modelData && modelData.width) || 320, height: (modelData && modelData.height) || 180})
+            readonly property var box: Geometry.boundsForSize(widgetSetting, root.width, root.height, root.safeTop, naturalSize)
+            screen: root.modelData
+            anchors { top: true; left: true }
+            // qmllint disable missing-property
+            margins { top: Math.max(0, Math.round(extCard.box.y) - 8); left: Math.max(0, Math.round(extCard.box.x) - 8) }
+            // qmllint enable missing-property
+            implicitWidth: Math.ceil(box.width) + 16
+            implicitHeight: Math.ceil(box.height) + 16
+            color: "transparent"
+            visible: root.visible && (modelData && modelData.enabled !== false)
+            WlrLayershell.layer: WlrLayer.Bottom
+            WlrLayershell.namespace: "poly-desktop-widget"
+            exclusionMode: ExclusionMode.Ignore
+            exclusiveZone: 0
+            mask: Region { item: extLoader }
+            Loader {
+                id: extLoader
+                x: Math.min(8, extCard.box.x)
+                y: Math.min(8, extCard.box.y)
+                width: extCard.box.width
+                height: extCard.box.height
+                active: extCard.visible
+                source: modelData ? (modelData.entry_path || (modelData.path ? (modelData.path + "/" + (modelData.entry || "Main.qml")) : "")) : ""
+                onLoaded: {
+                    if (item) {
+                        try {
+                            item.width = Qt.binding(function() { return extLoader.width; });
+                            item.height = Qt.binding(function() { return extLoader.height; });
+                        } catch (_) {}
+                    }
+                }
+            }
+        }
+    }
     IpcHandler {
         target: "desktop-widgets-" + (root.modelData ? root.modelData.name : "disconnected")
-        function status(): string { return JSON.stringify({visible: root.visible, screen: root.targetScreen, width: root.width, height: root.height, clock: root.bounds("clock"), weather: root.bounds("weather"), music: root.bounds("music"), developer: root.bounds("developer"), apps: root.bounds("apps"), exposed: {clock: root.exposed("clock"), weather: root.exposed("weather"), music: root.exposed("music"), developer: root.exposed("developer"), apps: root.exposed("apps")}, animations: !!root.config.animations && Session.visual.widgetAnimations && !Motion.reduced}); }
+        function status(): string { return JSON.stringify({visible: root.visible, screen: root.targetScreen, width: root.width, height: root.height, clock: root.bounds("clock"), weather: root.bounds("weather"), music: root.bounds("music"), developer: root.bounds("developer"), apps: root.bounds("apps"), exposed: {clock: root.exposed("clock"), weather: root.exposed("weather"), music: root.exposed("music"), developer: root.exposed("developer"), apps: root.exposed("apps")}, animations: !!root.config.animations && Session.visual.widgetAnimations && !Motion.reduced, externalWidgets: root.externalWidgets}); }
+        function reload(): void { root.refreshExternalWidgets(); }
     }
 }
