@@ -1,11 +1,30 @@
 # Changelog
 
-## [Unreleased]
+## [v1.1.0] — 2026-11-28 — Feature & Architecture Release
 
-- Update Center TUI (24-bit TrueColor) and 3 new Settings pages (Update, System Care, Ecosystem).
-- Wallpapers: pick any local image, native file picker, slideshow; fixed lockscreen rejecting custom wallpapers.
-- Calendar panel: Open-Meteo 7-day weather, event reminders via notifications.
-- Maintainability: modularized large files, file-size guard test, CODEOWNERS, Dependabot, SECURITY.md, `docs/MAINTAINING.md`.
+### Key Highlights & Superpowers
+
+#### TrueColor Update Center (TUI & GUI)
+- **Interactive TUI**: 24-bit TrueColor Update Center (`poly-shell update tui`) with theme-adaptive palette, box-drawing layout, 5-stage progress animation, and keyboard shortcuts (`a` to apply, `q` to quit).
+- **Settings Integration**: Dedicated Update & About settings page (`SettingsUpdateAbout.qml`) displaying current vs upstream version, changelog viewer, and 1-click update trigger.
+- **OTA Infrastructure**: Semver parsing, cache validation, and safe Git pull with automated snapshot rollbacks on failure.
+
+#### Personal Wallpapers & Slideshow Engine
+- **Local Image Discovery**: Automatic scanning across `~/Pictures`, `~/Downloads`, `~/Pictures/Screenshots`, `/usr/share/backgrounds`, or any user-defined folder.
+- **Color Extraction & Sync**: Automatic palette extraction for GTK, Hyprland, Terminal, and Lockscreen directly from custom wallpapers.
+- **Fixed Lockscreen Sandbox**: Eliminated path restrictions in `lockscreen.py` allowing custom wallpaper rendering on Hyprlock without rollbacks.
+- **Wallpaper Slideshow**: Configurable rotation timer (`slideshow.py`, `ThemeSlideshowCard.qml`) supporting 5/15/30/60 minute intervals, random shuffle, and folder targeting.
+- **Native File Picker**: Bridge to system file dialogs (`kdialog`, `zenity`, `yad`) with graceful fallback to path selector.
+
+#### Calendar, Weather & Schedule Integration
+- **Open-Meteo Weather Outlook**: Integrated 7-day weather outlook card (`DayWeatherCard.qml`) into the topbar calendar panel showing current temp, humidity, daily high/low, and rain probability.
+- **Interactive Schedule Reminders**: Schedule events with customizable notification reminders (exact time, 5/15/30/60 mins, or 1 day before) dispatched through `notify-send`.
+- **Date Sync**: Tapping any day tile in the weather forecast immediately centers and selects that day in the calendar.
+
+#### Codebase Modularization & Maintainability
+- **Large File Breakdown**: Refactored all monolithic files (`SettingsDetails.qml`, `QuickSettingsSubpages.qml`, `welcome.qml`, `Launcher.qml`, `task_manager.qml`, `themes.py`) to strictly under 500 lines.
+- **Automated Guardrails**: Added `test_file_budget.py` unit test to prevent future file bloat in CI.
+- **Maintenance Handbook**: Comprehensive [MAINTAINING.md](file:///home/pnam/code/alpora/docs/MAINTAINING.md), GitHub `CODEOWNERS`, `dependabot.yml`, and `SECURITY.md`.
 
 ## [v1.0.0] — 2026-11-03 — Official First Release
 

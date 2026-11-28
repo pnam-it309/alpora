@@ -1,6 +1,6 @@
 pkgbase = alpora-shell-git
 	pkgdesc = Fluid Wayland desktop shell, multi-compositor HAL, and workspace control center built with Quickshell
-	pkgver = 1.0.0.r20261104.9c25efa
+	pkgver = 1.1.0.r20261128.cb7a50f
 	pkgrel = 1
 	url = https://github.com/pnam-it309/alpora
 	install = alpora.install
