@@ -197,3 +197,7 @@ WelcomeThemesTab 1.0 welcome/WelcomeThemesTab.qml
 WelcomeDoctorTab 1.0 welcome/WelcomeDoctorTab.qml
 TaskProcessesTab 1.0 taskmanager/TaskProcessesTab.qml
 TaskPerformanceTab 1.0 taskmanager/TaskPerformanceTab.qml
+
+# QuickSettings
+NotificationCenter 1.0 quicksettings/NotificationCenter.qml
+

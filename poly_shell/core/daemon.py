@@ -263,6 +263,18 @@ class PolyShellDaemon:
         except ImportError:
             pass
 
+        # Notification Center & History endpoints
+        try:
+            from .notification_history import NotificationHistory
+            from .state import Paths
+            self.notification_history = NotificationHistory(
+                storage_path=Paths.current().state / "notification-history.json",
+                ipc_server=self.ipc_server,
+            )
+            self.notification_history.register_ipc_handlers(self.ipc_server)
+        except Exception as exc:
+            logger.debug("NotificationHistory initialization skipped: %s", exc)
+
     def start(self) -> None:
         """Start all services, IPC server, and compositor event watcher."""
         if self._running:
