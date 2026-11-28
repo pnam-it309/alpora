@@ -1036,5 +1036,21 @@
   "arcade.score": "Счёт",
   "arcade.high_score": "Рекорд",
   "arcade.throw_ball": "Перетащите или нажмите, чтобы бросить мяч питомцу",
-  "arcade.exit_hint": "Нажмите Esc или Super+G для выхода"
+  "arcade.exit_hint": "Нажмите Esc или Super+G для выхода",
+  "arcade.game_catch": "Поймай мяч",
+  "arcade.game_fishing": "Рыбалка на рабочем столе",
+  "arcade.blitz_mode": "Режим Блиц (60с)",
+  "arcade.blitz_time": "Время: {time}с",
+  "arcade.blitz_over": "Время вышло!",
+  "arcade.fishing_cast_hint": "Нажмите на воду, чтобы забросить удочку",
+  "arcade.fishing_wait_hint": "Следим за поплавком... ждем поклевку",
+  "arcade.fishing_bite_hint": "Клюет! Подсекай!",
+  "arcade.fishing_reel_hint": "Удерживайте, чтобы держать натяжение в зеленой зоне!",
+  "arcade.fishing_caught": "Пойман {name}!",
+  "arcade.fish_ro": "Анабас",
+  "arcade.fish_chep": "Сазан",
+  "arcade.fish_hoi": "Радужная форель",
+  "arcade.fish_than_thoai": "Мифическая рыба-дракон",
+  "arcade.fish_specs": "{weight} кг · {length} см",
+  "arcade.fish_again": "Нажмите, чтобы забросить снова"
 }

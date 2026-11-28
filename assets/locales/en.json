@@ -1036,5 +1036,21 @@
   "arcade.score": "Score",
   "arcade.high_score": "Best",
   "arcade.throw_ball": "Drag or click to toss the ball for Companion",
-  "arcade.exit_hint": "Press Esc or Super+G to exit"
+  "arcade.exit_hint": "Press Esc or Super+G to exit",
+  "arcade.game_catch": "Pet Catch",
+  "arcade.game_fishing": "Desktop Fishing",
+  "arcade.blitz_mode": "Blitz (60s)",
+  "arcade.blitz_time": "Time: {time}s",
+  "arcade.blitz_over": "Time's Up!",
+  "arcade.fishing_cast_hint": "Click in the pond to cast your line",
+  "arcade.fishing_wait_hint": "Watching the water... wait for a bite",
+  "arcade.fishing_bite_hint": "Bite! Strike now!",
+  "arcade.fishing_reel_hint": "Hold / click to keep tension in the green zone!",
+  "arcade.fishing_caught": "Caught {name}!",
+  "arcade.fish_ro": "Climbing Perch",
+  "arcade.fish_chep": "Common Carp",
+  "arcade.fish_hoi": "Rainbow Salmon",
+  "arcade.fish_than_thoai": "Mythic Dragonfish",
+  "arcade.fish_specs": "{weight} kg · {length} cm",
+  "arcade.fish_again": "Click anywhere to cast again"
 }

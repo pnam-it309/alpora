@@ -161,6 +161,9 @@ DesktopNotificationTicker 1.0 widgets/DesktopNotificationTicker.qml
 DesktopRunningApps 1.0 widgets/DesktopRunningApps.qml
 DesktopWeather 1.0 widgets/DesktopWeather.qml
 ArcadeOverlay 1.0 widgets/ArcadeOverlay.qml
+ArcadeCatchGame 1.0 widgets/ArcadeCatchGame.qml
+ArcadeFishingGame 1.0 widgets/ArcadeFishingGame.qml
+FishingPondView 1.0 widgets/FishingPondView.qml
 DesktopWidgetCard 1.0 widgets/DesktopWidgetCard.qml
 DesktopWidgets 1.0 widgets/DesktopWidgets.qml
 LivingLandscape 1.0 widgets/LivingLandscape.qml

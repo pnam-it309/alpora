@@ -8,14 +8,19 @@ from typing import Any
 
 from ..core.state import ConfigError, Paths
 
-DEFAULT_ARCADE_STATE: dict[str, Any] = {
-    "version": 1,
-    "high_scores": {
-        "catch": 0,
-    },
-    "sound_fx": True,
-    "last_game": "catch",
-}
+def _default_arcade_state() -> dict[str, Any]:
+    return {
+        "version": 1,
+        "high_scores": {
+            "catch": 0,
+            "fishing": 0,
+        },
+        "sound_fx": True,
+        "last_game": "catch",
+    }
+
+
+DEFAULT_ARCADE_STATE: dict[str, Any] = _default_arcade_state()
 
 
 def _arcade_path(paths: Paths) -> Path:
@@ -28,20 +33,24 @@ def get_arcade_data(paths: Paths) -> dict[str, Any]:
     """Read and validate the arcade scores and preferences."""
     path = _arcade_path(paths)
     if not path.is_file():
-        return dict(DEFAULT_ARCADE_STATE)
+        return _default_arcade_state()
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
         if not isinstance(data, dict):
-            return dict(DEFAULT_ARCADE_STATE)
+            return _default_arcade_state()
         if "high_scores" not in data or not isinstance(data["high_scores"], dict):
-            data["high_scores"] = dict(DEFAULT_ARCADE_STATE["high_scores"])
+            data["high_scores"] = dict(_default_arcade_state()["high_scores"])
+        else:
+            for k, v in _default_arcade_state()["high_scores"].items():
+                if k not in data["high_scores"]:
+                    data["high_scores"][k] = v
         if "sound_fx" not in data:
             data["sound_fx"] = True
         if "last_game" not in data:
             data["last_game"] = "catch"
         return data
     except (json.JSONDecodeError, OSError):
-        return dict(DEFAULT_ARCADE_STATE)
+        return _default_arcade_state()
 
 
 def save_arcade_data(paths: Paths, data: dict[str, Any]) -> None:

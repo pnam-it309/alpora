@@ -1036,5 +1036,21 @@
   "arcade.score": "Điểm",
   "arcade.high_score": "Kỷ lục",
   "arcade.throw_ball": "Kéo hoặc nhấp để ném bóng cho Companion bắt",
-  "arcade.exit_hint": "Nhấn Esc hoặc Super+G để thoát"
+  "arcade.exit_hint": "Nhấn Esc hoặc Super+G để thoát",
+  "arcade.game_catch": "Bắt bóng Pet",
+  "arcade.game_fishing": "Câu cá Thư giãn",
+  "arcade.blitz_mode": "Chế độ Blitz (60s)",
+  "arcade.blitz_time": "Thời gian: {time}s",
+  "arcade.blitz_over": "Hết giờ!",
+  "arcade.fishing_cast_hint": "Nhấp vào mặt hồ để quăng cần câu",
+  "arcade.fishing_wait_hint": "Đang thả câu... chờ cá cắn mồi",
+  "arcade.fishing_bite_hint": "Cắn câu rồi! Giật cần ngay!",
+  "arcade.fishing_reel_hint": "Nhấp / giữ để giữ độ căng trong vùng xanh lá!",
+  "arcade.fishing_caught": "Bắt được {name}!",
+  "arcade.fish_ro": "Cá rô đồng",
+  "arcade.fish_chep": "Cá chép",
+  "arcade.fish_hoi": "Cá hồi vân",
+  "arcade.fish_than_thoai": "Cá rồng Thần thoại",
+  "arcade.fish_specs": "{weight} kg · {length} cm",
+  "arcade.fish_again": "Nhấp để tiếp tục câu"
 }

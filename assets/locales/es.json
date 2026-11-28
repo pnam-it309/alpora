@@ -1036,5 +1036,21 @@
   "arcade.score": "Puntuación",
   "arcade.high_score": "Récord",
   "arcade.throw_ball": "Arrastra o haz clic para lanzar la pelota a Companion",
-  "arcade.exit_hint": "Presiona Esc o Super+G para salir"
+  "arcade.exit_hint": "Presiona Esc o Super+G para salir",
+  "arcade.game_catch": "Atrapa Mascota",
+  "arcade.game_fishing": "Pesca de Escritorio",
+  "arcade.blitz_mode": "Modo Blitz (60s)",
+  "arcade.blitz_time": "Tiempo: {time}s",
+  "arcade.blitz_over": "¡Tiempo agotado!",
+  "arcade.fishing_cast_hint": "Haz clic en el estanque para lanzar el anzuelo",
+  "arcade.fishing_wait_hint": "Observando el agua... esperando que piquen",
+  "arcade.fishing_bite_hint": "¡Picó! ¡Tira de la caña!",
+  "arcade.fishing_reel_hint": "¡Mantén presionado para mantener la tensión en la zona verde!",
+  "arcade.fishing_caught": "¡Pescaste {name}!",
+  "arcade.fish_ro": "Pez trepador",
+  "arcade.fish_chep": "Carpa común",
+  "arcade.fish_hoi": "Salmón arcoíris",
+  "arcade.fish_than_thoai": "Pez dragón mítico",
+  "arcade.fish_specs": "{weight} kg · {length} cm",
+  "arcade.fish_again": "Haz clic para volver a pescar"
 }

@@ -24,6 +24,8 @@ class ArcadeServiceTests(unittest.TestCase):
         self.assertEqual(data["version"], 1)
         self.assertIn("catch", data["high_scores"])
         self.assertEqual(data["high_scores"]["catch"], 0)
+        self.assertIn("fishing", data["high_scores"])
+        self.assertEqual(data["high_scores"]["fishing"], 0)
         self.assertTrue(data["sound_fx"])
 
     def test_record_new_high_score(self):
@@ -44,12 +46,23 @@ class ArcadeServiceTests(unittest.TestCase):
         data = get_arcade_data(self.paths)
         self.assertEqual(data["high_scores"]["catch"], 500)
 
+    def test_record_fishing_score(self):
+        is_new, high = record_score(self.paths, "fishing", 1450)
+        self.assertTrue(is_new)
+        self.assertEqual(high, 1450)
+
+        data = get_arcade_data(self.paths)
+        self.assertEqual(data["high_scores"]["fishing"], 1450)
+        self.assertEqual(data["last_game"], "fishing")
+
     def test_reset_scores(self):
         record_score(self.paths, "catch", 400)
+        record_score(self.paths, "fishing", 650)
         record_score(self.paths, "retro", 250)
         reset_scores(self.paths)
         data = get_arcade_data(self.paths)
         self.assertEqual(data["high_scores"]["catch"], 0)
+        self.assertEqual(data["high_scores"]["fishing"], 0)
         self.assertEqual(data["high_scores"]["retro"], 0)
 
     def test_corrupt_file_recovery(self):
@@ -59,6 +72,26 @@ class ArcadeServiceTests(unittest.TestCase):
         data = get_arcade_data(self.paths)
         self.assertEqual(data["version"], 1)
         self.assertEqual(data["high_scores"]["catch"], 0)
+        self.assertEqual(data["high_scores"]["fishing"], 0)
+
+    def test_cli_handle_arcade_play_and_record(self):
+        from unittest.mock import patch
+        from types import SimpleNamespace
+        from poly_shell.commands.arcade_cmd import handle_arcade
+
+        # CLI play fishing
+        with patch("poly_shell.commands.arcade_cmd.call_shell_ipc", return_value=True) as mock_ipc:
+            args = SimpleNamespace(action="play", game="fishing", score=0)
+            ret = handle_arcade(self.paths, args)
+            self.assertEqual(ret, 0)
+            mock_ipc.assert_called_once_with("openArcade", "fishing")
+
+        # CLI record fishing score
+        args_record = SimpleNamespace(action="record", game="fishing", score=850)
+        ret_record = handle_arcade(self.paths, args_record)
+        self.assertEqual(ret_record, 0)
+        data = get_arcade_data(self.paths)
+        self.assertEqual(data["high_scores"]["fishing"], 850)
 
 
 if __name__ == "__main__":
