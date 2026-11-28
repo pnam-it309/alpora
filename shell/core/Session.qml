@@ -32,7 +32,7 @@ Singleton {
     readonly property int motionMs: settings.reducedMotion ? 0 : (profile.motionMs || 0)
     readonly property string controller: Quickshell.env("POLY_SHELL_CTL") || "poly-shell"
     readonly property string runtimeDir: Quickshell.env("XDG_RUNTIME_DIR") ? (Quickshell.env("XDG_RUNTIME_DIR") + "/poly-shell") : (Quickshell.env("HOME") + "/.local/state/poly-shell")
-    readonly property string socketPath: Quickshell.env("POLY_SHELL_SOCKET") || (runtimeDir + "/ipc.sock")
+    readonly property string socketPath: Quickshell.env("POLY_SHELL_SOCKET") || Quickshell.env("POLY_SHELL_SOCK") || (runtimeDir + "/ipc.sock")
     readonly property bool switching: modeWriter.running
 
     FontLoader {

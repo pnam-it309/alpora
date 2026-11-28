@@ -22,7 +22,8 @@ DesktopWidgetCard {
     property string forceProcessKey: ""
     property string requestedSignal: ""
     property bool terminationGraceElapsed: false
-    readonly property bool terminatorRunning: terminator.running
+    property bool socketTerminating: false
+    readonly property bool terminatorRunning: terminator.running || socketTerminating
     readonly property bool expanded: RunningAppsState.expanded
     readonly property var windows: clients.filter(client => client && client.address && client.mapped
         && !client.hidden && Number(client.pid) > 1
@@ -197,9 +198,43 @@ DesktopWidgetCard {
         }
         if (!clientReader.running) clientReader.running = true;
     }
+    function applySnapshot(data: var): void {
+        root.processes = (data && data.processes) ? data.processes : [];
+        root.errorText = "";
+        if (root.pendingProcessKey) {
+            const stillPresent = root.processes.some(p => root.processKey(p) === root.pendingProcessKey);
+            if (!stillPresent) {
+                root.pendingProcessKey = ""; root.forceProcessKey = "";
+                root.terminationGraceElapsed = false; terminationGrace.stop();
+            } else if (root.terminationGraceElapsed && !root.terminatorRunning) {
+                root.forceProcessKey = root.pendingProcessKey; root.pendingProcessKey = "";
+                root.terminationGraceElapsed = false; terminationGrace.stop();
+            }
+        }
+    }
+    function handleSignalResult(failed: bool): void {
+        if (failed) {
+            root.pendingProcessKey = ""; root.forceProcessKey = "";
+            terminationGrace.stop(); root.errorText = root.tr("endError"); root.refreshDelay.restart();
+        } else if (root.requestedSignal === "TERM") {
+            root.terminationGraceElapsed = false;
+            terminationGrace.restart();
+            root.refreshDelay.restart();
+        } else {
+            root.pendingProcessKey = ""; root.forceProcessKey = "";
+            terminationGrace.stop(); root.refreshDelay.restart();
+        }
+    }
     function refreshProcesses(): void {
-        if (processReader.running) return;
         const refs = windows.map(w => ({pid: Number(w.pid), appClass: appIdentity(w), appName: appName(w)}));
+        if (IpcClient.socketConnected) {
+            IpcClient.request("apps.snapshot", { windows: refs }, (res, err) => {
+                if (err || !res) { root.errorText = root.tr("readError"); return; }
+                root.applySnapshot(res);
+            });
+            return;
+        }
+        if (processReader.running) return;
         processReader.command = [Session.controller, "running-apps", "snapshot", JSON.stringify(refs)];
         processReader.running = true;
     }
@@ -212,7 +247,7 @@ DesktopWidgetCard {
         refreshDelay.restart();
     }
     function requestSignal(proc: var, force: bool): void {
-        if (!proc || !proc.canSignal || terminator.running) return;
+        if (!proc || !proc.canSignal || root.terminatorRunning) return;
         const key = processKey(proc);
         if (force && key !== forceProcessKey) return;
         pendingProcessKey = key;
@@ -220,6 +255,14 @@ DesktopWidgetCard {
         terminationGraceElapsed = false;
         errorText = "";
         requestedSignal = force ? "KILL" : "TERM";
+        if (IpcClient.socketConnected) {
+            socketTerminating = true;
+            IpcClient.request("apps.signal", { pid: proc.pid, start_ticks: proc.startTicks, sig: requestedSignal }, (res, err) => {
+                socketTerminating = false;
+                root.handleSignalResult(!!err);
+            });
+            return;
+        }
         terminator.command = [Session.controller, "running-apps",
             "signal", String(proc.pid), String(proc.startTicks), requestedSignal];
         terminator.running = true;
@@ -268,18 +311,7 @@ DesktopWidgetCard {
                 try {
                     const data = JSON.parse(text);
                     if (!data.ok) throw new Error(data.error || "snapshot failed");
-                    root.processes = data.processes || [];
-                    root.errorText = "";
-                    if (root.pendingProcessKey) {
-                        const stillPresent = root.processes.some(p => root.processKey(p) === root.pendingProcessKey);
-                        if (!stillPresent) {
-                            root.pendingProcessKey = ""; root.forceProcessKey = "";
-                            root.terminationGraceElapsed = false; terminationGrace.stop();
-                        } else if (root.terminationGraceElapsed && !terminator.running) {
-                            root.forceProcessKey = root.pendingProcessKey; root.pendingProcessKey = "";
-                            root.terminationGraceElapsed = false; terminationGrace.stop();
-                        }
-                    }
+                    root.applySnapshot(data);
                 } catch (_) { root.errorText = root.tr("readError"); }
             }
         }
@@ -289,19 +321,7 @@ DesktopWidgetCard {
         id: terminator
         command: []
         stderr: StdioCollector { onStreamFinished: if (text.trim()) root.errorText = text.trim() }
-        onExited: (exitCode, exitStatus) => {
-            if (exitCode !== 0 || exitStatus !== 0) {
-                root.pendingProcessKey = ""; root.forceProcessKey = "";
-                terminationGrace.stop(); root.errorText = root.tr("endError"); root.refreshDelay.restart();
-            } else if (root.requestedSignal === "TERM") {
-                root.terminationGraceElapsed = false;
-                terminationGrace.restart();
-                root.refreshDelay.restart();
-            } else {
-                root.pendingProcessKey = ""; root.forceProcessKey = "";
-                terminationGrace.stop(); root.refreshDelay.restart();
-            }
-        }
+        onExited: (exitCode, exitStatus) => root.handleSignalResult(exitCode !== 0 || exitStatus !== 0)
     }
     Component.onCompleted: refreshDebounce.start()
 
