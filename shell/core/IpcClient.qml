@@ -24,10 +24,67 @@ Singleton {
     property var pendingRequests: ({})
     property int nextReqId: 1
 
-    function request(action: string, params: var, callback: var): void {
+    function request(action: string, params: var, callback: var, originSubcommand: var, originAction: var): void {
         const cb = (typeof callback === "function") ? callback : null;
         if (!ipcSocket.connected) {
-            // Fallback via CLI ipc command
+            // Intelligent CLI fallback when socket is disconnected
+            const p = (params && typeof params === "object") ? params : {};
+            if (action === "apps.snapshot") {
+                send("running-apps", ["snapshot", JSON.stringify(p.windows || [])], cb);
+                return;
+            }
+            if (action === "apps.signal") {
+                send("running-apps", ["signal", String(p.pid || 0), String(p.start_ticks || 0), String(p.sig || "TERM")], cb);
+                return;
+            }
+            if (action === "widgets.weather") {
+                send("widgets", ["weather"], cb);
+                return;
+            }
+            if (action === "metrics.snapshot") {
+                send("widgets", ["metrics"], cb);
+                return;
+            }
+            if (action === "organizer.request") {
+                send("organizer", [p.action || "get", JSON.stringify(p.payload || {})], cb);
+                return;
+            }
+            if (action === "timeline.get") {
+                send("timeline", ["get"], cb);
+                return;
+            }
+            if (action === "timeline.set") {
+                send("timeline", ["set", JSON.stringify(p.payload || {})], cb);
+                return;
+            }
+            if (action === "desktop.control") {
+                const act = p.action || "status";
+                const valArgs = (p.value !== undefined && p.value !== null) ? [act, String(p.value)] : [act];
+                send("control", valArgs, cb);
+                return;
+            }
+            if (action === "desktop.status") {
+                send("control", ["status"], cb);
+                return;
+            }
+            if (action === "window.cascade") {
+                send("control", ["cascade"], cb);
+                return;
+            }
+            if (action === "window.float_toggle") {
+                send("control", ["float-toggle"], cb);
+                return;
+            }
+            if (action === "arcade.scores") {
+                send("arcade", ["scores"], cb);
+                return;
+            }
+            if (action === "arcade.record") {
+                send("arcade", ["record", String(p.game || ""), String(p.score || 0)], cb);
+                return;
+            }
+
+            // Fallback via CLI ipc command for generic endpoints
             const pStr = (params !== undefined && params !== null) ? (typeof params === "string" ? params : JSON.stringify(params)) : "{}";
             send("ipc", [action, pStr], cb);
             return;
@@ -36,6 +93,8 @@ Singleton {
         const reqId = root.nextReqId++;
         root.pendingRequests[reqId] = {
             action: action,
+            subcommand: originSubcommand || "socket",
+            subaction: originAction || action,
             callback: cb,
             timestamp: Date.now()
         };
@@ -66,35 +125,35 @@ Singleton {
                 if (cmdArgs.length > 1) {
                     try { parsedParams = JSON.parse(cmdArgs[1]); } catch (_) { parsedParams = cmdArgs[1]; }
                 }
-                request(cmdArgs[0], parsedParams, cb);
+                request(cmdArgs[0], parsedParams, cb, "ipc", cmdArgs[0]);
                 return;
             }
             if (subcommand === "widgets") {
                 if (cmdArgs[0] === "metrics") {
-                    request("metrics.snapshot", {}, cb);
+                    request("metrics.snapshot", {}, cb, "widgets", "metrics");
                     return;
                 }
                 if (cmdArgs[0] === "weather") {
-                    request("widgets.weather", {}, cb);
+                    request("widgets.weather", {}, cb, "widgets", "weather");
                     return;
                 }
             }
             if (subcommand === "arcade" && cmdArgs[0] === "scores") {
-                request("arcade.scores", {}, cb);
+                request("arcade.scores", {}, cb, "arcade", "scores");
                 return;
             }
             if (subcommand === "control") {
                 if (cmdArgs[0] === "cascade") {
-                    request("window.cascade", {}, cb);
+                    request("window.cascade", {}, cb, "control", "cascade");
                     return;
                 }
                 if (cmdArgs[0] === "float-toggle") {
-                    request("window.float_toggle", {}, cb);
+                    request("window.float_toggle", {}, cb, "control", "float-toggle");
                     return;
                 }
                 const act = cmdArgs.length > 0 ? cmdArgs[0] : "status";
                 const val = cmdArgs.length > 1 ? cmdArgs[1] : null;
-                request("desktop.control", { action: act, value: val }, cb);
+                request("desktop.control", { action: act, value: val }, cb, "control", act);
                 return;
             }
             if (subcommand === "organizer") {
@@ -103,13 +162,13 @@ Singleton {
                 if (cmdArgs.length > 1) {
                     try { payload = JSON.parse(cmdArgs[1]); } catch (_) { payload = cmdArgs[1]; }
                 }
-                request("organizer.request", { action: act, payload: payload }, cb);
+                request("organizer.request", { action: act, payload: payload }, cb, "organizer", act);
                 return;
             }
             if (subcommand === "timeline") {
                 const act = cmdArgs.length > 0 ? cmdArgs[0] : "get";
                 if (act === "get") {
-                    request("timeline.get", {}, cb);
+                    request("timeline.get", {}, cb, "timeline", "get");
                     return;
                 }
                 if (act === "set") {
@@ -117,7 +176,7 @@ Singleton {
                     if (cmdArgs.length > 1) {
                         try { payload = JSON.parse(cmdArgs[1]); } catch (_) { payload = cmdArgs[1]; }
                     }
-                    request("timeline.set", { payload: payload }, cb);
+                    request("timeline.set", { payload: payload }, cb, "timeline", "set");
                     return;
                 }
             }
@@ -163,6 +222,9 @@ Singleton {
             const msg = JSON.parse(trimmed);
             if (msg.event) {
                 root.eventReceived(msg.event, msg.data || {});
+                if (msg.domain && String(msg.domain).length > 0 && String(msg.event).indexOf(msg.domain + ".") !== 0) {
+                    root.eventReceived(msg.domain + "." + msg.event, msg.data || {});
+                }
                 return;
             }
             if (msg.id !== undefined && root.pendingRequests[msg.id]) {
@@ -179,7 +241,7 @@ Singleton {
                         console.error("IpcClient socket callback error:", String(cbErr));
                     }
                 }
-                root.actionCompleted("socket", req.action || "", success, result, errText);
+                root.actionCompleted(req.subcommand || "socket", req.subaction || req.action || "", success, result, errText);
             }
         } catch (err) {
             console.error("IpcClient socket parse error:", String(err));

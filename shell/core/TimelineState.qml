@@ -125,6 +125,22 @@ Singleton {
         watchChanges: true; printErrors: false
         onFileChanged: { reload(); root.refresh(); }
     }
+    Connections {
+        target: IpcClient
+        function onEventReceived(eventName, eventData): void {
+            if (eventName === "timeline.updated" || eventName === "timeline.changed" || eventName === "timeline") {
+                if (eventData && eventData.stops) {
+                    if (JSON.stringify(root.stops) !== JSON.stringify(eventData.stops)) root.stops = eventData.stops;
+                    root.savedMinute = eventData.minute;
+                    const follow = !root.loaded || (!root.dragging && !root.dirty && !root.busy);
+                    if (follow) root.minute = eventData.minute;
+                    root.loaded = true;
+                } else if (root.active) {
+                    root.refresh();
+                }
+            }
+        }
+    }
     Component.onCompleted: refresh()
     IpcHandler {
         target: "timeline"

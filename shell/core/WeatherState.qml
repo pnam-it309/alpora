@@ -51,6 +51,19 @@ Singleton {
         target: WidgetState
         function onValuesChanged(): void { if (root.active) root.refresh(); }
     }
+    Connections {
+        target: IpcClient
+        function onEventReceived(eventName, eventData): void {
+            if (eventName === "weather.updated" || eventName === "widgets.weather" || eventName === "weather") {
+                if (eventData && eventData.coordinates) {
+                    root.data = eventData;
+                    root.error = root.data.error || "";
+                } else if (root.active) {
+                    root.refresh();
+                }
+            }
+        }
+    }
     Timer { interval: root.error ? 60000 : 1800000; repeat: true; running: root.active; onTriggered: root.refresh() }
     Process {
         id: reader

@@ -117,10 +117,42 @@ class TestWatchdog(unittest.TestCase):
                     self.assertEqual(data["status"], "healthy")
                     self.assertTrue(data["ipc_socket"]["responsive"])
 
-                # Test run once
+                # Test run once when active
                 args = argparse.Namespace(action="run", interval=0.1, timeout=0.5, once=True)
                 code = handle_watchdog(fake_paths, args)
                 self.assertEqual(code, 0)
+            finally:
+                server.stop()
+
+            # Test run once when dead -> must return 1
+            args = argparse.Namespace(action="run", interval=0.1, timeout=0.5, once=True)
+            code = handle_watchdog(fake_paths, args)
+            self.assertEqual(code, 1)
+
+    def test_watchdog_env_socket_and_broadcast_stream_resilience(self):
+        """Verify watchdog respects POLY_SHELL_SOCK and handles concurrent broadcast streams."""
+        import os
+        import time
+        from unittest.mock import patch
+        from poly_shell.contracts.base import ShellEventEnvelope
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            custom_sock = temp_path / "custom.sock"
+            server = IPCServer(socket_path=custom_sock)
+            server.start()
+            try:
+                time.sleep(0.05)
+                # Set env var
+                with patch.dict(os.environ, {"POLY_SHELL_SOCK": str(custom_sock)}):
+                    res = _ping_ipc_socket(custom_sock)
+                    self.assertTrue(res["ok"])
+
+                    # Server broadcasts event
+                    server.broadcast(ShellEventEnvelope(domain="compositor", event="workspace", data={"id": 2}))
+                    # Ping must still succeed despite concurrent broadcast in stream
+                    res2 = _ping_ipc_socket(custom_sock)
+                    self.assertTrue(res2["ok"])
             finally:
                 server.stop()
 

@@ -160,10 +160,17 @@ def send_ipc_request(endpoint: str, action: str, params: dict | None = None) -> 
             sock.connect((host, int(port)))
         req = json.dumps({"id": "cli", "action": action, "params": params}) + "\n"
         sock.sendall(req.encode("utf-8"))
-        resp_line = sock.makefile("r").readline()
-        if not resp_line:
-            raise ConfigError("Empty response from Poly Shell IPC server")
-        return json.loads(resp_line)
+        stream = sock.makefile("r", encoding="utf-8")
+        while True:
+            resp_line = stream.readline()
+            if not resp_line:
+                raise ConfigError("Empty response from Poly Shell IPC server")
+            try:
+                data = json.loads(resp_line.strip())
+                if isinstance(data, dict) and ("id" in data or "success" in data):
+                    return data
+            except json.JSONDecodeError:
+                continue
     except OSError as exc:
         raise ConfigError(f"Cannot connect to Poly Shell daemon ({endpoint}): {exc}") from exc
     finally:

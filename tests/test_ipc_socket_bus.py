@@ -231,6 +231,90 @@ class TestDaemonSocketIntegration(unittest.TestCase):
         finally:
             sock.close()
 
+    def test_daemon_mutation_broadcasts(self):
+        """Verify mutating actions (timeline.set, organizer mutations) broadcast push events."""
+        listener = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        listener.settimeout(2.0)
+        listener.connect(str(self.socket_path))
+        listener_stream = listener.makefile("r", encoding="utf-8")
+        time.sleep(0.05)
+
+        caller = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        caller.settimeout(2.0)
+        caller.connect(str(self.socket_path))
+        caller_stream = caller.makefile("r", encoding="utf-8")
+
+        try:
+            # organizer.request note mutation
+            req = {"id": 50, "action": "organizer.request", "params": {"action": "note", "payload": {"text": "Broadcast test"}}}
+            caller.sendall((json.dumps(req) + "\n").encode("utf-8"))
+
+            # caller receives response matching id: 50 (ignoring any broadcast lines)
+            resp_caller = None
+            while True:
+                line = caller_stream.readline()
+                self.assertTrue(line, "Stream ended unexpectedly before response")
+                parsed = json.loads(line.strip())
+                if parsed.get("id") == 50:
+                    resp_caller = parsed
+                    break
+
+            self.assertIsNotNone(resp_caller)
+            self.assertTrue(resp_caller.get("success"))
+
+            # listener receives broadcast event
+            raw_listener = listener_stream.readline()
+            self.assertTrue(raw_listener, "Listener stream ended before broadcast")
+            msg_listener = json.loads(raw_listener.strip())
+            self.assertEqual(msg_listener.get("domain"), "organizer")
+            self.assertEqual(msg_listener.get("event"), "organizer.updated")
+            self.assertEqual(msg_listener.get("data", {}).get("note"), "Broadcast test")
+        finally:
+            listener.close()
+            caller.close()
+
+    def test_concurrent_heavy_traffic_integrity(self):
+        """Verify concurrent requests and push broadcasts do not corrupt JSON packet streams."""
+        import threading
+
+        errors = []
+        completed = []
+
+        def worker(worker_id):
+            sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            sock.settimeout(3.0)
+            try:
+                sock.connect(str(self.socket_path))
+                stream = sock.makefile("r", encoding="utf-8")
+                for i in range(5):
+                    req_id = worker_id * 100 + i
+                    payload = {"id": req_id, "action": "ping", "params": {}}
+                    sock.sendall((json.dumps(payload) + "\n").encode("utf-8"))
+                    # Broadcast concurrently from server
+                    self.daemon.ipc_server.broadcast(ShellEventEnvelope(domain="test", event="load", data={"id": req_id}))
+                    while True:
+                        line = stream.readline()
+                        if not line:
+                            errors.append(f"Worker {worker_id}: EOF before response")
+                            return
+                        data = json.loads(line.strip())
+                        if data.get("id") == req_id:
+                            break
+                completed.append(worker_id)
+            except Exception as e:
+                errors.append(f"Worker {worker_id}: {e}")
+            finally:
+                sock.close()
+
+        threads = [threading.Thread(target=worker, args=(w,)) for w in range(6)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join(timeout=5.0)
+
+        self.assertEqual(errors, [])
+        self.assertEqual(len(completed), 6)
+
 
 if __name__ == "__main__":
     unittest.main()

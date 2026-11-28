@@ -150,12 +150,8 @@ DesktopWidgetCard {
         const key = processKey(proc);
         return pendingProcessKey === key ? "…" : (forceProcessKey === key ? tr("forceKill") : tr("endApp"));
     }
-    function compactActionLabel(app: var): string {
-        return tr("closeWindow");
-    }
-    function compactActionText(app: var): string {
-        return "×";
-    }
+    function compactActionLabel(app: var): string { return tr("closeWindow"); }
+    function compactActionText(app: var): string { return "×"; }
     function compactActionEnabled(app: var): bool {
         if (!app || !app.windows || app.windows.length === 0) return false;
         // The preview represents the first window title, so its close action targets
@@ -276,6 +272,13 @@ DesktopWidgetCard {
         target: Hyprland
         function onRawEvent(event): void {
             if (/^(openwindow|closewindow|movewindow|activewindow|workspace|focusedmon|windowtitle|windowtitlev2|configreloaded)/.test(event.name))
+                refreshDebounce.restart();
+        }
+    }
+    Connections {
+        target: IpcClient
+        function onEventReceived(eventName, eventData): void {
+            if (/^(openwindow|closewindow|movewindow|activewindow|workspace|focusedmon|windowtitle|windowtitlev2|configreloaded|compositor)/.test(eventName))
                 refreshDebounce.restart();
         }
     }

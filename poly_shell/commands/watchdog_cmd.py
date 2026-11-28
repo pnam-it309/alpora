@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import signal
 import socket
+import subprocess
 import sys
 import time
 from typing import Any, Dict, Optional
@@ -29,10 +30,19 @@ def _ping_ipc_socket(socket_path: Path, timeout: float = 2.0) -> Dict[str, Any]:
         sock.connect(str(socket_path))
         payload = json.dumps({"id": 1, "action": "ping", "params": {}}) + "\n"
         sock.sendall(payload.encode("utf-8"))
-        raw = sock.recv(4096).decode("utf-8", errors="replace")
-        resp = json.loads(raw.strip())
-        return {"ok": bool(resp.get("success")), "data": resp.get("data", {})}
-    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        stream = sock.makefile("r", encoding="utf-8")
+        while True:
+            line = stream.readline()
+            if not line:
+                break
+            try:
+                resp = json.loads(line.strip())
+                if isinstance(resp, dict) and resp.get("id") == 1:
+                    return {"ok": bool(resp.get("success")), "data": resp.get("data", {})}
+            except json.JSONDecodeError:
+                continue
+        return {"ok": False, "error": "No valid ping response received"}
+    except (OSError, ValueError) as exc:
         return {"ok": False, "error": str(exc)}
     finally:
         try:
@@ -44,10 +54,14 @@ def _ping_ipc_socket(socket_path: Path, timeout: float = 2.0) -> Dict[str, Any]:
 def handle_watchdog(paths: Paths, args: argparse.Namespace) -> int:
     """Handle `poly-shell watchdog` CLI commands."""
     action = getattr(args, "action", "run") or "run"
-    runtime_dir = paths.runtime if hasattr(paths, "runtime") and paths.runtime else (
-        Path(os.environ.get("XDG_RUNTIME_DIR", "/tmp")) / "poly-shell"
-    )
-    socket_path = runtime_dir / "ipc.sock"
+    env_sock = os.environ.get("POLY_SHELL_SOCKET") or os.environ.get("POLY_SHELL_SOCK")
+    if env_sock:
+        socket_path = Path(env_sock)
+    else:
+        runtime_dir = paths.runtime if hasattr(paths, "runtime") and paths.runtime else (
+            Path(os.environ.get("XDG_RUNTIME_DIR", "/tmp")) / "poly-shell"
+        )
+        socket_path = runtime_dir / "ipc.sock"
 
     if action in ("check", "status"):
         metrics = ProcessMonitor.get_process_metrics()
@@ -105,18 +119,28 @@ def handle_watchdog(paths: Paths, args: argparse.Namespace) -> int:
         print(f"ALPORA Watchdog started (interval={interval}s, timeout={stall_timeout}s, socket={socket_path})")
 
         consecutive_stalls = 0
+        last_check_ok = False
         while running:
             res = _ping_ipc_socket(socket_path, timeout=min(2.0, interval))
-            if res.get("ok"):
+            last_check_ok = bool(res.get("ok"))
+            if last_check_ok:
                 watchdog.beat()
                 consecutive_stalls = 0
             else:
                 if watchdog.is_stalled():
                     consecutive_stalls += 1
                     logger.warning("ALPORA Shell watchdog detected stall (%d consecutive checks)", consecutive_stalls)
+                    if consecutive_stalls >= 3:
+                        logger.error("ALPORA Shell watchdog: shell is unresponsive; triggering recovery restart")
+                        try:
+                            subprocess.run(["systemctl", "--user", "restart", "alpora-shell.service"], check=False)
+                        except Exception as exc:
+                            logger.error("Failed to trigger recovery restart: %s", exc)
+                        consecutive_stalls = 0
+                        watchdog.beat()
 
             if once:
-                break
+                return 0 if last_check_ok else 1
 
             time.sleep(interval)
 

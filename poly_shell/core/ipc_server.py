@@ -28,6 +28,7 @@ class IPCServer:
         self._server_socket: Optional[socket.socket] = None
         self._clients: Set[socket.socket] = set()
         self._clients_lock = threading.Lock()
+        self._client_locks: Dict[socket.socket, threading.Lock] = {}
         self._handlers: Dict[str, Callable[[Dict[str, Any]], Any]] = {}
         self._running = False
         self._thread: Optional[threading.Thread] = None
@@ -65,7 +66,7 @@ class IPCServer:
                 try:
                     self.socket_path.unlink()
                 except OSError as exc:
-                    logger.warning("Failed to remove stale socket %s: %exc", self.socket_path, exc)
+                    logger.warning("Failed to remove stale socket %s: %s", self.socket_path, exc)
 
             self.socket_path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
             self._server_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
@@ -109,6 +110,7 @@ class IPCServer:
                 except OSError:
                     pass
             self._clients.clear()
+            self._client_locks.clear()
 
         if self._server_socket:
             try:
@@ -136,7 +138,13 @@ class IPCServer:
         sent_count = 0
         for client in active_clients:
             try:
-                client.sendall(payload)
+                with self._clients_lock:
+                    lock = self._client_locks.get(client)
+                if lock is not None:
+                    with lock:
+                        client.sendall(payload)
+                else:
+                    client.sendall(payload)
                 sent_count += 1
             except (BrokenPipeError, ConnectionResetError, OSError):
                 disconnections.append(client)
@@ -145,6 +153,7 @@ class IPCServer:
             with self._clients_lock:
                 for dead_sock in disconnections:
                     self._clients.discard(dead_sock)
+                    self._client_locks.pop(dead_sock, None)
                     try:
                         dead_sock.close()
                     except OSError:
@@ -162,6 +171,7 @@ class IPCServer:
                         logger.warning("Rejected IPC client: connection limit reached")
                         continue
                     self._clients.add(client_sock)
+                    self._client_locks[client_sock] = threading.Lock()
                 client_sock.settimeout(self.CLIENT_IO_TIMEOUT)
                 worker = threading.Thread(
                     target=self._handle_client,
@@ -198,7 +208,14 @@ class IPCServer:
                         continue
                     response = self._process_request(line)
                     if response is not None:
-                        client_sock.sendall((json.dumps(response) + "\n").encode("utf-8"))
+                        resp_bytes = (json.dumps(response) + "\n").encode("utf-8")
+                        with self._clients_lock:
+                            lock = self._client_locks.get(client_sock)
+                        if lock is not None:
+                            with lock:
+                                client_sock.sendall(resp_bytes)
+                        else:
+                            client_sock.sendall(resp_bytes)
                 if len(buffer.encode("utf-8")) > self.MAX_REQUEST_BYTES:
                     logger.warning("Rejected oversized IPC request")
                     return
@@ -207,6 +224,7 @@ class IPCServer:
         finally:
             with self._clients_lock:
                 self._clients.discard(client_sock)
+                self._client_locks.pop(client_sock, None)
             try:
                 client_sock.close()
             except OSError:

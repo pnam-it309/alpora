@@ -93,6 +93,22 @@ Singleton {
         }
     }
     Connections {
+        target: IpcClient
+        function onEventReceived(eventName, eventData): void {
+            if (eventName === "organizer.updated" || eventName === "organizer.changed" || eventName === "organizer") {
+                if (eventData && eventData.events) {
+                    root.data = eventData;
+                    root.now = Date.now() / 1000;
+                    root.loaded = true;
+                    root.error = "";
+                    root.checkReminders();
+                } else {
+                    root.request("get", {});
+                }
+            }
+        }
+    }
+    Connections {
         target: ClockState
         function onDateChanged(): void { root.checkReminders(); }
         function onResumed(): void {

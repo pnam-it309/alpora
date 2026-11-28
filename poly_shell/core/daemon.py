@@ -188,10 +188,15 @@ class PolyShellDaemon:
         try:
             from ..system.desktop import control as desktop_control, status as desktop_status
             from .state import Paths
-            self.ipc_server.register_handler(
-                "desktop.control",
-                lambda p: desktop_control(Paths.current(), str(p.get("action", "status")), p.get("value")),
-            )
+
+            def _handle_desktop_control(p: Dict[str, Any]) -> Any:
+                action = str(p.get("action", "status"))
+                res = desktop_control(Paths.current(), action, p.get("value"))
+                if action != "status":
+                    self.ipc_server.broadcast(ShellEventEnvelope(domain="desktop", event="desktop.updated", data=res if isinstance(res, dict) else {}))
+                return res
+
+            self.ipc_server.register_handler("desktop.control", _handle_desktop_control)
             self.ipc_server.register_handler(
                 "desktop.status",
                 lambda _p: desktop_status(Paths.current()),
@@ -214,10 +219,15 @@ class PolyShellDaemon:
         try:
             from ..services.organizer import organizer
             from .state import Paths
-            self.ipc_server.register_handler(
-                "organizer.request",
-                lambda p: organizer(Paths.current(), str(p.get("action", "get")), p.get("payload")),
-            )
+
+            def _handle_organizer_request(p: Dict[str, Any]) -> Any:
+                action = str(p.get("action", "get"))
+                res = organizer(Paths.current(), action, p.get("payload"))
+                if action != "get":
+                    self.ipc_server.broadcast(ShellEventEnvelope(domain="organizer", event="organizer.updated", data=res if isinstance(res, dict) else {}))
+                return res
+
+            self.ipc_server.register_handler("organizer.request", _handle_organizer_request)
         except ImportError:
             pass
 
@@ -225,25 +235,31 @@ class PolyShellDaemon:
         try:
             from ..theming.timeline import timeline_control
             from .state import Paths
+
+            def _handle_timeline_set(p: Dict[str, Any]) -> Any:
+                res = timeline_control(Paths.current(), "set", p.get("payload", {}))
+                self.ipc_server.broadcast(ShellEventEnvelope(domain="timeline", event="timeline.updated", data=res if isinstance(res, dict) else {}))
+                return res
+
             self.ipc_server.register_handler(
                 "timeline.get",
                 lambda _p: timeline_control(Paths.current(), "get", {}),
             )
-            self.ipc_server.register_handler(
-                "timeline.set",
-                lambda p: timeline_control(Paths.current(), "set", p.get("payload", {})),
-            )
+            self.ipc_server.register_handler("timeline.set", _handle_timeline_set)
         except ImportError:
             pass
 
         # Arcade high-scores
         try:
             from ..services.arcade_service import get_scores, record_score
+
+            def _handle_arcade_record(p: Dict[str, Any]) -> Any:
+                res = record_score(str(p.get("game", "")), int(p.get("score", 0)))
+                self.ipc_server.broadcast(ShellEventEnvelope(domain="arcade", event="arcade.updated", data=res if isinstance(res, dict) else {}))
+                return res
+
             self.ipc_server.register_handler("arcade.scores", lambda _p: get_scores())
-            self.ipc_server.register_handler(
-                "arcade.record",
-                lambda p: record_score(str(p.get("game", "")), int(p.get("score", 0))),
-            )
+            self.ipc_server.register_handler("arcade.record", _handle_arcade_record)
         except ImportError:
             pass
 
