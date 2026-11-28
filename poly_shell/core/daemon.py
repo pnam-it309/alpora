@@ -184,6 +184,58 @@ class PolyShellDaemon:
         except ImportError:
             pass
 
+        # Desktop Quick Settings controls & status (zero-fork adapter)
+        try:
+            from ..system.desktop import control as desktop_control, status as desktop_status
+            from .state import Paths
+            self.ipc_server.register_handler(
+                "desktop.control",
+                lambda p: desktop_control(Paths.current(), str(p.get("action", "status")), p.get("value")),
+            )
+            self.ipc_server.register_handler(
+                "desktop.status",
+                lambda _p: desktop_status(Paths.current()),
+            )
+        except ImportError:
+            pass
+
+        # Widgets Weather endpoint (zero-fork weather query)
+        try:
+            from ..system.widgets import weather as get_weather
+            from .state import Paths
+            self.ipc_server.register_handler(
+                "widgets.weather",
+                lambda _p: get_weather(Paths.current()),
+            )
+        except ImportError:
+            pass
+
+        # Organizer / Day planner endpoints (zero-fork calendar, tasks, notes)
+        try:
+            from ..services.organizer import organizer
+            from .state import Paths
+            self.ipc_server.register_handler(
+                "organizer.request",
+                lambda p: organizer(Paths.current(), str(p.get("action", "get")), p.get("payload")),
+            )
+        except ImportError:
+            pass
+
+        # Timeline endpoints (zero-fork theme timeline)
+        try:
+            from ..theming.timeline import timeline_control
+            from .state import Paths
+            self.ipc_server.register_handler(
+                "timeline.get",
+                lambda _p: timeline_control(Paths.current(), "get", {}),
+            )
+            self.ipc_server.register_handler(
+                "timeline.set",
+                lambda p: timeline_control(Paths.current(), "set", p.get("payload", {})),
+            )
+        except ImportError:
+            pass
+
         # Arcade high-scores
         try:
             from ..services.arcade_service import get_scores, record_score

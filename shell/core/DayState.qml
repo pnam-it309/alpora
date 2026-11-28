@@ -33,6 +33,21 @@ Singleton {
         }
     }
     function request(action: string, payload: var): void {
+        if (IpcClient.socketConnected) {
+            IpcClient.request("organizer.request", { action: action, payload: payload || {} }, (res, err) => {
+                if (err || !res) {
+                    root.error = err || I18n.tr("day.error_read");
+                } else {
+                    root.data = res;
+                    root.now = Date.now() / 1000;
+                    root.loaded = true;
+                    root.error = "";
+                    root.checkReminders();
+                    root.saved(action);
+                }
+            });
+            return;
+        }
         const task = [Session.controller, "organizer", action, JSON.stringify(payload || {})];
         if (action === "note") root.queue = root.queue.filter(item => item[2] !== "note");
         root.queue = root.queue.concat([task]);

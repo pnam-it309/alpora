@@ -1,0 +1,8 @@
+[Unit]
+Description=ALPORA Desktop Session Target
+BindsTo=graphical-session.target
+Wants=alpora-shell.service alpora-watchdog.service
+After=graphical-session.target
+
+[Install]
+WantedBy=graphical-session.target

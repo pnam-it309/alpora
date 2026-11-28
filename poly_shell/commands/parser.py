@@ -325,7 +325,20 @@ def build_parser(version: str) -> argparse.ArgumentParser:
         default="status",
         help="service action (status, start, stop, restart, logs, enable, disable)",
     )
+    service_parser.add_argument("-u", "--unit", default="poly-shell.service", help="systemd user unit to manage (default: poly-shell.service)")
     service_parser.add_argument("-n", "--lines", type=int, default=80, help="number of journal lines to display for logs")
     service_parser.add_argument("-f", "--follow", action="store_true", help="follow journal logs")
+
+    watchdog_parser = sub.add_parser("watchdog", help="ALPORA shell runtime watchdog and health monitor")
+    watchdog_parser.add_argument(
+        "action",
+        nargs="?",
+        default="run",
+        choices=("run", "check", "status", "metrics"),
+        help="watchdog action",
+    )
+    watchdog_parser.add_argument("--interval", type=float, default=5.0, help="heartbeat check interval in seconds")
+    watchdog_parser.add_argument("--timeout", type=float, default=15.0, help="heartbeat stall timeout in seconds")
+    watchdog_parser.add_argument("--once", action="store_true", help="run single check and exit")
 
     return parser

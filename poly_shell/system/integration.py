@@ -36,6 +36,68 @@ WantedBy=graphical-session.target
 '''
 
 
+def alpora_shell_unit_text(launcher):
+    escaped = str(launcher).replace("%", "%%").replace("\\", "\\\\").replace('"', '\\"')
+    return f'''[Unit]
+Description=ALPORA QuickShell Desktop UI
+PartOf=graphical-session.target
+After=graphical-session.target
+StartLimitIntervalSec=30
+StartLimitBurst=3
+
+[Service]
+Type=simple
+ExecStart="{escaped}" run
+Restart=on-failure
+RestartSec=2
+TimeoutStopSec=5
+KillMode=control-group
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=alpora-shell
+
+[Install]
+WantedBy=graphical-session.target
+'''
+
+
+def watchdog_unit_text(launcher):
+    escaped = str(launcher).replace("%", "%%").replace("\\", "\\\\").replace('"', '\\"')
+    return f'''[Unit]
+Description=ALPORA Desktop Shell Watchdog & Health Supervisor
+PartOf=graphical-session.target
+After=alpora-shell.service
+StartLimitIntervalSec=30
+StartLimitBurst=3
+
+[Service]
+Type=simple
+ExecStart="{escaped}" watchdog run
+Restart=on-failure
+RestartSec=2
+TimeoutStopSec=5
+KillMode=control-group
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=alpora-watchdog
+
+[Install]
+WantedBy=graphical-session.target
+'''
+
+
+def session_target_text():
+    return '''[Unit]
+Description=ALPORA Desktop Session Target
+BindsTo=graphical-session.target
+Wants=alpora-shell.service alpora-watchdog.service
+After=graphical-session.target
+
+[Install]
+WantedBy=graphical-session.target
+'''
+
+
 def install(paths):
     # Existing files with these names are never overwritten by the installer.
     links = {
@@ -50,6 +112,22 @@ def install(paths):
     text = unit_text(Path.home() / ".local/bin/poly-shell")
     if unit.exists() and unit.read_text(encoding="utf-8") != text:
         raise ConfigError(f"Existing service differs; inspect {unit} before replacing it")
+
+    alpora_unit = paths.config.parent / "systemd/user/alpora-shell.service"
+    alpora_text = alpora_shell_unit_text(Path.home() / ".local/bin/poly-shell")
+    if alpora_unit.exists() and alpora_unit.read_text(encoding="utf-8") != alpora_text:
+        raise ConfigError(f"Existing service differs; inspect {alpora_unit} before replacing it")
+
+    watchdog_unit = paths.config.parent / "systemd/user/alpora-watchdog.service"
+    watchdog_text = watchdog_unit_text(Path.home() / ".local/bin/poly-shell")
+    if watchdog_unit.exists() and watchdog_unit.read_text(encoding="utf-8") != watchdog_text:
+        raise ConfigError(f"Existing service differs; inspect {watchdog_unit} before replacing it")
+
+    target_unit = paths.config.parent / "systemd/user/alpora-session.target"
+    target_text = session_target_text()
+    if target_unit.exists() and target_unit.read_text(encoding="utf-8") != target_text:
+        raise ConfigError(f"Existing target differs; inspect {target_unit} before replacing it")
+
     # Validate every owned target before creating even the first command link.
     settings_desktop_plan()
     for target, source in links.items():
@@ -58,6 +136,9 @@ def install(paths):
             target.symlink_to(source, target_is_directory=source.is_dir())
     unit.parent.mkdir(parents=True, exist_ok=True)
     unit.write_text(text, encoding="utf-8")
+    alpora_unit.write_text(alpora_text, encoding="utf-8")
+    watchdog_unit.write_text(watchdog_text, encoding="utf-8")
+    target_unit.write_text(target_text, encoding="utf-8")
     install_settings_desktop()
     print(f"Installed user-local links and {unit}")
 

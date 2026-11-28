@@ -305,6 +305,7 @@ def main(argv=None):
         "running-apps": lambda: commands.handle_running_apps(args),
         "clipboard-serve": lambda: commands.handle_clipboard_serve(),
         "service": lambda: commands.handle_service(paths, args),
+        "watchdog": lambda: commands.handle_watchdog(paths, args),
     }
 
     try:

@@ -10,11 +10,26 @@ Singleton {
     property string error: ""
     property string requestedLocation: ""
     readonly property bool active: WidgetState.loaded && WidgetState.values.weather.enabled && Quickshell.screens.length > 0
-    readonly property bool busy: reader.running
+    property bool socketBusy: false
+    readonly property bool busy: reader.running || socketBusy
     readonly property var current: data.coordinates && data.coordinates[0] === WidgetState.values.location.latitude && data.coordinates[1] === WidgetState.values.location.longitude ? data.current || null : null
     function refresh(): void {
-        if (reader.running) return;
+        if (busy) return;
         requestedLocation = JSON.stringify(WidgetState.values.location);
+        if (IpcClient.socketConnected) {
+            socketBusy = true;
+            IpcClient.request("widgets.weather", {}, (res, err) => {
+                socketBusy = false;
+                if (err || !res) {
+                    root.error = err || I18n.tr("weather.error");
+                } else {
+                    root.data = res;
+                    root.error = root.data.error || "";
+                }
+            });
+            return;
+        }
+        if (reader.running) return;
         reader.running = true;
     }
     function label(code: int): string {

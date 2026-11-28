@@ -18,7 +18,8 @@ Singleton {
     readonly property var palette: active && loaded && Session.appearance.colorsFromWallpaper !== false ? TimelineMath.palette(shownMinute, stops) : null
     readonly property string formatted: TimelineMath.format(minute)
     readonly property bool dirty: minute % 1440 !== savedMinute
-    readonly property bool busy: writer.running
+    property bool socketWriting: false
+    readonly property bool busy: writer.running || socketWriting
     property string error: ""
     property var response: null
     property bool pending: false
@@ -29,7 +30,25 @@ Singleton {
         if (active && !presented && !takeover.running && Quickshell.screens.every(s => !!next[s.name])) takeover.running = true;
     }
     Behavior on shownMinute { NumberAnimation { duration: Motion.reduced || !root.loaded ? 0 : 110; easing.type: Easing.OutCubic } }
-    function refresh(): void { if (active && !reader.running) reader.running = true; }
+    function refresh(): void {
+        if (!active) return;
+        if (IpcClient.socketConnected) {
+            IpcClient.request("timeline.get", {}, (res, err) => {
+                if (!root.active) return;
+                if (err || !res) {
+                    root.error = I18n.tr("timeline.error_read");
+                    return;
+                }
+                const follow = !root.loaded || (!root.dragging && !root.dirty && !root.busy);
+                if (JSON.stringify(root.stops) !== JSON.stringify(res.stops)) root.stops = res.stops;
+                root.savedMinute = res.minute;
+                if (follow) root.minute = res.minute;
+                root.loaded = true;
+            });
+            return;
+        }
+        if (!reader.running) reader.running = true;
+    }
     function move(value: real): void {
         if (!active || !loaded) return;
         minute = Math.max(0, Math.min(1440, Math.round(value))); error = "";
@@ -39,8 +58,24 @@ Singleton {
     function commit(): void {
         saveDelay.stop();
         if (!active || !loaded || !dirty) return;
-        if (writer.running) { pending = true; return; }
+        if (root.busy) { pending = true; return; }
         response = null; error = ""; pending = false;
+        if (IpcClient.socketConnected) {
+            socketWriting = true;
+            IpcClient.request("timeline.set", { payload: { minute: minute } }, (res, err) => {
+                socketWriting = false;
+                if (err || !res) {
+                    root.error = I18n.tr("timeline.error_save");
+                } else if (res.saved) {
+                    root.savedMinute = res.minute;
+                }
+                if (root.pending && root.active) {
+                    root.pending = false;
+                    Qt.callLater(root.commit);
+                }
+            });
+            return;
+        }
         writer.command = [Session.controller, "timeline", "set", JSON.stringify({minute: minute})];
         writer.running = true;
     }

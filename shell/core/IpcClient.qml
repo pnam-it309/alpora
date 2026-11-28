@@ -69,21 +69,57 @@ Singleton {
                 request(cmdArgs[0], parsedParams, cb);
                 return;
             }
-            if (subcommand === "widgets" && cmdArgs[0] === "metrics") {
-                request("metrics.snapshot", {}, cb);
-                return;
+            if (subcommand === "widgets") {
+                if (cmdArgs[0] === "metrics") {
+                    request("metrics.snapshot", {}, cb);
+                    return;
+                }
+                if (cmdArgs[0] === "weather") {
+                    request("widgets.weather", {}, cb);
+                    return;
+                }
             }
             if (subcommand === "arcade" && cmdArgs[0] === "scores") {
                 request("arcade.scores", {}, cb);
                 return;
             }
-            if (subcommand === "control" && cmdArgs[0] === "cascade") {
-                request("window.cascade", {}, cb);
+            if (subcommand === "control") {
+                if (cmdArgs[0] === "cascade") {
+                    request("window.cascade", {}, cb);
+                    return;
+                }
+                if (cmdArgs[0] === "float-toggle") {
+                    request("window.float_toggle", {}, cb);
+                    return;
+                }
+                const act = cmdArgs.length > 0 ? cmdArgs[0] : "status";
+                const val = cmdArgs.length > 1 ? cmdArgs[1] : null;
+                request("desktop.control", { action: act, value: val }, cb);
                 return;
             }
-            if (subcommand === "control" && cmdArgs[0] === "float-toggle") {
-                request("window.float_toggle", {}, cb);
+            if (subcommand === "organizer") {
+                const act = cmdArgs.length > 0 ? cmdArgs[0] : "get";
+                let payload = {};
+                if (cmdArgs.length > 1) {
+                    try { payload = JSON.parse(cmdArgs[1]); } catch (_) { payload = cmdArgs[1]; }
+                }
+                request("organizer.request", { action: act, payload: payload }, cb);
                 return;
+            }
+            if (subcommand === "timeline") {
+                const act = cmdArgs.length > 0 ? cmdArgs[0] : "get";
+                if (act === "get") {
+                    request("timeline.get", {}, cb);
+                    return;
+                }
+                if (act === "set") {
+                    let payload = {};
+                    if (cmdArgs.length > 1) {
+                        try { payload = JSON.parse(cmdArgs[1]); } catch (_) { payload = cmdArgs[1]; }
+                    }
+                    request("timeline.set", { payload: payload }, cb);
+                    return;
+                }
             }
         }
 

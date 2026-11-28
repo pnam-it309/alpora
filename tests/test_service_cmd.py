@@ -10,7 +10,12 @@ from unittest.mock import MagicMock, patch
 from poly_shell.commands.parser import build_parser
 from poly_shell.commands.service_cmd import handle_service, SERVICE_UNIT, VALID_ACTIONS
 from poly_shell.core.state import Paths, ROOT
-from poly_shell.system.integration import unit_text
+from poly_shell.system.integration import (
+    unit_text,
+    alpora_shell_unit_text,
+    watchdog_unit_text,
+    session_target_text,
+)
 
 
 class ServiceCmdTests(unittest.TestCase):
@@ -111,13 +116,32 @@ class ServiceCmdTests(unittest.TestCase):
         self.assertIn("RestartSec=2", text)
         self.assertIn("StartLimitBurst=3", text)
 
+        alpora_text = alpora_shell_unit_text(Path("/usr/bin/poly-shell"))
+        self.assertIn("Restart=on-failure", alpora_text)
+        self.assertIn("RestartSec=2", alpora_text)
+        self.assertIn("StartLimitBurst=3", alpora_text)
+
+        watchdog_text = watchdog_unit_text(Path("/usr/bin/poly-shell"))
+        self.assertIn("Restart=on-failure", watchdog_text)
+        self.assertIn("RestartSec=2", watchdog_text)
+        self.assertIn("watchdog run", watchdog_text)
+
+        target_text = session_target_text()
+        self.assertIn("Wants=alpora-shell.service alpora-watchdog.service", target_text)
+
     def test_dotfiles_service_systemd_properties(self):
-        service_file = ROOT / "dotfiles/systemd/.config/systemd/user/poly-shell.service"
-        self.assertTrue(service_file.exists(), f"Missing {service_file}")
-        content = service_file.read_text(encoding="utf-8")
-        self.assertIn("Restart=on-failure", content)
-        self.assertIn("RestartSec=2", content)
-        self.assertIn("StartLimitBurst=3", content)
+        for filename in ("poly-shell.service", "alpora-shell.service", "alpora-watchdog.service"):
+            with self.subTest(file=filename):
+                service_file = ROOT / f"dotfiles/systemd/.config/systemd/user/{filename}"
+                self.assertTrue(service_file.exists(), f"Missing {service_file}")
+                content = service_file.read_text(encoding="utf-8")
+                self.assertIn("Restart=on-failure", content)
+                self.assertIn("RestartSec=2", content)
+                self.assertIn("StartLimitBurst=3", content)
+
+        target_file = ROOT / "dotfiles/systemd/.config/systemd/user/alpora-session.target"
+        self.assertTrue(target_file.exists(), f"Missing {target_file}")
+        self.assertIn("Wants=alpora-shell.service alpora-watchdog.service", target_file.read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

@@ -9,6 +9,7 @@ from .shortcuts_cmd import handle_shortcuts
 from .organizer_cmd import handle_organizer
 from .arcade_cmd import handle_arcade
 from .service_cmd import handle_service
+from .watchdog_cmd import handle_watchdog
 from .desktop_cmd import (
     handle_control,
     handle_wallpaper,
@@ -107,4 +108,5 @@ __all__ = [
     "handle_welcome",
     "open_welcome",
     "handle_service",
+    "handle_watchdog",
 ]

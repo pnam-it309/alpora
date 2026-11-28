@@ -171,6 +171,66 @@ class TestDaemonSocketIntegration(unittest.TestCase):
         finally:
             sock.close()
 
+    def test_daemon_desktop_control_and_status(self):
+        """Verify daemon routes desktop.control and desktop.status zero-fork RPCs."""
+        sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        sock.settimeout(2.0)
+        sock.connect(str(self.socket_path))
+
+        try:
+            req = {"id": 10, "action": "desktop.status", "params": {}}
+            sock.sendall((json.dumps(req) + "\n").encode("utf-8"))
+
+            raw = sock.recv(4096).decode("utf-8")
+            resp = json.loads(raw.strip())
+            self.assertEqual(resp.get("id"), 10)
+            self.assertTrue(resp.get("success"))
+            self.assertIn("brightness", resp.get("data", {}))
+
+            req2 = {"id": 11, "action": "desktop.control", "params": {"action": "status"}}
+            sock.sendall((json.dumps(req2) + "\n").encode("utf-8"))
+            raw2 = sock.recv(4096).decode("utf-8")
+            resp2 = json.loads(raw2.strip())
+            self.assertEqual(resp2.get("id"), 11)
+            self.assertTrue(resp2.get("success"))
+            self.assertIn("brightness", resp2.get("data", {}))
+        finally:
+            sock.close()
+
+    def test_daemon_widgets_organizer_and_timeline(self):
+        """Verify daemon routes widgets.weather, organizer.request, and timeline.get/set."""
+        sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        sock.settimeout(2.0)
+        sock.connect(str(self.socket_path))
+
+        try:
+            # organizer.request
+            req = {"id": 20, "action": "organizer.request", "params": {"action": "get", "payload": {}}}
+            sock.sendall((json.dumps(req) + "\n").encode("utf-8"))
+            raw = sock.recv(4096).decode("utf-8")
+            resp = json.loads(raw.strip())
+            self.assertEqual(resp.get("id"), 20)
+            self.assertTrue(resp.get("success"))
+            self.assertIn("events", resp.get("data", {}))
+
+            # timeline.get
+            req2 = {"id": 21, "action": "timeline.get", "params": {}}
+            sock.sendall((json.dumps(req2) + "\n").encode("utf-8"))
+            raw2 = sock.recv(4096).decode("utf-8")
+            resp2 = json.loads(raw2.strip())
+            self.assertEqual(resp2.get("id"), 21)
+            self.assertTrue(resp2.get("success"))
+
+            # widgets.weather
+            req3 = {"id": 22, "action": "widgets.weather", "params": {}}
+            sock.sendall((json.dumps(req3) + "\n").encode("utf-8"))
+            raw3 = sock.recv(4096).decode("utf-8")
+            resp3 = json.loads(raw3.strip())
+            self.assertEqual(resp3.get("id"), 22)
+            self.assertTrue(resp3.get("success"))
+        finally:
+            sock.close()
+
 
 if __name__ == "__main__":
     unittest.main()
