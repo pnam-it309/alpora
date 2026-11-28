@@ -317,4 +317,15 @@ def build_parser(version: str) -> argparse.ArgumentParser:
     arcade_parser.add_argument("game", nargs="?", default="catch", help="game identifier (e.g. catch)")
     arcade_parser.add_argument("score", type=int, nargs="?", default=0, help="score value to record")
 
+    service_parser = sub.add_parser("service", help="manage poly-shell systemd user service")
+    service_parser.add_argument(
+        "action",
+        choices=("status", "start", "stop", "restart", "logs", "enable", "disable"),
+        nargs="?",
+        default="status",
+        help="service action (status, start, stop, restart, logs, enable, disable)",
+    )
+    service_parser.add_argument("-n", "--lines", type=int, default=80, help="number of journal lines to display for logs")
+    service_parser.add_argument("-f", "--follow", action="store_true", help="follow journal logs")
+
     return parser

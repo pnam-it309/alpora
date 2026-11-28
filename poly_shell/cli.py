@@ -304,6 +304,7 @@ def main(argv=None):
         "arcade": lambda: commands.handle_arcade(paths, args),
         "running-apps": lambda: commands.handle_running_apps(args),
         "clipboard-serve": lambda: commands.handle_clipboard_serve(),
+        "service": lambda: commands.handle_service(paths, args),
     }
 
     try:

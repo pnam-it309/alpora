@@ -8,6 +8,7 @@ from .tasks_cmd import handle_tasks, handle_task_manager, open_task_manager
 from .shortcuts_cmd import handle_shortcuts
 from .organizer_cmd import handle_organizer
 from .arcade_cmd import handle_arcade
+from .service_cmd import handle_service
 from .desktop_cmd import (
     handle_control,
     handle_wallpaper,
@@ -105,4 +106,5 @@ __all__ = [
     "handle_display_project",
     "handle_welcome",
     "open_welcome",
+    "handle_service",
 ]

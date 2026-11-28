@@ -30,6 +30,9 @@ KillMode=control-group
 StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=poly-shell
+
+[Install]
+WantedBy=graphical-session.target
 '''
 
 
