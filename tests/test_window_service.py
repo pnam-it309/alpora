@@ -32,14 +32,17 @@ class WindowServiceTests(unittest.TestCase):
     def test_cascade_floating_windows(self, mock_hyprctl, mock_clients):
         mock_clients.return_value = [
             {"address": "0x1", "floating": True, "workspace": {"id": 1}},
-            {"address": "0x2", "floating": True, "workspace": {"id": 1}},
+            {"address": "0x2", "floating": True, "fullscreen": True, "workspace": {"id": 1}},
             {"address": "0x3", "floating": False, "workspace": {"id": 1}},
             {"address": "0x4", "floating": True, "workspace": {"id": 2}},
         ]
         count = cascade_floating_windows(workspace_id=1)
         self.assertEqual(count, 2)
-        # Verify resize and move commands were dispatched for both windows
-        self.assertGreaterEqual(mock_hyprctl.call_count, 4)
+        # Verify resize, move, and fullscreen unmapping calls
+        self.assertGreaterEqual(mock_hyprctl.call_count, 6)
+        calls = [c[0][0] for c in mock_hyprctl.call_args_list]
+        self.assertIn(["dispatch", "focuswindow", "address:0x2"], calls)
+        self.assertIn(["dispatch", "fullscreen", "0"], calls)
 
     @patch("poly_shell.services.window_service.get_active_window")
     @patch("poly_shell.services.window_service._run_hyprctl")

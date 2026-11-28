@@ -69,12 +69,13 @@ function evaluateMath(expr) {
     if (isExplicit) clean = clean.substring(1).trim();
     if (!clean) return "";
 
+    clean = clean.replace(/\bMath\./gi, "");
     clean = clean.replace(/\^/g, "**").replace(/\bpi\b/gi, "Math.PI").replace(/\be\b/gi, "Math.E");
     clean = clean.replace(/\b(sin|cos|tan|sqrt|pow|abs|round|floor|ceil|log|min|max)\b/gi, "Math.$1");
 
     const sanitized = clean.replace(/\bMath\.(sin|cos|tan|sqrt|pow|abs|round|floor|ceil|log|min|max|PI|E)\b/g, "");
-    if (!/^[0-9\s\+\-\*\/\%\.\(\)\,]+$/.test(sanitized)) return "";
-    if (!isExplicit && !/[\+\-\*\/\%]|Math\./.test(clean)) return "";
+    if (!/^[0-9\s\+\-\*\/\%\.\(\)\,]*$/.test(sanitized)) return "";
+    if (!isExplicit && !/[\+\-\*\/\%]|Math\.(sin|cos|tan|sqrt|pow|abs|round|floor|ceil|log|min|max)/.test(clean)) return "";
     if (!/[0-9]|Math\.(PI|E)/.test(clean)) return "";
 
     try {

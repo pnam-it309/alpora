@@ -39,12 +39,18 @@ class LauncherQueryTests(unittest.TestCase):
         self.assertEqual(_eval_js("evaluateMath", "= 42"), "42")
         self.assertEqual(_eval_js("evaluateMath", "= 5 * 10"), "50")
         self.assertEqual(_eval_js("evaluateMath", "= 100"), "100")
+        self.assertEqual(_eval_js("evaluateMath", "= pi"), "3.1416")
+        self.assertEqual(_eval_js("evaluateMath", "= e"), "2.7183")
+        self.assertEqual(_eval_js("evaluateMath", "= Math.PI"), "3.1416")
 
     def test_evaluate_math_functions_and_constants(self):
         self.assertEqual(_eval_js("evaluateMath", "sqrt(144)"), "12")
+        self.assertEqual(_eval_js("evaluateMath", "Math.sqrt(144)"), "12")
+        self.assertEqual(_eval_js("evaluateMath", "= Math.sqrt(16) + 4"), "8")
         self.assertEqual(_eval_js("evaluateMath", "= sqrt(16) + 4"), "8")
         self.assertEqual(_eval_js("evaluateMath", "2 ^ 8"), "256")
         self.assertEqual(_eval_js("evaluateMath", "abs(-50)"), "50")
+        self.assertEqual(_eval_js("evaluateMath", "= Math.abs(-50)"), "50")
         self.assertEqual(_eval_js("evaluateMath", "sin(0)"), "0")
         self.assertEqual(_eval_js("evaluateMath", "round(4.6)"), "5")
         self.assertEqual(_eval_js("evaluateMath", "floor(4.9)"), "4")
@@ -54,6 +60,8 @@ class LauncherQueryTests(unittest.TestCase):
     def test_evaluate_math_rejections_and_security(self):
         self.assertEqual(_eval_js("evaluateMath", ""), "")
         self.assertEqual(_eval_js("evaluateMath", "firefox"), "")
+        self.assertEqual(_eval_js("evaluateMath", "e"), "")
+        self.assertEqual(_eval_js("evaluateMath", "pi"), "")
         self.assertEqual(_eval_js("evaluateMath", "hello world"), "")
         self.assertEqual(_eval_js("evaluateMath", "2; process.exit()"), "")
         self.assertEqual(_eval_js("evaluateMath", "alert('xss')"), "")

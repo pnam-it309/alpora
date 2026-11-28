@@ -40,9 +40,9 @@
 - **Modularized Running Apps, Launcher & Video PiP**: Extracted `DesktopProcessRow.qml`, `LauncherInstantSection.qml`, and `VideoPipPlaybackBar.qml`, keeping all source files comfortably under the strict 500-line budget (`Launcher.qml` 453 lines, `VideoPipOverlay.qml` 428 lines).
 - **Strict QML Linting Passed**: Resolved `duplicate-property-binding` on `squashX`/`squashY` in `ArcadeCatchGame.qml` and connected `ArcadePhysics.js` directly for shared velocity and restitution calculations.
 - **Semantic Palette Compliance**: Replaced baked hex colors in `VideoPipOverlay.qml` with dynamic semantic palette tokens (`Session.background`).
-- **Hyprland Shortcut Collision Fixed**: Resolved keybinding conflict where `Super + M` mapped to both notifications and window minimize; allocated Windows-standard `Super + D` / `Super + Shift + D` for minimize to special workspace while preserving `Super + M` for notifications.
-- **Hardened Omni-Search Calculator**: Fixed math evaluation regex in `LauncherQuery.js` to prevent code injection, added support for functions (`sqrt`, `sin`, `cos`, `abs`, `round`, `floor`, `ceil`) and power operator (`^`), verified with dedicated test suite in `tests/test_launcher_query.py`.
-- **Enhanced Float Cascade & Multi-Monitor**: Improved `window_service.py` with cascade cycle wrapping for workspaces with many windows, automatic fullscreen unmapping, and expanded unit tests (444 tests passing).
+- **Hyprland Shortcut Collision Fixed**: Resolved keybinding conflict where `Super + M` and `Super + Shift + M` mapped to both notifications and window minimize; allocated Windows-standard `Super + D` / `Super + Shift + D` for minimize to special workspace while dedicating `Super + M` cleanly to notifications.
+- **Hardened Omni-Search Calculator**: Fixed math evaluation regex in `LauncherQuery.js` to normalize `Math.` calls, support constant evaluation (`= pi`, `= e`), functions (`sqrt`, `sin`, `cos`, `abs`, `round`, `floor`, `ceil`) and power operator (`^`), verified with dedicated test suite in `tests/test_launcher_query.py`.
+- **Enhanced Float Cascade & Multi-Monitor**: Improved `window_service.py` with cascade cycle wrapping for workspaces with many windows, precise Hyprland fullscreen unmapping via targeted window focus, and expanded unit tests across `window_service` and `ArcadePhysics.js` (448 tests passing).
 
 ## [v1.1.0] — 2026-11-28 — Feature & Architecture Release
 
