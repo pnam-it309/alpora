@@ -96,7 +96,7 @@ jobs:
           cat sha256sums.txt
 
       - name: 5. Upload ISO Artifact (14-day retention)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: alpora-os-live-iso
           path: |
