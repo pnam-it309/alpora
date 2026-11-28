@@ -63,7 +63,7 @@ jobs:
           chmod +x packaging/iso/*.sh packaging/iso/airootfs/root/*.sh || true
 
       - name: 2.5. Cache Arch Pacman Packages
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: /tmp/pacman-pkg-cache
           key: pacman-cache-${{ hashFiles('packaging/iso/packages.x86_64') }}
